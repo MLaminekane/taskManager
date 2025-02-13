@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-72:/values-zh/values-zh.xml",
+            "map": [
+                {
+                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/4b442b763e919d8c5122d07a65d49f4b/transformed/calendar-1.2.0/res/values-zh/values-zh.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7",
+                        "startColumns": "4,4,4,4,4,4",
+                        "startOffsets": "55,118,179,242,303,369",
+                        "endColumns": "62,60,62,60,65,64",
+                        "endOffsets": "113,174,237,298,364,429"
+                    }
+                }
+            ]
+        }
+    ]
+}

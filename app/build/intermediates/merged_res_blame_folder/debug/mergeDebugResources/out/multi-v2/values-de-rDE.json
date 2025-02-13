@@ -1,0 +1,53 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-72:/values-de-rDE/values-de-rDE.xml",
+            "map": [
+                {
+                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/e82b22133edee689cba0bc439917c156/transformed/core-1.2.0/res/values-de-rDE/values-de-rDE.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,100",
+                        "endColumns": "44,33",
+                        "endOffsets": "95,129"
+                    }
+                },
+                {
+                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/4b442b763e919d8c5122d07a65d49f4b/transformed/calendar-1.2.0/res/values-de-rDE/values-de-rDE.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7",
+                        "startColumns": "4,4,4,4,4,4",
+                        "startOffsets": "55,128,200,274,345,422",
+                        "endColumns": "72,71,73,70,76,74",
+                        "endOffsets": "123,195,269,340,417,492"
+                    },
+                    "to": {
+                        "startLines": "4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4",
+                        "startOffsets": "134,207,279,353,424,501",
+                        "endColumns": "72,71,73,70,76,74",
+                        "endOffsets": "202,274,348,419,496,571"
+                    }
+                },
+                {
+                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/2460ef94b926b588bb20eaa9c9671998/transformed/clock-1.2.0/res/values-de-rDE/values-de-rDE.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,126,238,314,391,450,529,590,680,751,844,923",
+                        "endColumns": "70,111,75,76,58,78,60,89,70,92,78,61",
+                        "endOffsets": "121,233,309,386,445,524,585,675,746,839,918,980"
+                    },
+                    "to": {
+                        "startLines": "10,11,12,13,14,15,16,17,18,19,20,21",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "576,647,759,835,912,971,1050,1111,1201,1272,1365,1444",
+                        "endColumns": "70,111,75,76,58,78,60,89,70,92,78,61",
+                        "endOffsets": "642,754,830,907,966,1045,1106,1196,1267,1360,1439,1501"
+                    }
+                }
+            ]
+        }
+    ]
+}

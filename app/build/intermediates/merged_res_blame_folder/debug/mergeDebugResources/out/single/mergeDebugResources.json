@@ -1,0 +1,90 @@
+[
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/mipmap-xxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/xml_data_extraction_rules.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/xml/data_extraction_rules.xml"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/mipmap-mdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/mipmap-xhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/mipmap-mdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/mipmap-xxxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/mipmap-xxxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/mipmap-anydpi_ic_launcher_round.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/mipmap-anydpi/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/drawable_ic_clock.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/drawable/ic_clock.xml"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/mipmap-hdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/drawable_car_project.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/drawable/car_project.xml"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/drawable_ic_location.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/drawable/ic_location.xml"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/mipmap-hdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/drawable_ic_calendar.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/drawable/ic_calendar.xml"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/mipmap-xhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/mipmap-anydpi_ic_launcher.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/mipmap-anydpi/ic_launcher.xml"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/xml_backup_rules.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/xml/backup_rules.xml"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/drawable_task_illustration.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/drawable/task_illustration.xml"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/drawable_design_project.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/drawable/design_project.xml"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/mipmap-xxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.mlk.taskmanager.app-debug-74:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-76:/drawable/ic_launcher_background.xml"
+    }
+]

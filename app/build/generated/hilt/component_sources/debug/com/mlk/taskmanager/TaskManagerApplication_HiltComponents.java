@@ -8,6 +8,7 @@ import com.mlk.taskmanager.ui.MainActivity_GeneratedInjector;
 import com.mlk.taskmanager.ui.calendar.CalendarViewModel_HiltModules;
 import com.mlk.taskmanager.ui.home.HomeViewModel_HiltModules;
 import com.mlk.taskmanager.ui.settings.SettingsViewModel_HiltModules;
+import com.mlk.taskmanager.ui.tasks.TaskDetailViewModel_HiltModules;
 import com.mlk.taskmanager.ui.tasks.TasksViewModel_HiltModules;
 import dagger.Binds;
 import dagger.Component;
@@ -168,6 +169,7 @@ public final class TaskManagerApplication_HiltComponents {
           HiltWrapper_SavedStateHandleModule.class,
           HomeViewModel_HiltModules.KeyModule.class,
           SettingsViewModel_HiltModules.KeyModule.class,
+          TaskDetailViewModel_HiltModules.KeyModule.class,
           ActivityCBuilderModule.class,
           ViewModelCBuilderModule.class,
           TasksViewModel_HiltModules.KeyModule.class
@@ -210,6 +212,7 @@ public final class TaskManagerApplication_HiltComponents {
           HiltWrapper_HiltViewModelFactory_ViewModelModule.class,
           HomeViewModel_HiltModules.BindsModule.class,
           SettingsViewModel_HiltModules.BindsModule.class,
+          TaskDetailViewModel_HiltModules.BindsModule.class,
           TasksViewModel_HiltModules.BindsModule.class
       }
   )

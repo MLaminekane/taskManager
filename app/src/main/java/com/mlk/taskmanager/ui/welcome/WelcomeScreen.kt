@@ -127,7 +127,7 @@ fun WelcomeScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "This productive tool is designed to help you better manage your task project-wise conveniently!",
+                    text = "Tp1 Informatique mobile developpe with Kotlin and Jetpack compose",
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = Color(0xFF666666)

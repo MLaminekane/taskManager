@@ -57,7 +57,7 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR ABORT INTO `tasks` (`id`,`title`,`description`,`dueDateTime`,`isCompleted`,`priority`,`latitude`,`longitude`,`locationRadius`,`reminderEnabled`,`categoryId`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?,?,?)";
+        return "INSERT OR REPLACE INTO `tasks` (`id`,`title`,`description`,`dueDateTime`,`isCompleted`,`priority`,`latitude`,`longitude`,`locationRadius`,`reminderEnabled`,`categoryId`,`category`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?,?,?,?)";
       }
 
       @Override
@@ -104,6 +104,11 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           statement.bindNull(11);
         } else {
           statement.bindLong(11, entity.getCategoryId());
+        }
+        if (entity.getCategory() == null) {
+          statement.bindNull(12);
+        } else {
+          statement.bindString(12, entity.getCategory());
         }
       }
     };
@@ -124,7 +129,7 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "UPDATE OR ABORT `tasks` SET `id` = ?,`title` = ?,`description` = ?,`dueDateTime` = ?,`isCompleted` = ?,`priority` = ?,`latitude` = ?,`longitude` = ?,`locationRadius` = ?,`reminderEnabled` = ?,`categoryId` = ? WHERE `id` = ?";
+        return "UPDATE OR ABORT `tasks` SET `id` = ?,`title` = ?,`description` = ?,`dueDateTime` = ?,`isCompleted` = ?,`priority` = ?,`latitude` = ?,`longitude` = ?,`locationRadius` = ?,`reminderEnabled` = ?,`categoryId` = ?,`category` = ? WHERE `id` = ?";
       }
 
       @Override
@@ -172,7 +177,12 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
         } else {
           statement.bindLong(11, entity.getCategoryId());
         }
-        statement.bindLong(12, entity.getId());
+        if (entity.getCategory() == null) {
+          statement.bindNull(12);
+        } else {
+          statement.bindString(12, entity.getCategory());
+        }
+        statement.bindLong(13, entity.getId());
       }
     };
     this.__preparedStmtOfDeleteCompletedTasks = new SharedSQLiteStatement(__db) {
@@ -283,6 +293,7 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           final int _cursorIndexOfLocationRadius = CursorUtil.getColumnIndexOrThrow(_cursor, "locationRadius");
           final int _cursorIndexOfReminderEnabled = CursorUtil.getColumnIndexOrThrow(_cursor, "reminderEnabled");
           final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
+          final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
           final List<Task> _result = new ArrayList<Task>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Task _item;
@@ -342,7 +353,13 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
             } else {
               _tmpCategoryId = _cursor.getLong(_cursorIndexOfCategoryId);
             }
-            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId);
+            final String _tmpCategory;
+            if (_cursor.isNull(_cursorIndexOfCategory)) {
+              _tmpCategory = null;
+            } else {
+              _tmpCategory = _cursor.getString(_cursorIndexOfCategory);
+            }
+            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory);
             _result.add(_item);
           }
           return _result;
@@ -379,6 +396,7 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           final int _cursorIndexOfLocationRadius = CursorUtil.getColumnIndexOrThrow(_cursor, "locationRadius");
           final int _cursorIndexOfReminderEnabled = CursorUtil.getColumnIndexOrThrow(_cursor, "reminderEnabled");
           final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
+          final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
           final List<Task> _result = new ArrayList<Task>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Task _item;
@@ -438,7 +456,13 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
             } else {
               _tmpCategoryId = _cursor.getLong(_cursorIndexOfCategoryId);
             }
-            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId);
+            final String _tmpCategory;
+            if (_cursor.isNull(_cursorIndexOfCategory)) {
+              _tmpCategory = null;
+            } else {
+              _tmpCategory = _cursor.getString(_cursorIndexOfCategory);
+            }
+            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory);
             _result.add(_item);
           }
           return _result;
@@ -478,6 +502,7 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           final int _cursorIndexOfLocationRadius = CursorUtil.getColumnIndexOrThrow(_cursor, "locationRadius");
           final int _cursorIndexOfReminderEnabled = CursorUtil.getColumnIndexOrThrow(_cursor, "reminderEnabled");
           final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
+          final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
           final Task _result;
           if (_cursor.moveToFirst()) {
             final long _tmpId;
@@ -536,7 +561,13 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
             } else {
               _tmpCategoryId = _cursor.getLong(_cursorIndexOfCategoryId);
             }
-            _result = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId);
+            final String _tmpCategory;
+            if (_cursor.isNull(_cursorIndexOfCategory)) {
+              _tmpCategory = null;
+            } else {
+              _tmpCategory = _cursor.getString(_cursorIndexOfCategory);
+            }
+            _result = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory);
           } else {
             _result = null;
           }
@@ -576,6 +607,7 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           final int _cursorIndexOfLocationRadius = CursorUtil.getColumnIndexOrThrow(_cursor, "locationRadius");
           final int _cursorIndexOfReminderEnabled = CursorUtil.getColumnIndexOrThrow(_cursor, "reminderEnabled");
           final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
+          final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
           final List<Task> _result = new ArrayList<Task>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Task _item;
@@ -635,7 +667,13 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
             } else {
               _tmpCategoryId = _cursor.getLong(_cursorIndexOfCategoryId);
             }
-            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId);
+            final String _tmpCategory;
+            if (_cursor.isNull(_cursorIndexOfCategory)) {
+              _tmpCategory = null;
+            } else {
+              _tmpCategory = _cursor.getString(_cursorIndexOfCategory);
+            }
+            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory);
             _result.add(_item);
           }
           return _result;
@@ -691,6 +729,7 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           final int _cursorIndexOfLocationRadius = CursorUtil.getColumnIndexOrThrow(_cursor, "locationRadius");
           final int _cursorIndexOfReminderEnabled = CursorUtil.getColumnIndexOrThrow(_cursor, "reminderEnabled");
           final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
+          final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
           final List<Task> _result = new ArrayList<Task>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Task _item;
@@ -750,7 +789,13 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
             } else {
               _tmpCategoryId = _cursor.getLong(_cursorIndexOfCategoryId);
             }
-            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId);
+            final String _tmpCategory;
+            if (_cursor.isNull(_cursorIndexOfCategory)) {
+              _tmpCategory = null;
+            } else {
+              _tmpCategory = _cursor.getString(_cursorIndexOfCategory);
+            }
+            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory);
             _result.add(_item);
           }
           return _result;
@@ -807,6 +852,7 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           final int _cursorIndexOfLocationRadius = CursorUtil.getColumnIndexOrThrow(_cursor, "locationRadius");
           final int _cursorIndexOfReminderEnabled = CursorUtil.getColumnIndexOrThrow(_cursor, "reminderEnabled");
           final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
+          final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
           final List<Task> _result = new ArrayList<Task>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Task _item;
@@ -866,7 +912,13 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
             } else {
               _tmpCategoryId = _cursor.getLong(_cursorIndexOfCategoryId);
             }
-            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId);
+            final String _tmpCategory;
+            if (_cursor.isNull(_cursorIndexOfCategory)) {
+              _tmpCategory = null;
+            } else {
+              _tmpCategory = _cursor.getString(_cursorIndexOfCategory);
+            }
+            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory);
             _result.add(_item);
           }
           return _result;

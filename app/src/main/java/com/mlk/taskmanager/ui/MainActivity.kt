@@ -59,7 +59,7 @@ fun TaskManagerApp() {
             unselectedIcon = Icons.Outlined.Folder,
             label = "Files"
         ),
-        null, // Center placeholder for FAB
+        null,
         NavigationItem(
             route = Screen.Calendar.route,
             selectedIcon = Icons.Filled.CalendarToday,
@@ -99,7 +99,6 @@ fun TaskManagerApp() {
                             val currentDestination = navBackStackEntry?.destination
                             items.forEach { item ->
                                 if (item == null) {
-                                    // Placeholder for FAB spacing
                                     Spacer(modifier = Modifier.width(24.dp))
                                 } else {
                                     val selected = currentDestination?.hierarchy?.any { it.route == item.route } == true

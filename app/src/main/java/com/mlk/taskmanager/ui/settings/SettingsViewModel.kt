@@ -17,7 +17,7 @@ data class SettingsUiState(
     val isVibrationEnabled: Boolean = true,
     val isLocationEnabled: Boolean = false,
     val defaultLocationRadius: Float = 100f,
-    val categories: List<String> = emptyList(),
+    val categories: List<String> = listOf("Work", "Personal", "Shopping", "Health", "Education"),
     val defaultReminderTime: LocalTime = LocalTime.of(9, 0)
 )
 
@@ -137,6 +137,22 @@ class SettingsViewModel @Inject constructor(
     fun setDefaultReminderTime(time: LocalTime) {
         viewModelScope.launch {
             settingsRepository.setDefaultReminderTime(time)
+        }
+    }
+
+    fun toggleDarkMode() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isDarkMode = !_uiState.value.isDarkMode
+            )
+        }
+    }
+
+    fun toggleNotifications() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                areNotificationsEnabled = !_uiState.value.areNotificationsEnabled
+            )
         }
     }
 }

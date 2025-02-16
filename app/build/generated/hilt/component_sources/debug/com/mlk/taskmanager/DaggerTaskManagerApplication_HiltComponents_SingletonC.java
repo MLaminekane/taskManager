@@ -24,6 +24,8 @@ import com.mlk.taskmanager.ui.home.HomeViewModel;
 import com.mlk.taskmanager.ui.home.HomeViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.mlk.taskmanager.ui.settings.SettingsViewModel;
 import com.mlk.taskmanager.ui.settings.SettingsViewModel_HiltModules_KeyModule_ProvideFactory;
+import com.mlk.taskmanager.ui.tasks.TaskDetailViewModel;
+import com.mlk.taskmanager.ui.tasks.TaskDetailViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.mlk.taskmanager.ui.tasks.TasksViewModel;
 import com.mlk.taskmanager.ui.tasks.TasksViewModel_HiltModules_KeyModule_ProvideFactory;
 import dagger.hilt.android.ActivityRetainedLifecycle;
@@ -383,7 +385,7 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
 
     @Override
     public Set<String> getViewModelKeys() {
-      return SetBuilder.<String>newSetBuilder(4).add(CalendarViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(HomeViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(SettingsViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(TasksViewModel_HiltModules_KeyModule_ProvideFactory.provide()).build();
+      return SetBuilder.<String>newSetBuilder(5).add(CalendarViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(HomeViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(SettingsViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(TaskDetailViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(TasksViewModel_HiltModules_KeyModule_ProvideFactory.provide()).build();
     }
 
     @Override
@@ -415,6 +417,8 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
 
     private Provider<SettingsViewModel> settingsViewModelProvider;
 
+    private Provider<TaskDetailViewModel> taskDetailViewModelProvider;
+
     private Provider<TasksViewModel> tasksViewModelProvider;
 
     private ViewModelCImpl(SingletonCImpl singletonCImpl,
@@ -433,12 +437,13 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
       this.calendarViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 0);
       this.homeViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 1);
       this.settingsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 2);
-      this.tasksViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 3);
+      this.taskDetailViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 3);
+      this.tasksViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 4);
     }
 
     @Override
     public Map<String, javax.inject.Provider<ViewModel>> getHiltViewModelMap() {
-      return MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(4).put("com.mlk.taskmanager.ui.calendar.CalendarViewModel", ((Provider) calendarViewModelProvider)).put("com.mlk.taskmanager.ui.home.HomeViewModel", ((Provider) homeViewModelProvider)).put("com.mlk.taskmanager.ui.settings.SettingsViewModel", ((Provider) settingsViewModelProvider)).put("com.mlk.taskmanager.ui.tasks.TasksViewModel", ((Provider) tasksViewModelProvider)).build();
+      return MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(5).put("com.mlk.taskmanager.ui.calendar.CalendarViewModel", ((Provider) calendarViewModelProvider)).put("com.mlk.taskmanager.ui.home.HomeViewModel", ((Provider) homeViewModelProvider)).put("com.mlk.taskmanager.ui.settings.SettingsViewModel", ((Provider) settingsViewModelProvider)).put("com.mlk.taskmanager.ui.tasks.TaskDetailViewModel", ((Provider) taskDetailViewModelProvider)).put("com.mlk.taskmanager.ui.tasks.TasksViewModel", ((Provider) tasksViewModelProvider)).build();
     }
 
     @Override
@@ -476,7 +481,10 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
           case 2: // com.mlk.taskmanager.ui.settings.SettingsViewModel 
           return (T) new SettingsViewModel(singletonCImpl.provideSettingsRepositoryProvider.get());
 
-          case 3: // com.mlk.taskmanager.ui.tasks.TasksViewModel 
+          case 3: // com.mlk.taskmanager.ui.tasks.TaskDetailViewModel 
+          return (T) new TaskDetailViewModel(singletonCImpl.provideTaskRepositoryProvider.get());
+
+          case 4: // com.mlk.taskmanager.ui.tasks.TasksViewModel 
           return (T) new TasksViewModel(singletonCImpl.provideTaskRepositoryProvider.get());
 
           default: throw new AssertionError(id);

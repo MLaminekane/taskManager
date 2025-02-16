@@ -34,7 +34,7 @@ public abstract interface TaskDao {
     java.time.LocalDateTime endDateTime, @org.jetbrains.annotations.NotNull()
     kotlin.coroutines.Continuation<? super java.util.List<com.mlk.taskmanager.data.model.Task>> $completion);
     
-    @androidx.room.Insert()
+    @androidx.room.Insert(onConflict = 1)
     @org.jetbrains.annotations.Nullable()
     public abstract java.lang.Object insertTask(@org.jetbrains.annotations.NotNull()
     com.mlk.taskmanager.data.model.Task task, @org.jetbrains.annotations.NotNull()

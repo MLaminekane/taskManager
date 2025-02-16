@@ -54,24 +54,39 @@ class TasksViewModel @Inject constructor(
         description: String,
         dueDateTime: LocalDateTime,
         priority: Priority,
+        category: String? = null,
         latitude: Double? = null,
         longitude: Double? = null,
         locationRadius: Float? = null
     ) {
         viewModelScope.launch {
             try {
+                println("DEBUG: Starting task creation process")
+                println("DEBUG: Creating task with title: $title, due date: $dueDateTime, category: $category")
+                
                 val task = Task(
                     title = title,
                     description = description,
                     dueDateTime = dueDateTime,
                     priority = priority,
+                    category = category,
                     latitude = latitude,
                     longitude = longitude,
                     locationRadius = locationRadius
                 )
-                taskRepository.insertTask(task)
+                
+                println("DEBUG: Task object created, inserting into database")
+                val taskId = taskRepository.insertTask(task)
+                println("DEBUG: Task inserted successfully with ID: $taskId")
+                
+                loadTasks()
+                println("DEBUG: Tasks reloaded after insertion")
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                println("DEBUG: Error creating task: ${e.message}")
+                e.printStackTrace()
+                _uiState.update { 
+                    it.copy(error = e.message ?: "Failed to create task") 
+                }
             }
         }
     }

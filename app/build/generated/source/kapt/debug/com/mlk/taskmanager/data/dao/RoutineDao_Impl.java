@@ -182,7 +182,7 @@ public final class RoutineDao_Impl implements RoutineDao {
   }
 
   @Override
-  public Object insertRoutine(final Routine routine, final Continuation<? super Long> $completion) {
+  public Object insertRoutine(final Routine routine, final Continuation<? super Long> arg1) {
     return CoroutinesRoom.execute(__db, true, new Callable<Long>() {
       @Override
       @NonNull
@@ -196,11 +196,11 @@ public final class RoutineDao_Impl implements RoutineDao {
           __db.endTransaction();
         }
       }
-    }, $completion);
+    }, arg1);
   }
 
   @Override
-  public Object deleteRoutine(final Routine routine, final Continuation<? super Unit> $completion) {
+  public Object deleteRoutine(final Routine routine, final Continuation<? super Unit> arg1) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -214,11 +214,11 @@ public final class RoutineDao_Impl implements RoutineDao {
           __db.endTransaction();
         }
       }
-    }, $completion);
+    }, arg1);
   }
 
   @Override
-  public Object updateRoutine(final Routine routine, final Continuation<? super Unit> $completion) {
+  public Object updateRoutine(final Routine routine, final Continuation<? super Unit> arg1) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -232,7 +232,7 @@ public final class RoutineDao_Impl implements RoutineDao {
           __db.endTransaction();
         }
       }
-    }, $completion);
+    }, arg1);
   }
 
   @Override
@@ -430,8 +430,7 @@ public final class RoutineDao_Impl implements RoutineDao {
   }
 
   @Override
-  public Object getRoutineById(final long routineId,
-      final Continuation<? super Routine> $completion) {
+  public Object getRoutineById(final long routineId, final Continuation<? super Routine> arg1) {
     final String _sql = "SELECT * FROM routines WHERE id = ?";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
     int _argIndex = 1;
@@ -523,7 +522,7 @@ public final class RoutineDao_Impl implements RoutineDao {
           _statement.release();
         }
       }
-    }, $completion);
+    }, arg1);
   }
 
   @Override

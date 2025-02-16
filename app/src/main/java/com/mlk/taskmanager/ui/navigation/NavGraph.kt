@@ -10,6 +10,7 @@ import com.mlk.taskmanager.ui.settings.SettingsScreen
 import com.mlk.taskmanager.ui.tasks.AddTaskScreen
 import com.mlk.taskmanager.ui.tasks.TasksScreen
 import com.mlk.taskmanager.ui.welcome.WelcomeScreen
+import com.mlk.taskmanager.ui.tasks.TaskDetailScreen
 
 sealed class Screen(val route: String) {
     object Welcome : Screen("welcome")
@@ -67,7 +68,7 @@ fun TaskManagerNavGraph(
         composable(Screen.TaskDetail.route) { backStackEntry ->
             val taskId = backStackEntry.arguments?.getString("taskId")?.toLongOrNull()
             if (taskId != null) {
-                // TaskDetailScreen(taskId, navController)
+                TaskDetailScreen(taskId, navController)
             }
         }
         

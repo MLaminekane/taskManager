@@ -8,6 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,21 +40,24 @@ import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import com.maxkeppeler.sheets.clock.ClockDialog
 import com.maxkeppeler.sheets.clock.models.ClockSelection
 import com.mlk.taskmanager.data.model.Priority
+import com.mlk.taskmanager.ui.settings.SettingsViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import androidx.compose.foundation.BorderStroke
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTaskScreen(
     navController: NavController,
-    viewModel: TasksViewModel = hiltViewModel()
+    viewModel: TasksViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
-    var title by remember { mutableStateOf("Mobile App Interface Optimization") }
-    var description by remember { mutableStateOf("Optimize the user interface for our mobile app, ensuring a seamless and delightful user experience. Consider incorporating user feedback and modern design trends to enhance usability and aesthetics.") }
-    var projectName by remember { mutableStateOf("App Enhancements") }
+    var title by remember { mutableStateOf("Task title") }
+    var description by remember { mutableStateOf("Description....") }
+    var projectName by remember { mutableStateOf("name...") }
     var selectedDate by remember { mutableStateOf(LocalDate.of(2025, 3, 15)) }
     var showDatePicker by remember { mutableStateOf(false) }
     var progress by remember { mutableStateOf(33) }
@@ -68,6 +73,8 @@ fun AddTaskScreen(
     var showAddUserDialog by remember { mutableStateOf(false) }
     var newUserName by remember { mutableStateOf("") }
     var assignedUsers by remember { mutableStateOf(listOf("Lamine Kane")) }
+    var selectedCategory by remember { mutableStateOf<String?>(null) }
+    var showCategoryDialog by remember { mutableStateOf(false) }
 
     val calendarState = rememberUseCaseState()
     val clockState = rememberUseCaseState()
@@ -85,6 +92,9 @@ fun AddTaskScreen(
             useLocation = true
         }
     }
+
+    val settingsState by settingsViewModel.uiState.collectAsState()
+    val categories = settingsState.categories
 
     if (showGroupDialog) {
         AlertDialog(
@@ -479,6 +489,44 @@ fun AddTaskScreen(
                 }
             }
 
+            // Category Selection
+            Text(
+                text = "Category",
+                style = MaterialTheme.typography.titleMedium
+            )
+            OutlinedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showCategoryDialog = true },
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = if (selectedCategory != null) 
+                        MaterialTheme.colorScheme.primary 
+                    else 
+                        MaterialTheme.colorScheme.outline
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = selectedCategory ?: "Select Category",
+                        color = if (selectedCategory != null) 
+                            MaterialTheme.colorScheme.onSurface 
+                        else 
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = "Select Category"
+                    )
+                }
+            }
+
             // Location Selection
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -593,6 +641,7 @@ fun AddTaskScreen(
                         description = description,
                         dueDateTime = LocalDateTime.of(selectedDate, selectedTime),
                         priority = priority,
+                        category = selectedCategory,
                         latitude = selectedLocation?.latitude,
                         longitude = selectedLocation?.longitude,
                         locationRadius = if (useLocation) locationRadius else null
@@ -635,4 +684,43 @@ fun AddTaskScreen(
             selectedTime = LocalTime.of(hours, minutes)
         }
     )
+
+    // Category selection dialog
+    if (showCategoryDialog) {
+        AlertDialog(
+            onDismissRequest = { showCategoryDialog = false },
+            title = { Text("Select Category") },
+            text = {
+                LazyColumn {
+                    items(categories) { category ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedCategory = category
+                                    showCategoryDialog = false
+                                }
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(category)
+                            if (category == selectedCategory) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = "Selected",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showCategoryDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }

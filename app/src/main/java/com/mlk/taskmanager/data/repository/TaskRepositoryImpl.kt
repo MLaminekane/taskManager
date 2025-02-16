@@ -22,7 +22,17 @@ class TaskRepositoryImpl @Inject constructor(
     
     override suspend fun getTaskById(taskId: Long): Task? = taskDao.getTaskById(taskId)
     
-    override suspend fun insertTask(task: Task): Long = taskDao.insertTask(task)
+    override suspend fun insertTask(task: Task): Long {
+        println("DEBUG: Repository - Inserting task: ${task.title}")
+        try {
+            val id = taskDao.insertTask(task)
+            println("DEBUG: Repository - Task inserted successfully with ID: $id")
+            return id
+        } catch (e: Exception) {
+            println("DEBUG: Repository - Error inserting task: ${e.message}")
+            throw e
+        }
+    }
     
     override suspend fun updateTask(task: Task) = taskDao.updateTask(task)
     

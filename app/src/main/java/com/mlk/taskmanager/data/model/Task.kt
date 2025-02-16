@@ -17,7 +17,8 @@ data class Task(
     val longitude: Double? = null,
     val locationRadius: Float? = null, // in meters
     val reminderEnabled: Boolean = true,
-    val categoryId: Long? = null
+    val categoryId: Long? = null,
+    val category: String? = null
 )
 
 enum class Priority {

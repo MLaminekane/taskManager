@@ -24,7 +24,12 @@ class CalendarViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
+                println("DEBUG: Loading tasks from $startDateTime to $endDateTime")
                 val tasks = taskRepository.getTasksByDateRange(startDateTime, endDateTime)
+                println("DEBUG: Loaded ${tasks.size} tasks")
+                tasks.forEach { task ->
+                    println("DEBUG: Task: ${task.title} due at ${task.dueDateTime}")
+                }
                 _uiState.update { 
                     it.copy(
                         isLoading = false,
@@ -32,6 +37,8 @@ class CalendarViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
+                println("DEBUG: Error loading tasks: ${e.message}")
+                e.printStackTrace()
                 _uiState.update { 
                     it.copy(
                         isLoading = false,

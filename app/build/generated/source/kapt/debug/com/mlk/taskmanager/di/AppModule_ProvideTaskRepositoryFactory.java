@@ -1,6 +1,7 @@
 package com.mlk.taskmanager.di;
 
 import com.mlk.taskmanager.data.local.TaskDatabase;
+import com.mlk.taskmanager.data.repository.ProjectRepository;
 import com.mlk.taskmanager.data.repository.TaskRepository;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
@@ -26,21 +27,27 @@ import javax.inject.Provider;
 public final class AppModule_ProvideTaskRepositoryFactory implements Factory<TaskRepository> {
   private final Provider<TaskDatabase> databaseProvider;
 
-  public AppModule_ProvideTaskRepositoryFactory(Provider<TaskDatabase> databaseProvider) {
+  private final Provider<ProjectRepository> projectRepositoryProvider;
+
+  public AppModule_ProvideTaskRepositoryFactory(Provider<TaskDatabase> databaseProvider,
+      Provider<ProjectRepository> projectRepositoryProvider) {
     this.databaseProvider = databaseProvider;
+    this.projectRepositoryProvider = projectRepositoryProvider;
   }
 
   @Override
   public TaskRepository get() {
-    return provideTaskRepository(databaseProvider.get());
+    return provideTaskRepository(databaseProvider.get(), projectRepositoryProvider.get());
   }
 
   public static AppModule_ProvideTaskRepositoryFactory create(
-      Provider<TaskDatabase> databaseProvider) {
-    return new AppModule_ProvideTaskRepositoryFactory(databaseProvider);
+      Provider<TaskDatabase> databaseProvider,
+      Provider<ProjectRepository> projectRepositoryProvider) {
+    return new AppModule_ProvideTaskRepositoryFactory(databaseProvider, projectRepositoryProvider);
   }
 
-  public static TaskRepository provideTaskRepository(TaskDatabase database) {
-    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideTaskRepository(database));
+  public static TaskRepository provideTaskRepository(TaskDatabase database,
+      ProjectRepository projectRepository) {
+    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideTaskRepository(database, projectRepository));
   }
 }

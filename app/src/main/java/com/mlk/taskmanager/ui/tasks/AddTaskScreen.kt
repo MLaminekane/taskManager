@@ -40,6 +40,7 @@ import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import com.maxkeppeler.sheets.clock.ClockDialog
 import com.maxkeppeler.sheets.clock.models.ClockSelection
 import com.mlk.taskmanager.data.model.Priority
+import com.mlk.taskmanager.data.model.Project
 import com.mlk.taskmanager.ui.settings.SettingsViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -47,13 +48,15 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import androidx.compose.foundation.BorderStroke
+import com.mlk.taskmanager.ui.home.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTaskScreen(
     navController: NavController,
     viewModel: TasksViewModel = hiltViewModel(),
-    settingsViewModel: SettingsViewModel = hiltViewModel()
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     var title by remember { mutableStateOf("Task title") }
     var description by remember { mutableStateOf("Description....") }
@@ -75,6 +78,8 @@ fun AddTaskScreen(
     var assignedUsers by remember { mutableStateOf(listOf("Lamine Kane")) }
     var selectedCategory by remember { mutableStateOf<String?>(null) }
     var showCategoryDialog by remember { mutableStateOf(false) }
+    var showProjectDialog by remember { mutableStateOf(false) }
+    var selectedProject by remember { mutableStateOf<Project?>(null) }
 
     val calendarState = rememberUseCaseState()
     val clockState = rememberUseCaseState()
@@ -95,6 +100,8 @@ fun AddTaskScreen(
 
     val settingsState by settingsViewModel.uiState.collectAsState()
     val categories = settingsState.categories
+
+    val homeState by homeViewModel.uiState.collectAsState()
 
     if (showGroupDialog) {
         AlertDialog(
@@ -180,6 +187,58 @@ fun AddTaskScreen(
                     newUserName = ""
                 }) {
                     Text("Cancel")
+                }
+            }
+        )
+    }
+
+    if (showProjectDialog) {
+        AlertDialog(
+            onDismissRequest = { showProjectDialog = false },
+            title = { Text("Select Project") },
+            text = {
+                LazyColumn {
+                    items(homeState.projects) { project ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedProject = project
+                                    showProjectDialog = false
+                                }
+                                .padding(vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(project.color))
+                                    .padding(6.dp)
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column {
+                                Text(
+                                    text = project.name,
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                )
+                                Text(
+                                    text = project.description,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.Gray
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showProjectDialog = false }
+                ) {
+                    Text("Close")
                 }
             }
         )
@@ -274,44 +333,54 @@ fun AddTaskScreen(
                 )
             }
 
-            // Project Name
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Project field
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
+                ),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 2.dp
+                )
+            ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Project name",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Medium
-                        )
+                    Icon(
+                        imageVector = Icons.Default.Folder,
+                        contentDescription = "Project",
+                        tint = MaterialTheme.colorScheme.primary
                     )
-                    TextButton(onClick = { /* Add new */ }) {
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
                         Text(
-                            text = "Add new",
-                            color = Color(0xFF613BE7)
+                            text = "Project",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color.Gray
+                        )
+                        Text(
+                            text = selectedProject?.name ?: "Select a project",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                    IconButton(onClick = { showProjectDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = "Select Project"
                         )
                     }
                 }
-                OutlinedTextField(
-                    value = projectName,
-                    onValueChange = { projectName = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    trailingIcon = {
-                        Icon(
-                            Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Select project",
-                            tint = Color.Gray
-                        )
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = Color.LightGray,
-                        focusedBorderColor = Color(0xFF613BE7)
-                    )
-                )
             }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+
 
             // Assigned To
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -636,30 +705,34 @@ fun AddTaskScreen(
             // Create Button
             Button(
                 onClick = {
+                    val dueDateTime = LocalDateTime.of(selectedDate, selectedTime)
+                    
                     viewModel.addTask(
                         title = title,
                         description = description,
-                        dueDateTime = LocalDateTime.of(selectedDate, selectedTime),
+                        dueDateTime = dueDateTime,
                         priority = priority,
                         category = selectedCategory,
-                        latitude = selectedLocation?.latitude,
-                        longitude = selectedLocation?.longitude,
-                        locationRadius = if (useLocation) locationRadius else null
+                        latitude = if (useLocation) selectedLocation?.latitude else null,
+                        longitude = if (useLocation) selectedLocation?.longitude else null,
+                        locationRadius = if (useLocation) locationRadius else null,
+                        projectId = selectedProject?.id
                     )
+                    
                     navController.navigateUp()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp),
+                    .padding(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF613BE7)
-                )
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
-                    text = "Create new tasks",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
+                    "Create Task",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
 

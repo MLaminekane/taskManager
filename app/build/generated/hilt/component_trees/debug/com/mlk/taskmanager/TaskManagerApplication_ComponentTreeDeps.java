@@ -20,6 +20,7 @@ import dagger.hilt.processor.internal.definecomponent.codegen._dagger_hilt_compo
 import hilt_aggregated_deps._com_mlk_taskmanager_TaskManagerApplication_GeneratedInjector;
 import hilt_aggregated_deps._com_mlk_taskmanager_di_AppModule;
 import hilt_aggregated_deps._com_mlk_taskmanager_di_DatabaseModule;
+import hilt_aggregated_deps._com_mlk_taskmanager_di_RepositoryModule;
 import hilt_aggregated_deps._com_mlk_taskmanager_di_ServiceModule;
 import hilt_aggregated_deps._com_mlk_taskmanager_service_GeofenceBroadcastReceiver_GeneratedInjector;
 import hilt_aggregated_deps._com_mlk_taskmanager_ui_MainActivity_GeneratedInjector;
@@ -27,10 +28,10 @@ import hilt_aggregated_deps._com_mlk_taskmanager_ui_calendar_CalendarViewModel_H
 import hilt_aggregated_deps._com_mlk_taskmanager_ui_calendar_CalendarViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._com_mlk_taskmanager_ui_home_HomeViewModel_HiltModules_BindsModule;
 import hilt_aggregated_deps._com_mlk_taskmanager_ui_home_HomeViewModel_HiltModules_KeyModule;
+import hilt_aggregated_deps._com_mlk_taskmanager_ui_routines_RoutinesViewModel_HiltModules_BindsModule;
+import hilt_aggregated_deps._com_mlk_taskmanager_ui_routines_RoutinesViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._com_mlk_taskmanager_ui_settings_SettingsViewModel_HiltModules_BindsModule;
 import hilt_aggregated_deps._com_mlk_taskmanager_ui_settings_SettingsViewModel_HiltModules_KeyModule;
-import hilt_aggregated_deps._com_mlk_taskmanager_ui_tasks_TaskDetailViewModel_HiltModules_BindsModule;
-import hilt_aggregated_deps._com_mlk_taskmanager_ui_tasks_TaskDetailViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._com_mlk_taskmanager_ui_tasks_TasksViewModel_HiltModules_BindsModule;
 import hilt_aggregated_deps._com_mlk_taskmanager_ui_tasks_TasksViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._dagger_hilt_android_flags_FragmentGetContextFix_FragmentGetContextFixEntryPoint;
@@ -76,6 +77,7 @@ import hilt_aggregated_deps._dagger_hilt_android_internal_modules_HiltWrapper_Ac
         _com_mlk_taskmanager_TaskManagerApplication_GeneratedInjector.class,
         _com_mlk_taskmanager_di_AppModule.class,
         _com_mlk_taskmanager_di_DatabaseModule.class,
+        _com_mlk_taskmanager_di_RepositoryModule.class,
         _com_mlk_taskmanager_di_ServiceModule.class,
         _com_mlk_taskmanager_service_GeofenceBroadcastReceiver_GeneratedInjector.class,
         _com_mlk_taskmanager_ui_MainActivity_GeneratedInjector.class,
@@ -83,10 +85,10 @@ import hilt_aggregated_deps._dagger_hilt_android_internal_modules_HiltWrapper_Ac
         _com_mlk_taskmanager_ui_calendar_CalendarViewModel_HiltModules_KeyModule.class,
         _com_mlk_taskmanager_ui_home_HomeViewModel_HiltModules_BindsModule.class,
         _com_mlk_taskmanager_ui_home_HomeViewModel_HiltModules_KeyModule.class,
+        _com_mlk_taskmanager_ui_routines_RoutinesViewModel_HiltModules_BindsModule.class,
+        _com_mlk_taskmanager_ui_routines_RoutinesViewModel_HiltModules_KeyModule.class,
         _com_mlk_taskmanager_ui_settings_SettingsViewModel_HiltModules_BindsModule.class,
         _com_mlk_taskmanager_ui_settings_SettingsViewModel_HiltModules_KeyModule.class,
-        _com_mlk_taskmanager_ui_tasks_TaskDetailViewModel_HiltModules_BindsModule.class,
-        _com_mlk_taskmanager_ui_tasks_TaskDetailViewModel_HiltModules_KeyModule.class,
         _com_mlk_taskmanager_ui_tasks_TasksViewModel_HiltModules_BindsModule.class,
         _com_mlk_taskmanager_ui_tasks_TasksViewModel_HiltModules_KeyModule.class,
         _dagger_hilt_android_flags_FragmentGetContextFix_FragmentGetContextFixEntryPoint.class,

@@ -57,12 +57,13 @@ class TasksViewModel @Inject constructor(
         category: String? = null,
         latitude: Double? = null,
         longitude: Double? = null,
-        locationRadius: Float? = null
+        locationRadius: Float? = null,
+        projectId: Long? = null
     ) {
         viewModelScope.launch {
             try {
                 println("DEBUG: Starting task creation process")
-                println("DEBUG: Creating task with title: $title, due date: $dueDateTime, category: $category")
+                println("DEBUG: Creating task with title: $title, due date: $dueDateTime, category: $category, projectId: $projectId")
                 
                 val task = Task(
                     title = title,
@@ -72,7 +73,8 @@ class TasksViewModel @Inject constructor(
                     category = category,
                     latitude = latitude,
                     longitude = longitude,
-                    locationRadius = locationRadius
+                    locationRadius = locationRadius,
+                    projectId = projectId
                 )
                 
                 println("DEBUG: Task object created, inserting into database")

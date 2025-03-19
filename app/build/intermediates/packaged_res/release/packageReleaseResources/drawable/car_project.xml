@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="240dp"
+    android:viewportWidth="240"
+    android:viewportHeight="240">
+
+    <!-- Background -->
+    <path
+        android:fillColor="#E5E5E5"
+        android:pathData="M0,0h240v240h-240z"/>
+
+    <!-- Car -->
+    <path
+        android:fillColor="#333333"
+        android:pathData="M40,140c0,0 20,-30 40,-30h80c20,0 40,30 40,30v40h-160z"/>
+    
+    <!-- Windows -->
+    <path
+        android:fillColor="#666666"
+        android:pathData="M80,110h80v30h-80z"/>
+    
+    <!-- Wheels -->
+    <path
+        android:fillColor="#1A1A1A"
+        android:pathData="M60,170c0,11 -9,20 -20,20s-20,-9 -20,-20 9,-20 20,-20 20,9 20,20"/>
+    <path
+        android:fillColor="#1A1A1A"
+        android:pathData="M220,170c0,11 -9,20 -20,20s-20,-9 -20,-20 9,-20 20,-20 20,9 20,20"/>
+    
+    <!-- Tree -->
+    <path
+        android:fillColor="#333333"
+        android:pathData="M180,40c0,0 20,-30 40,-20s0,40 -20,40 -20,-20 -20,-20"/>
+    <path
+        android:fillColor="#1A1A1A"
+        android:pathData="M190,60h10v30h-10z"/>
+    
+    <!-- Leaves -->
+    <path
+        android:fillColor="#333333"
+        android:pathData="M160,20c0,0 30,-20 40,0s-20,30 -40,0"/>
+</vector> 

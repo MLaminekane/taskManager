@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.8.0" type="incidents">
+
+    <incident
+        id="AndroidGradlePluginVersion"
+        severity="warning"
+        message="A newer version of com.android.application than 8.8.0 is available: 8.9.0. (There is also a newer version of 8.8.𝑥 available, if upgrading to 8.9.0 is difficult: 8.8.2)">
+        <fix-alternatives>
+            <fix-replace
+                description="Change to 8.9.0"
+                family="Update versions"
+                oldString="8.8.0"
+                replacement="8.9.0"
+                priority="0"/>
+            <fix-replace
+                description="Change to 8.8.2"
+                family="Update versions"
+                robot="true"
+                independent="true"
+                oldString="8.8.0"
+                replacement="8.8.2"
+                priority="0"/>
+        </fix-alternatives>
+        <location
+            file="$HOME/Projects/taskManager/gradle/libs.versions.toml"
+            line="2"
+            column="7"
+            startOffset="17"
+            endLine="2"
+            endColumn="14"
+            endOffset="24"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.activity:activity-compose than 1.10.0 is available: 1.10.1">
+        <fix-replace
+            description="Change to 1.10.1"
+            family="Update versions"
+            oldString="1.10.0"
+            replacement="1.10.1"
+            priority="0"/>
+        <location
+            file="$HOME/Projects/taskManager/gradle/libs.versions.toml"
+            line="9"
+            column="19"
+            startOffset="172"
+            endLine="9"
+            endColumn="27"
+            endOffset="180"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.compose:compose-bom than 2024.04.01 is available: 2025.03.00">
+        <fix-replace
+            description="Change to 2025.03.00"
+            family="Update versions"
+            oldString="2024.04.01"
+            replacement="2025.03.00"
+            priority="0"/>
+        <location
+            file="$HOME/Projects/taskManager/gradle/libs.versions.toml"
+            line="10"
+            column="14"
+            startOffset="194"
+            endLine="10"
+            endColumn="26"
+            endOffset="206"/>
+    </incident>
+
+</incidents>

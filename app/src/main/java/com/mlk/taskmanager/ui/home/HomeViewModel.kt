@@ -2,7 +2,11 @@ package com.mlk.taskmanager.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mlk.taskmanager.data.model.Project
+import com.mlk.taskmanager.data.model.Routine
 import com.mlk.taskmanager.data.model.Task
+import com.mlk.taskmanager.data.repository.ProjectRepository
+import com.mlk.taskmanager.data.repository.RoutineRepository
 import com.mlk.taskmanager.data.repository.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -10,23 +14,12 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-data class Project(
-    val id: Long,
-    val name: String,
-    val description: String,
-    val icon: String,
-    val color: Long,
-    val taskCount: Int = 0
-)
-
 data class HomeUiState(
     val assignedTasks: Int = 0,
     val completedTasks: Int = 0,
     val todayTasks: List<Task> = emptyList(),
-    val projects: List<Project> = listOf(
-        Project(1, "Mobile App", "Application mobile Android", "kotlin", 0xFF613BE7, 5),
-        Project(2, "Web App", "Application web React", "typescript", 0xFF4CAF50, 3)
-    ),
+    val todayRoutines: List<Routine> = emptyList(),
+    val projects: List<Project> = emptyList(),
     val selectedFilter: TaskFilter = TaskFilter.ALL,
     val isLoading: Boolean = false,
     val error: String? = null,
@@ -39,7 +32,9 @@ enum class TaskFilter {
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
+    private val routineRepository: RoutineRepository,
+    private val projectRepository: ProjectRepository
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
@@ -58,8 +53,10 @@ class HomeViewModel @Inject constructor(
                     taskRepository.getTasksInTimeRange(
                         LocalDateTime.now().withHour(0).withMinute(0),
                         LocalDateTime.now().withHour(23).withMinute(59)
-                    )
-                ) { allTasks, activeTasks, todayTasks ->
+                    ),
+                    routineRepository.getActiveRoutines(),
+                    projectRepository.getAllProjects()
+                ) { allTasks, activeTasks, todayTasks, routines, projects ->
                     _uiState.value.copy(
                         assignedTasks = activeTasks.size,
                         completedTasks = allTasks.count { it.isCompleted },
@@ -68,6 +65,8 @@ class HomeViewModel @Inject constructor(
                             TaskFilter.IN_PROGRESS -> todayTasks.filter { !it.isCompleted }
                             TaskFilter.COMPLETED -> todayTasks.filter { it.isCompleted }
                         },
+                        todayRoutines = routines,
+                        projects = projects,
                         isLoading = false
                     )
                 }.collect { state ->
@@ -90,33 +89,35 @@ class HomeViewModel @Inject constructor(
     fun clearError() {
         _uiState.update { it.copy(error = null) }
     }
-
+    
     fun showCreateProjectDialog() {
         _uiState.update { it.copy(showCreateProjectDialog = true) }
     }
-
+    
     fun hideCreateProjectDialog() {
         _uiState.update { it.copy(showCreateProjectDialog = false) }
     }
-
+    
     fun createProject(name: String, description: String, icon: String) {
-        val newProject = Project(
-            id = (_uiState.value.projects.maxOfOrNull { it.id } ?: 0) + 1,
-            name = name,
-            description = description,
-            icon = icon,
-            color = when (icon) {
-                "kotlin" -> 0xFF613BE7
-                "typescript" -> 0xFF4CAF50
-                else -> 0xFF666666
+        viewModelScope.launch {
+            try {
+                val project = Project(
+                    id = 0, // Auto-généré par Room
+                    name = name,
+                    description = description,
+                    icon = icon,
+                    color = listOf(0xFF613BE7, 0xFF4CAF50, 0xFFE91E63, 0xFFFF9800).random(),
+                    taskCount = 0
+                )
+                projectRepository.insertProject(project)
+                hideCreateProjectDialog()
+                // Recharger les données pour voir le nouveau projet
+                loadData()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(
+                    error = "Erreur lors de la création du projet: ${e.message}"
+                ) }
             }
-        )
-        
-        _uiState.update { state ->
-            state.copy(
-                projects = state.projects + newProject,
-                showCreateProjectDialog = false
-            )
         }
     }
 } 

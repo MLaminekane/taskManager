@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="240dp"
+    android:viewportWidth="240"
+    android:viewportHeight="240">
+
+    <!-- Background -->
+    <path
+        android:fillColor="#E5E5E5"
+        android:pathData="M0,0h240v240h-240z"/>
+
+    <!-- Person -->
+    <path
+        android:fillColor="#333333"
+        android:pathData="M120,80c-22.1,0 -40,17.9 -40,40v40h80v-40C160,97.9 142.1,80 120,80z"/>
+    <path
+        android:fillColor="#1A1A1A"
+        android:pathData="M120,140c-11,0 -20,-9 -20,-20s9,-20 20,-20s20,9 20,20S131,140 120,140z"/>
+
+    <!-- Design Elements -->
+    <path
+        android:fillColor="#666666"
+        android:pathData="M40,40h40v20h-40z"/>
+    <path
+        android:fillColor="#666666"
+        android:pathData="M90,40h60v20h-60z"/>
+    <path
+        android:fillColor="#666666"
+        android:pathData="M160,40h40v20h-40z"/>
+
+    <path
+        android:fillColor="#666666"
+        android:pathData="M40,70h30v30h-30z"/>
+    <path
+        android:fillColor="#666666"
+        android:pathData="M170,70h30v30h-30z"/>
+
+    <!-- Lines -->
+    <path
+        android:strokeColor="#666666"
+        android:strokeWidth="2"
+        android:pathData="M40,180h160"/>
+    <path
+        android:strokeColor="#666666"
+        android:strokeWidth="2"
+        android:pathData="M40,200h120"/>
+    <path
+        android:strokeColor="#666666"
+        android:strokeWidth="2"
+        android:pathData="M40,220h80"/>
+</vector> 

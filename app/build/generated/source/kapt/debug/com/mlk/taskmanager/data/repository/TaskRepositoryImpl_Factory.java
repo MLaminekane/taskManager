@@ -24,20 +24,26 @@ import javax.inject.Provider;
 public final class TaskRepositoryImpl_Factory implements Factory<TaskRepositoryImpl> {
   private final Provider<TaskDao> taskDaoProvider;
 
-  public TaskRepositoryImpl_Factory(Provider<TaskDao> taskDaoProvider) {
+  private final Provider<ProjectRepository> projectRepositoryProvider;
+
+  public TaskRepositoryImpl_Factory(Provider<TaskDao> taskDaoProvider,
+      Provider<ProjectRepository> projectRepositoryProvider) {
     this.taskDaoProvider = taskDaoProvider;
+    this.projectRepositoryProvider = projectRepositoryProvider;
   }
 
   @Override
   public TaskRepositoryImpl get() {
-    return newInstance(taskDaoProvider.get());
+    return newInstance(taskDaoProvider.get(), projectRepositoryProvider.get());
   }
 
-  public static TaskRepositoryImpl_Factory create(Provider<TaskDao> taskDaoProvider) {
-    return new TaskRepositoryImpl_Factory(taskDaoProvider);
+  public static TaskRepositoryImpl_Factory create(Provider<TaskDao> taskDaoProvider,
+      Provider<ProjectRepository> projectRepositoryProvider) {
+    return new TaskRepositoryImpl_Factory(taskDaoProvider, projectRepositoryProvider);
   }
 
-  public static TaskRepositoryImpl newInstance(TaskDao taskDao) {
-    return new TaskRepositoryImpl(taskDao);
+  public static TaskRepositoryImpl newInstance(TaskDao taskDao,
+      ProjectRepository projectRepository) {
+    return new TaskRepositoryImpl(taskDao, projectRepository);
   }
 }

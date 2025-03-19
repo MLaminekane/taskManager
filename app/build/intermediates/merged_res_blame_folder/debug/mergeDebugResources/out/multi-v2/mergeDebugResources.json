@@ -1626,20 +1626,20 @@
                     }
                 },
                 {
-                    "source": "/Users/lamine/Code/taskmanager/app/src/main/res/values/themes.xml",
+                    "source": "/Users/lamine/Projects/taskManager/app/src/main/res/values/strings.xml",
                     "from": {
-                        "startLines": "3",
-                        "startColumns": "4",
-                        "startOffsets": "56",
-                        "endColumns": "88",
-                        "endOffsets": "140"
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,104",
+                        "endColumns": "48,80",
+                        "endOffsets": "99,180"
                     },
                     "to": {
-                        "startLines": "303",
-                        "startColumns": "4",
-                        "startOffsets": "20239",
-                        "endColumns": "87",
-                        "endOffsets": "20322"
+                        "startLines": "155,249",
+                        "startColumns": "4,4",
+                        "startOffsets": "9034,16792",
+                        "endColumns": "48,80",
+                        "endOffsets": "9078,16868"
                     }
                 },
                 {
@@ -1696,6 +1696,23 @@
                     }
                 },
                 {
+                    "source": "/Users/lamine/Projects/taskManager/app/src/main/res/values/colors.xml",
+                    "from": {
+                        "startLines": "7,2,3,4,5,6,8",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "286,55,102,149,196,241,328",
+                        "endColumns": "41,46,46,46,44,44,41",
+                        "endOffsets": "323,97,144,191,236,281,365"
+                    },
+                    "to": {
+                        "startLines": "9,22,23,24,25,26,27",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "630,1606,1653,1700,1747,1792,1837",
+                        "endColumns": "41,46,46,46,44,44,41",
+                        "endOffsets": "667,1648,1695,1742,1787,1832,1874"
+                    }
+                },
+                {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/501e27abcb87b839fe2a3b7f61122c70/transformed/play-services-base-18.1.0/res/values/values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,33,46",
@@ -1712,23 +1729,6 @@
                         "endLines": "12,13,14,15,16,17,18,19,166,167,168,169,170,171,172,173,175,176,177,178,179,180,181,182,183,445,566",
                         "endColumns": "89,79,89,89,79,80,79,79,104,180,124,106,179,122,115,102,187,104,180,124,174,147,62,61,78,20,20",
                         "endOffsets": "888,968,1058,1148,1228,1309,1389,1469,9855,10036,10161,10268,10448,10571,10687,10790,11145,11250,11431,11556,11731,11879,11942,12004,12083,25239,28838"
-                    }
-                },
-                {
-                    "source": "/Users/lamine/Code/taskmanager/app/src/main/res/values/strings.xml",
-                    "from": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,104",
-                        "endColumns": "48,80",
-                        "endOffsets": "99,180"
-                    },
-                    "to": {
-                        "startLines": "155,249",
-                        "startColumns": "4,4",
-                        "startOffsets": "9034,16792",
-                        "endColumns": "48,80",
-                        "endOffsets": "9078,16868"
                     }
                 },
                 {
@@ -1763,6 +1763,23 @@
                         "startOffsets": "17739,17810,17919,17995,18072,18129,18208,18269,18356,18427,18522,18601",
                         "endColumns": "70,108,75,76,56,78,60,86,70,94,78,60",
                         "endOffsets": "17805,17914,17990,18067,18124,18203,18264,18351,18422,18517,18596,18657"
+                    }
+                },
+                {
+                    "source": "/Users/lamine/Projects/taskManager/app/src/main/res/values/themes.xml",
+                    "from": {
+                        "startLines": "3",
+                        "startColumns": "4",
+                        "startOffsets": "56",
+                        "endColumns": "88",
+                        "endOffsets": "140"
+                    },
+                    "to": {
+                        "startLines": "303",
+                        "startColumns": "4",
+                        "startOffsets": "20239",
+                        "endColumns": "87",
+                        "endOffsets": "20322"
                     }
                 },
                 {
@@ -1871,23 +1888,6 @@
                         "startOffsets": "3345,3408,3453,3498,3543,3588,3633,3678,3723,3769,3815,3861,3907,3953,3997,4041,4085,4129,4173,4217,4261,4305,4349,4393,4437,4479,4523,4568,4613,4656,4699,9594,17025",
                         "endColumns": "62,44,44,44,44,44,44,44,45,45,45,45,45,43,43,43,43,43,43,43,43,43,43,43,41,43,44,44,42,42,42,41,33",
                         "endOffsets": "3403,3448,3493,3538,3583,3628,3673,3718,3764,3810,3856,3902,3948,3992,4036,4080,4124,4168,4212,4256,4300,4344,4388,4432,4474,4518,4563,4608,4651,4694,4737,9631,17054"
-                    }
-                },
-                {
-                    "source": "/Users/lamine/Code/taskmanager/app/src/main/res/values/colors.xml",
-                    "from": {
-                        "startLines": "7,2,3,4,5,6,8",
-                        "startColumns": "4,4,4,4,4,4,4",
-                        "startOffsets": "286,55,102,149,196,241,328",
-                        "endColumns": "41,46,46,46,44,44,41",
-                        "endOffsets": "323,97,144,191,236,281,365"
-                    },
-                    "to": {
-                        "startLines": "9,22,23,24,25,26,27",
-                        "startColumns": "4,4,4,4,4,4,4",
-                        "startOffsets": "630,1606,1653,1700,1747,1792,1837",
-                        "endColumns": "41,46,46,46,44,44,41",
-                        "endOffsets": "667,1648,1695,1742,1787,1832,1874"
                     }
                 },
                 {

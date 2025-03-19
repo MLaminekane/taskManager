@@ -68,10 +68,10 @@ com.mlk.taskmanager.app-room-runtime-2.6.1-66 /Users/lamine/.gradle/caches/8.10.
 com.mlk.taskmanager.app-activity-1.10.0-67 /Users/lamine/.gradle/caches/8.10.2/transforms/fd267a98cf831517ee7a7a90adb947ec/transformed/activity-1.10.0/res
 com.mlk.taskmanager.app-foundation-release-68 /Users/lamine/.gradle/caches/8.10.2/transforms/fddddddc79635dc7fe9d895573bc9ca9/transformed/foundation-release/res
 com.mlk.taskmanager.app-lifecycle-livedata-core-ktx-2.8.7-69 /Users/lamine/.gradle/caches/8.10.2/transforms/ff42d601457b55e6bfb0ef859d150306/transformed/lifecycle-livedata-core-ktx-2.8.7/res
-com.mlk.taskmanager.app-pngs-70 /Users/lamine/Code/taskmanager/app/build/generated/res/pngs/debug
-com.mlk.taskmanager.app-resValues-71 /Users/lamine/Code/taskmanager/app/build/generated/res/resValues/debug
-com.mlk.taskmanager.app-packageDebugResources-72 /Users/lamine/Code/taskmanager/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
-com.mlk.taskmanager.app-packageDebugResources-73 /Users/lamine/Code/taskmanager/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
-com.mlk.taskmanager.app-debug-74 /Users/lamine/Code/taskmanager/app/build/intermediates/merged_res/debug/mergeDebugResources
-com.mlk.taskmanager.app-debug-75 /Users/lamine/Code/taskmanager/app/src/debug/res
-com.mlk.taskmanager.app-main-76 /Users/lamine/Code/taskmanager/app/src/main/res
+com.mlk.taskmanager.app-pngs-70 /Users/lamine/Projects/taskManager/app/build/generated/res/pngs/debug
+com.mlk.taskmanager.app-resValues-71 /Users/lamine/Projects/taskManager/app/build/generated/res/resValues/debug
+com.mlk.taskmanager.app-packageDebugResources-72 /Users/lamine/Projects/taskManager/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
+com.mlk.taskmanager.app-packageDebugResources-73 /Users/lamine/Projects/taskManager/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
+com.mlk.taskmanager.app-debug-74 /Users/lamine/Projects/taskManager/app/build/intermediates/merged_res/debug/mergeDebugResources
+com.mlk.taskmanager.app-debug-75 /Users/lamine/Projects/taskManager/app/src/debug/res
+com.mlk.taskmanager.app-main-76 /Users/lamine/Projects/taskManager/app/src/main/res

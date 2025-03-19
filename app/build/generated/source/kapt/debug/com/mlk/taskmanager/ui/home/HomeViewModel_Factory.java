@@ -1,5 +1,7 @@
 package com.mlk.taskmanager.ui.home;
 
+import com.mlk.taskmanager.data.repository.ProjectRepository;
+import com.mlk.taskmanager.data.repository.RoutineRepository;
 import com.mlk.taskmanager.data.repository.TaskRepository;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
@@ -24,20 +26,31 @@ import javax.inject.Provider;
 public final class HomeViewModel_Factory implements Factory<HomeViewModel> {
   private final Provider<TaskRepository> taskRepositoryProvider;
 
-  public HomeViewModel_Factory(Provider<TaskRepository> taskRepositoryProvider) {
+  private final Provider<RoutineRepository> routineRepositoryProvider;
+
+  private final Provider<ProjectRepository> projectRepositoryProvider;
+
+  public HomeViewModel_Factory(Provider<TaskRepository> taskRepositoryProvider,
+      Provider<RoutineRepository> routineRepositoryProvider,
+      Provider<ProjectRepository> projectRepositoryProvider) {
     this.taskRepositoryProvider = taskRepositoryProvider;
+    this.routineRepositoryProvider = routineRepositoryProvider;
+    this.projectRepositoryProvider = projectRepositoryProvider;
   }
 
   @Override
   public HomeViewModel get() {
-    return newInstance(taskRepositoryProvider.get());
+    return newInstance(taskRepositoryProvider.get(), routineRepositoryProvider.get(), projectRepositoryProvider.get());
   }
 
-  public static HomeViewModel_Factory create(Provider<TaskRepository> taskRepositoryProvider) {
-    return new HomeViewModel_Factory(taskRepositoryProvider);
+  public static HomeViewModel_Factory create(Provider<TaskRepository> taskRepositoryProvider,
+      Provider<RoutineRepository> routineRepositoryProvider,
+      Provider<ProjectRepository> projectRepositoryProvider) {
+    return new HomeViewModel_Factory(taskRepositoryProvider, routineRepositoryProvider, projectRepositoryProvider);
   }
 
-  public static HomeViewModel newInstance(TaskRepository taskRepository) {
-    return new HomeViewModel(taskRepository);
+  public static HomeViewModel newInstance(TaskRepository taskRepository,
+      RoutineRepository routineRepository, ProjectRepository projectRepository) {
+    return new HomeViewModel(taskRepository, routineRepository, projectRepository);
   }
 }

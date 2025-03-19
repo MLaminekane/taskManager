@@ -1,7 +1,7 @@
 package com.mlk.taskmanager.di;
 
-import com.mlk.taskmanager.data.TaskManagerDatabase;
 import com.mlk.taskmanager.data.dao.RoutineDao;
+import com.mlk.taskmanager.data.local.TaskDatabase;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.Preconditions;
@@ -10,7 +10,7 @@ import dagger.internal.ScopeMetadata;
 import javax.annotation.processing.Generated;
 import javax.inject.Provider;
 
-@ScopeMetadata
+@ScopeMetadata("javax.inject.Singleton")
 @QualifierMetadata
 @DaggerGenerated
 @Generated(
@@ -24,9 +24,9 @@ import javax.inject.Provider;
     "KotlinInternalInJava"
 })
 public final class DatabaseModule_ProvideRoutineDaoFactory implements Factory<RoutineDao> {
-  private final Provider<TaskManagerDatabase> databaseProvider;
+  private final Provider<TaskDatabase> databaseProvider;
 
-  public DatabaseModule_ProvideRoutineDaoFactory(Provider<TaskManagerDatabase> databaseProvider) {
+  public DatabaseModule_ProvideRoutineDaoFactory(Provider<TaskDatabase> databaseProvider) {
     this.databaseProvider = databaseProvider;
   }
 
@@ -36,11 +36,11 @@ public final class DatabaseModule_ProvideRoutineDaoFactory implements Factory<Ro
   }
 
   public static DatabaseModule_ProvideRoutineDaoFactory create(
-      Provider<TaskManagerDatabase> databaseProvider) {
+      Provider<TaskDatabase> databaseProvider) {
     return new DatabaseModule_ProvideRoutineDaoFactory(databaseProvider);
   }
 
-  public static RoutineDao provideRoutineDao(TaskManagerDatabase database) {
+  public static RoutineDao provideRoutineDao(TaskDatabase database) {
     return Preconditions.checkNotNullFromProvides(DatabaseModule.INSTANCE.provideRoutineDao(database));
   }
 }

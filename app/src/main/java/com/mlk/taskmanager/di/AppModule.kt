@@ -1,8 +1,8 @@
 package com.mlk.taskmanager.di
 
 import android.content.Context
-import androidx.room.Room
 import com.mlk.taskmanager.data.local.TaskDatabase
+import com.mlk.taskmanager.data.repository.ProjectRepository
 import com.mlk.taskmanager.data.repository.SettingsRepository
 import com.mlk.taskmanager.data.repository.SettingsRepositoryImpl
 import com.mlk.taskmanager.data.repository.TaskRepository
@@ -20,24 +20,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTaskDatabase(
-        @ApplicationContext context: Context
-    ): TaskDatabase {
-        return Room.databaseBuilder(
-            context,
-            TaskDatabase::class.java,
-            "tasks.db"
-        )
-        .fallbackToDestructiveMigration()
-        .build()
-    }
-
-    @Provides
-    @Singleton
     fun provideTaskRepository(
-        database: TaskDatabase
+        database: TaskDatabase,
+        projectRepository: ProjectRepository
     ): TaskRepository {
-        return TaskRepositoryImpl(database.taskDao)
+        return TaskRepositoryImpl(database.taskDao, projectRepository)
     }
 
     @Provides

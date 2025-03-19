@@ -1,0 +1,1 @@
+{"className":"com.mlk.taskmanager.service.Hilt_GeofenceBroadcastReceiver","classAnnotations":["dagger.hilt.android.internal.OnReceiveBytecodeInjectionMarker"],"interfaces":[],"superClasses":["android.content.BroadcastReceiver","java.lang.Object"]}

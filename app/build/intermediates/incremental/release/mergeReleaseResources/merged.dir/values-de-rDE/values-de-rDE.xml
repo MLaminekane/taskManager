@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cancel">Abbrechen</string>
+    <string name="ok">ok</string>
+    <string name="scd_calendar_dialog_next_month">Letzten Monat</string>
+    <string name="scd_calendar_dialog_next_week">Nächste Woche</string>
+    <string name="scd_calendar_dialog_prev_month">Nächsten Monat</string>
+    <string name="scd_calendar_dialog_prev_week">Letzte Woche</string>
+    <string name="scd_calendar_dialog_select_month">Monat auswählen</string>
+    <string name="scd_calendar_dialog_select_year">Jahr auswählen</string>
+    <string name="scd_clock_dialog_am" translatable="true">AM</string>
+    <string name="scd_clock_dialog_boundary_hint" translatable="true">Muss zwischen %1$s und %2$s sein</string>
+    <string name="scd_clock_dialog_day_code" translatable="true">D</string>
+    <string name="scd_clock_dialog_hour_code" translatable="true">h</string>
+    <string name="scd_clock_dialog_hours">Stunden</string>
+    <string name="scd_clock_dialog_minute_code" translatable="true">m</string>
+    <string name="scd_clock_dialog_minutes">Minuten</string>
+    <string name="scd_clock_dialog_next_value" translatable="true">Nächster Wert</string>
+    <string name="scd_clock_dialog_pm" translatable="true">PM</string>
+    <string name="scd_clock_dialog_previous_value" translatable="true">Letzter Wert</string>
+    <string name="scd_clock_dialog_second_code" translatable="true">s</string>
+    <string name="scd_clock_dialog_seconds">Sekunden</string>
+</resources>

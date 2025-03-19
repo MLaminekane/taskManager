@@ -11,6 +11,9 @@ import com.mlk.taskmanager.ui.tasks.AddTaskScreen
 import com.mlk.taskmanager.ui.tasks.TasksScreen
 import com.mlk.taskmanager.ui.welcome.WelcomeScreen
 import com.mlk.taskmanager.ui.tasks.TaskDetailScreen
+import com.mlk.taskmanager.ui.routines.AddRoutineScreen
+import com.mlk.taskmanager.ui.routines.RoutineDetailScreen
+import com.mlk.taskmanager.ui.routines.RoutinesScreen
 
 sealed class Screen(val route: String) {
     object Welcome : Screen("welcome")
@@ -20,6 +23,7 @@ sealed class Screen(val route: String) {
     object Settings : Screen("settings")
     object AddTask : Screen("add_task")
     object AddRoutine : Screen("add_routine")
+    object Routines : Screen("routines")
     object TaskDetail : Screen("task_detail/{taskId}") {
         fun createRoute(taskId: Long) = "task_detail/$taskId"
     }
@@ -62,7 +66,11 @@ fun TaskManagerNavGraph(
         }
         
         composable(Screen.AddRoutine.route) {
-            // AddRoutineScreen(navController)
+            AddRoutineScreen(navController)
+        }
+        
+        composable(Screen.Routines.route) {
+            RoutinesScreen(navController)
         }
         
         composable(Screen.TaskDetail.route) { backStackEntry ->
@@ -75,7 +83,7 @@ fun TaskManagerNavGraph(
         composable(Screen.RoutineDetail.route) { backStackEntry ->
             val routineId = backStackEntry.arguments?.getString("routineId")?.toLongOrNull()
             if (routineId != null) {
-                // RoutineDetailScreen(routineId, navController)
+                RoutineDetailScreen(routineId, navController)
             }
         }
     }

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="240dp"
+    android:viewportWidth="240"
+    android:viewportHeight="240">
+    
+    <!-- Background -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M0,0h240v240h-240z"/>
+    
+    <!-- Person -->
+    <path
+        android:fillColor="#E3B587"
+        android:pathData="M120,80c-22.1,0 -40,17.9 -40,40v40h80v-40C160,97.9 142.1,80 120,80z"/>
+    <path
+        android:fillColor="#613BE7"
+        android:pathData="M120,140c-11,0 -20,-9 -20,-20s9,-20 20,-20s20,9 20,20S131,140 120,140z"/>
+    
+    <!-- Laptop -->
+    <path
+        android:fillColor="#613BE7"
+        android:pathData="M80,160h120v60h-120z"/>
+    <path
+        android:fillColor="#F5F5F5"
+        android:pathData="M90,170h100v40h-100z"/>
+    
+    <!-- Coffee Cup -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M170,140h30v40h-30z"/>
+    <path
+        android:fillColor="#613BE7"
+        android:pathData="M165,180h40v10h-40z"/>
+    
+    <!-- Plant -->
+    <path
+        android:fillColor="#613BE7"
+        android:pathData="M40,160c0,0 10,-20 20,-10s-10,30 -20,30s-20,-10 -10,-20S40,160 40,160z"/>
+    <path
+        android:fillColor="#4E2FBA"
+        android:pathData="M35,180h10v20h-10z"/>
+</vector> 

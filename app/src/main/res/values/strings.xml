@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TaskManager</string>
-    <string name="maps_api_key">your api key</string>
-    <string name="openweather_api_key">your api key</string>
+    <string name="maps_api_key">your key here</string>
+    <string name="openweather_api_key">your key here</string>
 </resources>

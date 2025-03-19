@@ -7,17 +7,19 @@ import android.view.View;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
-import com.mlk.taskmanager.data.TaskManagerDatabase;
+import com.mlk.taskmanager.data.dao.ProjectDao;
 import com.mlk.taskmanager.data.dao.RoutineDao;
 import com.mlk.taskmanager.data.local.TaskDatabase;
+import com.mlk.taskmanager.data.repository.ProjectRepository;
+import com.mlk.taskmanager.data.repository.ProjectRepositoryImpl;
 import com.mlk.taskmanager.data.repository.RoutineRepositoryImpl;
 import com.mlk.taskmanager.data.repository.SettingsRepository;
 import com.mlk.taskmanager.data.repository.TaskRepository;
 import com.mlk.taskmanager.di.AppModule_ProvideSettingsRepositoryFactory;
-import com.mlk.taskmanager.di.AppModule_ProvideTaskDatabaseFactory;
 import com.mlk.taskmanager.di.AppModule_ProvideTaskRepositoryFactory;
-import com.mlk.taskmanager.di.DatabaseModule_ProvideDatabaseFactory;
+import com.mlk.taskmanager.di.DatabaseModule_ProvideProjectDaoFactory;
 import com.mlk.taskmanager.di.DatabaseModule_ProvideRoutineDaoFactory;
+import com.mlk.taskmanager.di.DatabaseModule_ProvideTaskDatabaseFactory;
 import com.mlk.taskmanager.di.ServiceModule_ProvideNotificationManagerFactory;
 import com.mlk.taskmanager.service.GeofenceBroadcastReceiver;
 import com.mlk.taskmanager.service.GeofenceBroadcastReceiver_MembersInjector;
@@ -481,7 +483,7 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
           return (T) new CalendarViewModel(singletonCImpl.provideTaskRepositoryProvider.get());
 
           case 1: // com.mlk.taskmanager.ui.home.HomeViewModel 
-          return (T) new HomeViewModel(singletonCImpl.provideTaskRepositoryProvider.get(), singletonCImpl.routineRepositoryImplProvider.get());
+          return (T) new HomeViewModel(singletonCImpl.provideTaskRepositoryProvider.get(), singletonCImpl.routineRepositoryImplProvider.get(), singletonCImpl.bindProjectRepositoryProvider.get());
 
           case 2: // com.mlk.taskmanager.ui.routines.RoutinesViewModel 
           return (T) new RoutinesViewModel(singletonCImpl.routineRepositoryImplProvider.get());
@@ -578,9 +580,15 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
 
     private Provider<TaskDatabase> provideTaskDatabaseProvider;
 
+    private Provider<ProjectDao> provideProjectDaoProvider;
+
+    private Provider<ProjectRepositoryImpl> projectRepositoryImplProvider;
+
+    private Provider<ProjectRepository> bindProjectRepositoryProvider;
+
     private Provider<TaskRepository> provideTaskRepositoryProvider;
 
-    private Provider<TaskManagerDatabase> provideDatabaseProvider;
+    private Provider<RoutineDao> provideRoutineDaoProvider;
 
     private Provider<RoutineRepositoryImpl> routineRepositoryImplProvider;
 
@@ -592,19 +600,18 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
 
     }
 
-    private RoutineDao routineDao() {
-      return DatabaseModule_ProvideRoutineDaoFactory.provideRoutineDao(provideDatabaseProvider.get());
-    }
-
     @SuppressWarnings("unchecked")
     private void initialize(final ApplicationContextModule applicationContextModuleParam) {
       this.provideNotificationManagerProvider = DoubleCheck.provider(new SwitchingProvider<NotificationManager>(singletonCImpl, 1));
       this.locationReminderServiceProvider = DoubleCheck.provider(new SwitchingProvider<LocationReminderService>(singletonCImpl, 0));
       this.provideTaskDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<TaskDatabase>(singletonCImpl, 3));
+      this.provideProjectDaoProvider = DoubleCheck.provider(new SwitchingProvider<ProjectDao>(singletonCImpl, 5));
+      this.projectRepositoryImplProvider = new SwitchingProvider<>(singletonCImpl, 4);
+      this.bindProjectRepositoryProvider = DoubleCheck.provider((Provider) projectRepositoryImplProvider);
       this.provideTaskRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<TaskRepository>(singletonCImpl, 2));
-      this.provideDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<TaskManagerDatabase>(singletonCImpl, 5));
-      this.routineRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<RoutineRepositoryImpl>(singletonCImpl, 4));
-      this.provideSettingsRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<SettingsRepository>(singletonCImpl, 6));
+      this.provideRoutineDaoProvider = DoubleCheck.provider(new SwitchingProvider<RoutineDao>(singletonCImpl, 7));
+      this.routineRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<RoutineRepositoryImpl>(singletonCImpl, 6));
+      this.provideSettingsRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<SettingsRepository>(singletonCImpl, 8));
     }
 
     @Override
@@ -659,18 +666,24 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
           return (T) ServiceModule_ProvideNotificationManagerFactory.provideNotificationManager(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
           case 2: // com.mlk.taskmanager.data.repository.TaskRepository 
-          return (T) AppModule_ProvideTaskRepositoryFactory.provideTaskRepository(singletonCImpl.provideTaskDatabaseProvider.get());
+          return (T) AppModule_ProvideTaskRepositoryFactory.provideTaskRepository(singletonCImpl.provideTaskDatabaseProvider.get(), singletonCImpl.bindProjectRepositoryProvider.get());
 
           case 3: // com.mlk.taskmanager.data.local.TaskDatabase 
-          return (T) AppModule_ProvideTaskDatabaseFactory.provideTaskDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+          return (T) DatabaseModule_ProvideTaskDatabaseFactory.provideTaskDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
-          case 4: // com.mlk.taskmanager.data.repository.RoutineRepositoryImpl 
-          return (T) new RoutineRepositoryImpl(singletonCImpl.routineDao());
+          case 4: // com.mlk.taskmanager.data.repository.ProjectRepositoryImpl 
+          return (T) new ProjectRepositoryImpl(singletonCImpl.provideProjectDaoProvider.get());
 
-          case 5: // com.mlk.taskmanager.data.TaskManagerDatabase 
-          return (T) DatabaseModule_ProvideDatabaseFactory.provideDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+          case 5: // com.mlk.taskmanager.data.dao.ProjectDao 
+          return (T) DatabaseModule_ProvideProjectDaoFactory.provideProjectDao(singletonCImpl.provideTaskDatabaseProvider.get());
 
-          case 6: // com.mlk.taskmanager.data.repository.SettingsRepository 
+          case 6: // com.mlk.taskmanager.data.repository.RoutineRepositoryImpl 
+          return (T) new RoutineRepositoryImpl(singletonCImpl.provideRoutineDaoProvider.get());
+
+          case 7: // com.mlk.taskmanager.data.dao.RoutineDao 
+          return (T) DatabaseModule_ProvideRoutineDaoFactory.provideRoutineDao(singletonCImpl.provideTaskDatabaseProvider.get());
+
+          case 8: // com.mlk.taskmanager.data.repository.SettingsRepository 
           return (T) AppModule_ProvideSettingsRepositoryFactory.provideSettingsRepository(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
           default: throw new AssertionError(id);

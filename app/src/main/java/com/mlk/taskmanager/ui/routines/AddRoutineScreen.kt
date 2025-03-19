@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.clock.ClockDialog
 import com.maxkeppeler.sheets.clock.models.ClockSelection
+import com.mlk.taskmanager.ui.settings.SettingsViewModel
 import java.time.DayOfWeek
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -32,7 +33,8 @@ import java.util.*
 @Composable
 fun AddRoutineScreen(
     navController: NavController,
-    viewModel: RoutinesViewModel = hiltViewModel()
+    viewModel: RoutinesViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -40,6 +42,10 @@ fun AddRoutineScreen(
     var selectedDays by remember { mutableStateOf(setOf<DayOfWeek>()) }
     var selectedCategory by remember { mutableStateOf<String?>(null) }
     var showCategoryDialog by remember { mutableStateOf(false) }
+    
+    // Récupérer les catégories depuis les paramètres
+    val settingsState by settingsViewModel.uiState.collectAsState()
+    val categories = settingsState.categories
     
     val timePickerState = rememberUseCaseState()
     
@@ -56,26 +62,33 @@ fun AddRoutineScreen(
             title = { Text("Select Category") },
             text = {
                 Column {
-                    listOf("Work", "Health", "Personal", "Education", "Fitness").forEach { category ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    selectedCategory = category
-                                    showCategoryDialog = false
-                                }
-                                .padding(vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = selectedCategory == category,
-                                onClick = {
-                                    selectedCategory = category
-                                    showCategoryDialog = false
-                                }
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(category)
+                    if (categories.isEmpty()) {
+                        Text(
+                            "No categories available. Add categories in Settings.",
+                            modifier = Modifier.padding(vertical = 12.dp)
+                        )
+                    } else {
+                        categories.forEach { category ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        selectedCategory = category
+                                        showCategoryDialog = false
+                                    }
+                                    .padding(vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = selectedCategory == category,
+                                    onClick = {
+                                        selectedCategory = category
+                                        showCategoryDialog = false
+                                    }
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(category)
+                            }
                         }
                     }
                 }

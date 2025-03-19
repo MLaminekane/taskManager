@@ -8,12 +8,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -23,6 +25,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.mlk.taskmanager.data.model.Routine
 import com.mlk.taskmanager.ui.navigation.Screen
+import com.mlk.taskmanager.ui.settings.SettingsViewModel
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.*
@@ -32,10 +35,20 @@ import java.util.*
 fun RoutineDetailScreen(
     routineId: Long,
     navController: NavController,
-    viewModel: RoutinesViewModel = hiltViewModel()
+    viewModel: RoutinesViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val routine = uiState.routines.find { it.id == routineId }
+    
+    // Récupérer les catégories depuis les paramètres
+    val settingsState by settingsViewModel.uiState.collectAsState()
+    val categories = settingsState.categories
+    
+    // Récupérer le nom de la catégorie à partir de l'ID
+    val categoryName = routine?.categoryId?.let { categoryId ->
+        categories.find { it.hashCode().toLong() == categoryId }
+    }
     
     val scrollState = rememberScrollState()
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -67,7 +80,14 @@ fun RoutineDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Routine Details") },
+                title = { 
+                    Text(
+                        "Routine Details",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold
+                        )
+                    ) 
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -113,7 +133,7 @@ fun RoutineDetailScreen(
                         style = MaterialTheme.typography.headlineMedium
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = { navController.navigate(Screen.Tasks.route) }) {
+                    Button(onClick = { navController.navigate(Screen.Routines.route) }) {
                         Text("Go back to routines")
                     }
                 }
@@ -170,21 +190,43 @@ fun RoutineDetailScreen(
                     
                     Spacer(modifier = Modifier.height(24.dp))
                     
-                    // Time
-                    DetailItem(
-                        icon = Icons.Default.Schedule,
-                        label = "Time",
-                        value = routine.time.format(DateTimeFormatter.ofPattern("h:mm a"))
-                    )
+                    // Info Card
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        ),
+                        elevation = CardDefaults.cardElevation(0.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            // Time
+                            DetailItem(
+                                icon = Icons.Outlined.Schedule,
+                                label = "Time",
+                                value = routine.time.format(DateTimeFormatter.ofPattern("h:mm a"))
+                            )
+                            
+                            // Category (if present)
+                            if (categoryName != null) {
+                                DetailItem(
+                                    icon = Icons.Outlined.Category,
+                                    label = "Category",
+                                    value = categoryName
+                                )
+                            }
+                        }
+                    }
                     
                     // Repeat days section
-                    Text(
-                        text = "Repeats on",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
-                        modifier = Modifier.padding(top = 24.dp, bottom = 12.dp)
-                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    SectionTitle(icon = Icons.Outlined.Repeat, title = "Repeats on")
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
                     
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -236,78 +278,86 @@ fun RoutineDetailScreen(
                         }
                     }
                     
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
                     // Description section
-                    Text(
-                        text = "Description",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Text(
-                        text = routine.description.ifEmpty { "No description provided" },
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
-                    
-                    Spacer(modifier = Modifier.height(24.dp))
+                    if (routine.description.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(24.dp))
+                        
+                        SectionTitle(icon = Icons.Outlined.Description, title = "Description")
+                        
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surface
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                        ) {
+                            Text(
+                                text = routine.description,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
                     
                     // Location section (if present)
                     if (routine.latitude != null && routine.longitude != null) {
-                        Text(
-                            text = "Location",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
+                        Spacer(modifier = Modifier.height(24.dp))
                         
-                        Spacer(modifier = Modifier.height(8.dp))
+                        SectionTitle(icon = Icons.Outlined.LocationOn, title = "Location")
                         
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .clip(RoundedCornerShape(12.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                         ) {
-                            val markerState = rememberMarkerState(
-                                position = LatLng(routine.latitude, routine.longitude)
-                            )
-                            val cameraPositionState = rememberCameraPositionState {
-                                position = CameraPosition.fromLatLngZoom(
-                                    LatLng(routine.latitude, routine.longitude), 15f
-                                )
-                            }
-                            
-                            GoogleMap(
-                                modifier = Modifier.fillMaxSize(),
-                                cameraPositionState = cameraPositionState,
-                                properties = MapProperties(isMyLocationEnabled = false),
-                                uiSettings = MapUiSettings(
-                                    zoomControlsEnabled = false,
-                                    myLocationButtonEnabled = false
-                                )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
                             ) {
-                                Marker(
-                                    state = markerState,
-                                    title = routine.title
+                                val markerState = rememberMarkerState(
+                                    position = LatLng(routine.latitude, routine.longitude)
                                 )
-                                
-                                if (routine.locationRadius != null) {
-                                    Circle(
-                                        center = LatLng(routine.latitude, routine.longitude),
-                                        radius = routine.locationRadius.toDouble(),
-                                        fillColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                                        strokeColor = MaterialTheme.colorScheme.primary,
-                                        strokeWidth = 2f
+                                val cameraPositionState = rememberCameraPositionState {
+                                    position = CameraPosition.fromLatLngZoom(
+                                        LatLng(routine.latitude, routine.longitude), 15f
                                     )
+                                }
+                                
+                                GoogleMap(
+                                    modifier = Modifier.fillMaxSize(),
+                                    cameraPositionState = cameraPositionState,
+                                    properties = MapProperties(isMyLocationEnabled = false),
+                                    uiSettings = MapUiSettings(
+                                        zoomControlsEnabled = false,
+                                        myLocationButtonEnabled = false
+                                    )
+                                ) {
+                                    Marker(
+                                        state = markerState,
+                                        title = routine.title
+                                    )
+                                    
+                                    if (routine.locationRadius != null) {
+                                        Circle(
+                                            center = LatLng(routine.latitude, routine.longitude),
+                                            radius = routine.locationRadius.toDouble(),
+                                            fillColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                            strokeColor = MaterialTheme.colorScheme.primary,
+                                            strokeWidth = 2f
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
+                    
+                    Spacer(modifier = Modifier.height(80.dp)) // Espace pour le FAB
                 }
             }
         }
@@ -315,8 +365,35 @@ fun RoutineDetailScreen(
 }
 
 @Composable
+private fun SectionTitle(
+    icon: ImageVector,
+    title: String
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(20.dp)
+        )
+        
+        Spacer(modifier = Modifier.width(8.dp))
+        
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Bold
+            )
+        )
+    }
+}
+
+@Composable
 private fun DetailItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     label: String,
     value: String
 ) {
@@ -342,7 +419,9 @@ private fun DetailItem(
             
             Text(
                 text = value,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.SemiBold
+                )
             )
         }
     }

@@ -61,12 +61,22 @@ class RoutinesViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             try {
+                // Pour l'instant, on stocke simplement la catégorie comme un entier long 
+                // qui pourrait être converti plus tard en une entité de catégorie
+                val categoryId: Long? = if (category != null) {
+                    // On pourrait simplement utiliser un hashCode pour stocker la catégorie
+                    // ou mettre en place un système plus robuste avec une table séparée
+                    category.hashCode().toLong()
+                } else {
+                    null
+                }
+                
                 val routine = Routine(
                     title = title,
                     description = description,
                     time = time,
                     repeatDays = repeatDays,
-                    categoryId = null, // Will need a category repository to resolve this
+                    categoryId = categoryId,
                     latitude = latitude,
                     longitude = longitude,
                     locationRadius = locationRadius

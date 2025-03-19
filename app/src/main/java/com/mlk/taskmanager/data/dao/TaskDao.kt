@@ -30,8 +30,7 @@ interface TaskDao {
     
     @Query("""
         SELECT * FROM tasks 
-        WHERE isCompleted = 0 
-        AND dueDateTime BETWEEN :start AND :end
+        WHERE dueDateTime BETWEEN :start AND :end
         ORDER BY dueDateTime ASC
     """)
     fun getTasksInTimeRange(start: LocalDateTime, end: LocalDateTime): Flow<List<Task>>

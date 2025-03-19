@@ -838,8 +838,7 @@ public final class TaskDao_TaskDatabase_Impl implements TaskDao {
   public Flow<List<Task>> getTasksInTimeRange(final LocalDateTime start, final LocalDateTime end) {
     final String _sql = "\n"
             + "        SELECT * FROM tasks \n"
-            + "        WHERE isCompleted = 0 \n"
-            + "        AND dueDateTime BETWEEN ? AND ?\n"
+            + "        WHERE dueDateTime BETWEEN ? AND ?\n"
             + "        ORDER BY dueDateTime ASC\n"
             + "    ";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 2);

@@ -26,7 +26,7 @@ public abstract interface TaskDao {
     @org.jetbrains.annotations.NotNull()
     public abstract kotlinx.coroutines.flow.Flow<java.util.List<com.mlk.taskmanager.data.model.Task>> getLocationBasedTasks();
     
-    @androidx.room.Query(value = "\n        SELECT * FROM tasks \n        WHERE isCompleted = 0 \n        AND dueDateTime BETWEEN :start AND :end\n        ORDER BY dueDateTime ASC\n    ")
+    @androidx.room.Query(value = "\n        SELECT * FROM tasks \n        WHERE dueDateTime BETWEEN :start AND :end\n        ORDER BY dueDateTime ASC\n    ")
     @org.jetbrains.annotations.NotNull()
     public abstract kotlinx.coroutines.flow.Flow<java.util.List<com.mlk.taskmanager.data.model.Task>> getTasksInTimeRange(@org.jetbrains.annotations.NotNull()
     java.time.LocalDateTime start, @org.jetbrains.annotations.NotNull()

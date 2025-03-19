@@ -237,71 +237,10 @@ fun HomeScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Today's Tasks Section
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Today tasks",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold
-                )
-            )
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Task Filter Chips
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(TaskFilter.values()) { filter ->
-                FilterChip(
-                    selected = uiState.selectedFilter == filter,
-                    onClick = { viewModel.setTaskFilter(filter) },
-                    label = { 
-                        Text(
-                            when (filter) {
-                                TaskFilter.ALL -> "All tasks"
-                                TaskFilter.IN_PROGRESS -> "In progress"
-                                TaskFilter.COMPLETED -> "Completed"
-                            }
-                        ) 
-                    },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = Color(0xFF613BE7),
-                        selectedLabelColor = Color.White
-                    )
-                )
-            }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (uiState.isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-        } else {
-            // Tasks List
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                if (uiState.todayTasks.isEmpty()) {
-                    item {
-                        EmptyTasksMessage()
-                    }
-                } else {
-                    items(uiState.todayTasks) { task ->
-                        TaskCard(task = task)
-                    }
-                }
-            }
-        }
 
         if (uiState.showCreateProjectDialog) {
             CreateProjectDialog(
@@ -413,9 +352,14 @@ private fun ProjectCard(
 }
 
 @Composable
-private fun TaskCard(task: Task) {
+private fun TaskCard(
+    task: Task,
+    onClick: () -> Unit = {}
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(

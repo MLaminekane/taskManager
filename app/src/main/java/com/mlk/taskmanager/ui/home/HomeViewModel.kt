@@ -46,43 +46,59 @@ class HomeViewModel @Inject constructor(
     
     private fun loadData() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            
             try {
-                combine(
-                    taskRepository.getAllTasks(),
-                    taskRepository.getActiveTasks(),
-                    taskRepository.getTasksInTimeRange(
-                        LocalDateTime.now().withHour(0).withMinute(0),
-                        LocalDateTime.now().withHour(23).withMinute(59)
-                    ),
-                    routineRepository.getActiveRoutines(),
-                    projectRepository.getAllProjects()
-                ) { allTasks, activeTasks, todayTasks, routines, projects ->
-                    _uiState.value.copy(
-                        assignedTasks = activeTasks.size,
-                        completedTasks = allTasks.count { it.isCompleted },
-                        todayTasks = when (_uiState.value.selectedFilter) {
-                            TaskFilter.ALL -> todayTasks
-                            TaskFilter.IN_PROGRESS -> todayTasks.filter { !it.isCompleted }
-                            TaskFilter.COMPLETED -> todayTasks.filter { it.isCompleted }
-                        },
-                        todayRoutines = routines,
-                        projects = projects,
-                        isLoading = false
-                    )
-                }.collect { state ->
-                    _uiState.update { state }
+                // Récupérer toutes les données nécessaires
+                val allTasks = taskRepository.getAllTasks().first()
+                val activeTasks = taskRepository.getActiveTasks().first()
+                val todayStart = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)
+                val todayEnd = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59)
+                
+                // Récupérer les tâches d'aujourd'hui directement via une requête simple
+                val todayTasks = allTasks.filter { task ->
+                    val taskDate = task.dueDateTime
+                    taskDate.isAfter(todayStart) && taskDate.isBefore(todayEnd)
                 }
+                
+                // Appliquer le filtre actuel
+                val filteredTasks = when (_uiState.value.selectedFilter) {
+                    TaskFilter.ALL -> todayTasks
+                    TaskFilter.IN_PROGRESS -> todayTasks.filter { !it.isCompleted }
+                    TaskFilter.COMPLETED -> todayTasks.filter { it.isCompleted }
+                }
+                
+                // Afficher un message de débogage
+                println("DEBUG: Loaded ${todayTasks.size} tasks for today, filtered to ${filteredTasks.size} tasks")
+                
+                // Récupérer les autres données
+                val routines = routineRepository.getActiveRoutines().first()
+                val projects = projectRepository.getAllProjects().first()
+                
+                // Mettre à jour l'état
+                _uiState.update { it.copy(
+                    assignedTasks = activeTasks.size,
+                    completedTasks = allTasks.count { it.isCompleted },
+                    todayTasks = filteredTasks,
+                    todayRoutines = routines,
+                    projects = projects,
+                    isLoading = false
+                )}
             } catch (e: Exception) {
+                println("DEBUG ERROR: ${e.message}")
+                e.printStackTrace()
                 _uiState.update { it.copy(
                     isLoading = false,
                     error = e.message
-                ) }
+                )}
             }
         }
     }
 
     fun setTaskFilter(filter: TaskFilter) {
         _uiState.update { it.copy(selectedFilter = filter) }
+        
+        // Recharger complètement les données pour garantir que les filtres fonctionnent
         loadData()
     }
 

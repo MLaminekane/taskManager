@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Singleton
 class TaskRepositoryImpl @Inject constructor(
@@ -88,4 +90,9 @@ class TaskRepositoryImpl @Inject constructor(
 
     override suspend fun getTasksByDateRange(startDateTime: LocalDateTime, endDateTime: LocalDateTime): List<Task> =
         taskDao.getTasksByDateRange(startDateTime, endDateTime)
+
+    override suspend fun getAllTasksSync(): List<Task> = withContext(Dispatchers.IO) {
+        // Récupération synchrone de toutes les tâches (sans Flow)
+        taskDao.getAllTasksSync()
+    }
 } 

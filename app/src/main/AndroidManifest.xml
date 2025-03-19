@@ -4,6 +4,12 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".TaskManagerApplication"
@@ -31,6 +37,32 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/maps_api_key" />
+            
+        <!-- Service et récepteurs de diffusion pour les notifications -->
+        <receiver
+            android:name=".service.GeofenceBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.mlk.taskmanager.action.GEOFENCE_EVENT" />
+                <action android:name="com.mlk.taskmanager.action.COMPLETE_TASK" />
+                <action android:name="com.mlk.taskmanager.action.SNOOZE_TASK" />
+            </intent-filter>
+        </receiver>
+        
+        <receiver
+            android:name=".service.TimeNotificationReceiver"
+            android:enabled="true"
+            android:exported="false" />
+            
+        <receiver
+            android:name=".service.BootCompletedReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

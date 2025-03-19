@@ -1088,6 +1088,113 @@ public final class TaskDao_TaskDatabase_Impl implements TaskDao {
     }, $completion);
   }
 
+  @Override
+  public Object getAllTasksSync(final Continuation<? super List<Task>> $completion) {
+    final String _sql = "SELECT * FROM tasks";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
+    final CancellationSignal _cancellationSignal = DBUtil.createCancellationSignal();
+    return CoroutinesRoom.execute(__db, false, _cancellationSignal, new Callable<List<Task>>() {
+      @Override
+      @NonNull
+      public List<Task> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfTitle = CursorUtil.getColumnIndexOrThrow(_cursor, "title");
+          final int _cursorIndexOfDescription = CursorUtil.getColumnIndexOrThrow(_cursor, "description");
+          final int _cursorIndexOfDueDateTime = CursorUtil.getColumnIndexOrThrow(_cursor, "dueDateTime");
+          final int _cursorIndexOfIsCompleted = CursorUtil.getColumnIndexOrThrow(_cursor, "isCompleted");
+          final int _cursorIndexOfPriority = CursorUtil.getColumnIndexOrThrow(_cursor, "priority");
+          final int _cursorIndexOfLatitude = CursorUtil.getColumnIndexOrThrow(_cursor, "latitude");
+          final int _cursorIndexOfLongitude = CursorUtil.getColumnIndexOrThrow(_cursor, "longitude");
+          final int _cursorIndexOfLocationRadius = CursorUtil.getColumnIndexOrThrow(_cursor, "locationRadius");
+          final int _cursorIndexOfReminderEnabled = CursorUtil.getColumnIndexOrThrow(_cursor, "reminderEnabled");
+          final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
+          final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
+          final int _cursorIndexOfProjectId = CursorUtil.getColumnIndexOrThrow(_cursor, "projectId");
+          final List<Task> _result = new ArrayList<Task>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final Task _item;
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            final String _tmpTitle;
+            if (_cursor.isNull(_cursorIndexOfTitle)) {
+              _tmpTitle = null;
+            } else {
+              _tmpTitle = _cursor.getString(_cursorIndexOfTitle);
+            }
+            final String _tmpDescription;
+            if (_cursor.isNull(_cursorIndexOfDescription)) {
+              _tmpDescription = null;
+            } else {
+              _tmpDescription = _cursor.getString(_cursorIndexOfDescription);
+            }
+            final LocalDateTime _tmpDueDateTime;
+            final String _tmp;
+            if (_cursor.isNull(_cursorIndexOfDueDateTime)) {
+              _tmp = null;
+            } else {
+              _tmp = _cursor.getString(_cursorIndexOfDueDateTime);
+            }
+            _tmpDueDateTime = __converters.fromTimestamp(_tmp);
+            final boolean _tmpIsCompleted;
+            final int _tmp_1;
+            _tmp_1 = _cursor.getInt(_cursorIndexOfIsCompleted);
+            _tmpIsCompleted = _tmp_1 != 0;
+            final Priority _tmpPriority;
+            _tmpPriority = __Priority_stringToEnum(_cursor.getString(_cursorIndexOfPriority));
+            final Double _tmpLatitude;
+            if (_cursor.isNull(_cursorIndexOfLatitude)) {
+              _tmpLatitude = null;
+            } else {
+              _tmpLatitude = _cursor.getDouble(_cursorIndexOfLatitude);
+            }
+            final Double _tmpLongitude;
+            if (_cursor.isNull(_cursorIndexOfLongitude)) {
+              _tmpLongitude = null;
+            } else {
+              _tmpLongitude = _cursor.getDouble(_cursorIndexOfLongitude);
+            }
+            final Float _tmpLocationRadius;
+            if (_cursor.isNull(_cursorIndexOfLocationRadius)) {
+              _tmpLocationRadius = null;
+            } else {
+              _tmpLocationRadius = _cursor.getFloat(_cursorIndexOfLocationRadius);
+            }
+            final boolean _tmpReminderEnabled;
+            final int _tmp_2;
+            _tmp_2 = _cursor.getInt(_cursorIndexOfReminderEnabled);
+            _tmpReminderEnabled = _tmp_2 != 0;
+            final Long _tmpCategoryId;
+            if (_cursor.isNull(_cursorIndexOfCategoryId)) {
+              _tmpCategoryId = null;
+            } else {
+              _tmpCategoryId = _cursor.getLong(_cursorIndexOfCategoryId);
+            }
+            final String _tmpCategory;
+            if (_cursor.isNull(_cursorIndexOfCategory)) {
+              _tmpCategory = null;
+            } else {
+              _tmpCategory = _cursor.getString(_cursorIndexOfCategory);
+            }
+            final Long _tmpProjectId;
+            if (_cursor.isNull(_cursorIndexOfProjectId)) {
+              _tmpProjectId = null;
+            } else {
+              _tmpProjectId = _cursor.getLong(_cursorIndexOfProjectId);
+            }
+            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+          _statement.release();
+        }
+      }
+    }, $completion);
+  }
+
   @NonNull
   public static List<Class<?>> getRequiredConverters() {
     return Collections.emptyList();

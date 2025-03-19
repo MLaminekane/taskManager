@@ -1,17 +1,40 @@
 package com.mlk.taskmanager.ui.home
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.location.Location
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.mlk.taskmanager.data.model.Project
 import com.mlk.taskmanager.data.model.Routine
 import com.mlk.taskmanager.data.model.Task
+import com.mlk.taskmanager.data.model.WeatherResponse
 import com.mlk.taskmanager.data.repository.ProjectRepository
 import com.mlk.taskmanager.data.repository.RoutineRepository
 import com.mlk.taskmanager.data.repository.TaskRepository
+import com.mlk.taskmanager.data.repository.WeatherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import javax.inject.Inject
 
 data class HomeUiState(
@@ -23,7 +46,11 @@ data class HomeUiState(
     val selectedFilter: TaskFilter = TaskFilter.ALL,
     val isLoading: Boolean = false,
     val error: String? = null,
-    val showCreateProjectDialog: Boolean = false
+    val showCreateProjectDialog: Boolean = false,
+    val weatherData: WeatherResponse? = null,
+    val weatherLoading: Boolean = false,
+    val weatherError: String? = null,
+    val weatherModalVisible: Boolean = false
 )
 
 enum class TaskFilter {
@@ -34,19 +61,48 @@ enum class TaskFilter {
 class HomeViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val routineRepository: RoutineRepository,
-    private val projectRepository: ProjectRepository
+    private val projectRepository: ProjectRepository,
+    private val weatherRepository: WeatherRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
     
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
     init {
-        loadData()
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+        
+        viewModelScope.launch {
+            combine(
+                projectRepository.getAllProjects(),
+                taskRepository.getAllTasks(),
+                routineRepository.getRoutinesForDay(LocalDate.now().dayOfWeek)
+            ) { projects, tasks, routines ->
+                HomeUiState(
+                    assignedTasks = tasks.count { !it.isCompleted },
+                    completedTasks = tasks.count { it.isCompleted },
+                    todayTasks = tasks,
+                    todayRoutines = routines,
+                    projects = projects,
+                    weatherData = _uiState.value.weatherData,
+                    weatherLoading = _uiState.value.weatherLoading,
+                    weatherError = _uiState.value.weatherError,
+                    weatherModalVisible = _uiState.value.weatherModalVisible
+                )
+            }.collect { newState ->
+                _uiState.value = newState
+            }
+        }
+        
+        loadWeatherData()
     }
     
     private fun loadData() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            // Mettre à jour l'état pour indiquer le chargement
+            _uiState.value = _uiState.value.copy(isLoading = true)
             
             try {
                 // Récupérer toutes les données nécessaires
@@ -76,64 +132,109 @@ class HomeViewModel @Inject constructor(
                 val projects = projectRepository.getAllProjects().first()
                 
                 // Mettre à jour l'état
-                _uiState.update { it.copy(
+                _uiState.value = _uiState.value.copy(
                     assignedTasks = activeTasks.size,
                     completedTasks = allTasks.count { it.isCompleted },
                     todayTasks = filteredTasks,
                     todayRoutines = routines,
                     projects = projects,
                     isLoading = false
-                )}
+                )
             } catch (e: Exception) {
                 println("DEBUG ERROR: ${e.message}")
                 e.printStackTrace()
-                _uiState.update { it.copy(
+                _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     error = e.message
-                )}
+                )
             }
         }
     }
 
     fun setTaskFilter(filter: TaskFilter) {
-        _uiState.update { it.copy(selectedFilter = filter) }
+        _uiState.value = _uiState.value.copy(selectedFilter = filter)
         
         // Recharger complètement les données pour garantir que les filtres fonctionnent
         loadData()
     }
 
     fun clearError() {
-        _uiState.update { it.copy(error = null) }
+        _uiState.value = _uiState.value.copy(error = null)
     }
     
     fun showCreateProjectDialog() {
-        _uiState.update { it.copy(showCreateProjectDialog = true) }
+        _uiState.value = _uiState.value.copy(showCreateProjectDialog = true)
     }
     
     fun hideCreateProjectDialog() {
-        _uiState.update { it.copy(showCreateProjectDialog = false) }
+        _uiState.value = _uiState.value.copy(showCreateProjectDialog = false)
     }
     
     fun createProject(name: String, description: String, icon: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val newProject = Project(
+                name = name,
+                description = description,
+                icon = icon,
+                color = 0xFF613BE7L, // Valeur Long sans conversion en Int
+                taskCount = 0
+            )
+            projectRepository.insertProject(newProject)
+        }
+    }
+    
+    @SuppressLint("MissingPermission")
+    fun loadWeatherData() {
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(weatherLoading = true, weatherError = null)
+            
             try {
-                val project = Project(
-                    id = 0, // Auto-généré par Room
-                    name = name,
-                    description = description,
-                    icon = icon,
-                    color = listOf(0xFF613BE7, 0xFF4CAF50, 0xFFE91E63, 0xFFFF9800).random(),
-                    taskCount = 0
-                )
-                projectRepository.insertProject(project)
-                hideCreateProjectDialog()
-                // Recharger les données pour voir le nouveau projet
-                loadData()
+                fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                    location?.let {
+                        fetchWeatherForLocation(it.latitude, it.longitude)
+                    } ?: run {
+                        // Utiliser des coordonnées par défaut si la localisation n'est pas disponible
+                        fetchWeatherForLocation(48.8566, 2.3522) // Paris par défaut
+                    }
+                }
             } catch (e: Exception) {
-                _uiState.update { it.copy(
-                    error = "Erreur lors de la création du projet: ${e.message}"
-                ) }
+                _uiState.value = _uiState.value.copy(
+                    weatherLoading = false,
+                    weatherError = "Impossible d'obtenir la localisation"
+                )
             }
         }
+    }
+    
+    private fun fetchWeatherForLocation(latitude: Double, longitude: Double) {
+        viewModelScope.launch {
+            weatherRepository.getCurrentWeather(latitude, longitude)
+                .catch { e ->
+                    _uiState.value = _uiState.value.copy(
+                        weatherLoading = false,
+                        weatherError = e.message ?: "Erreur lors de la récupération des données météo"
+                    )
+                }
+                .collect { result ->
+                    result.onSuccess { weatherResponse ->
+                        _uiState.value = _uiState.value.copy(
+                            weatherData = weatherResponse,
+                            weatherLoading = false,
+                            weatherError = null
+                        )
+                    }.onFailure { error ->
+                        _uiState.value = _uiState.value.copy(
+                            weatherLoading = false,
+                            weatherError = error.message ?: "Erreur lors de la récupération des données météo"
+                        )
+                    }
+                }
+        }
+    }
+    
+    fun toggleWeatherModal() {
+        _uiState.value = _uiState.value.copy(
+            weatherModalVisible = !_uiState.value.weatherModalVisible
+        )
     }
 } 

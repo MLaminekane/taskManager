@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.mlk.taskmanager.data.model.Priority
 import com.mlk.taskmanager.data.model.Task
 import com.mlk.taskmanager.data.repository.TaskRepository
+import com.mlk.taskmanager.service.LocationReminderService
+import com.mlk.taskmanager.service.NotificationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -32,7 +34,9 @@ data class TasksUiState(
 
 @HiltViewModel
 class TasksViewModel @Inject constructor(
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
+    private val locationReminderService: LocationReminderService,
+    private val notificationManager: NotificationManager
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(TasksUiState(isLoading = true))
@@ -193,6 +197,11 @@ class TasksViewModel @Inject constructor(
                 println("DEBUG: Task object created, inserting into database")
                 val taskId = taskRepository.insertTask(task)
                 println("DEBUG: Task inserted successfully with ID: $taskId")
+                
+                // Utiliser le gestionnaire de notifications pour configurer toutes les notifications
+                val taskWithId = task.copy(id = taskId)
+                notificationManager.scheduleTaskNotifications(taskWithId)
+                println("DEBUG: Notifications scheduled for task")
                 
                 loadTasks()
                 println("DEBUG: Tasks reloaded after insertion")

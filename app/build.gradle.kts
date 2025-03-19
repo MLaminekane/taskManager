@@ -47,6 +47,11 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.8"
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -77,6 +82,7 @@ dependencies {
     // Location and Maps
     implementation("com.google.android.gms:play-services-location:21.1.0")
     implementation("com.google.maps.android:maps-compose:4.3.0")
+    implementation("com.google.android.libraries.places:places:3.3.0")
     
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
@@ -108,4 +114,21 @@ dependencies {
     
     // Gson for JSON serialization
     implementation("com.google.code.gson:gson:2.10.1")
+    
+    // Retrofit for API calls
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+    
+    // Test dependencies
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:5.10.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("app.cash.turbine:turbine:1.0.0") // Pour tester les Flows
+    testImplementation("io.mockk:mockk:1.13.9") // Alternative à Mockito plus adaptée à Kotlin
+    testImplementation("androidx.arch.core:core-testing:2.2.0") // Pour tester LiveData
+    testImplementation("com.google.truth:truth:1.1.5") // Assertions plus lisibles
+    // Room testing
+    testImplementation("androidx.room:room-testing:2.6.1")
 }

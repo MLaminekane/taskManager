@@ -18,11 +18,14 @@ import dagger.hilt.processor.internal.definecomponent.codegen._dagger_hilt_andro
 import dagger.hilt.processor.internal.definecomponent.codegen._dagger_hilt_android_internal_builders_ViewWithFragmentComponentBuilder;
 import dagger.hilt.processor.internal.definecomponent.codegen._dagger_hilt_components_SingletonComponent;
 import hilt_aggregated_deps._com_mlk_taskmanager_TaskManagerApplication_GeneratedInjector;
+import hilt_aggregated_deps._com_mlk_taskmanager_di_ApiModule;
 import hilt_aggregated_deps._com_mlk_taskmanager_di_AppModule;
 import hilt_aggregated_deps._com_mlk_taskmanager_di_DatabaseModule;
 import hilt_aggregated_deps._com_mlk_taskmanager_di_RepositoryModule;
 import hilt_aggregated_deps._com_mlk_taskmanager_di_ServiceModule;
+import hilt_aggregated_deps._com_mlk_taskmanager_service_BootCompletedReceiver_GeneratedInjector;
 import hilt_aggregated_deps._com_mlk_taskmanager_service_GeofenceBroadcastReceiver_GeneratedInjector;
+import hilt_aggregated_deps._com_mlk_taskmanager_service_TimeNotificationReceiver_GeneratedInjector;
 import hilt_aggregated_deps._com_mlk_taskmanager_ui_MainActivity_GeneratedInjector;
 import hilt_aggregated_deps._com_mlk_taskmanager_ui_calendar_CalendarViewModel_HiltModules_BindsModule;
 import hilt_aggregated_deps._com_mlk_taskmanager_ui_calendar_CalendarViewModel_HiltModules_KeyModule;
@@ -75,11 +78,14 @@ import hilt_aggregated_deps._dagger_hilt_android_internal_modules_HiltWrapper_Ac
     },
     aggregatedDeps = {
         _com_mlk_taskmanager_TaskManagerApplication_GeneratedInjector.class,
+        _com_mlk_taskmanager_di_ApiModule.class,
         _com_mlk_taskmanager_di_AppModule.class,
         _com_mlk_taskmanager_di_DatabaseModule.class,
         _com_mlk_taskmanager_di_RepositoryModule.class,
         _com_mlk_taskmanager_di_ServiceModule.class,
+        _com_mlk_taskmanager_service_BootCompletedReceiver_GeneratedInjector.class,
         _com_mlk_taskmanager_service_GeofenceBroadcastReceiver_GeneratedInjector.class,
+        _com_mlk_taskmanager_service_TimeNotificationReceiver_GeneratedInjector.class,
         _com_mlk_taskmanager_ui_MainActivity_GeneratedInjector.class,
         _com_mlk_taskmanager_ui_calendar_CalendarViewModel_HiltModules_BindsModule.class,
         _com_mlk_taskmanager_ui_calendar_CalendarViewModel_HiltModules_KeyModule.class,

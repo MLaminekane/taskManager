@@ -182,7 +182,7 @@ public final class RoutineDao_TaskManagerDatabase_Impl implements RoutineDao {
   }
 
   @Override
-  public Object insertRoutine(final Routine routine, final Continuation<? super Long> arg1) {
+  public Object insertRoutine(final Routine routine, final Continuation<? super Long> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Long>() {
       @Override
       @NonNull
@@ -196,11 +196,11 @@ public final class RoutineDao_TaskManagerDatabase_Impl implements RoutineDao {
           __db.endTransaction();
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
-  public Object deleteRoutine(final Routine routine, final Continuation<? super Unit> arg1) {
+  public Object deleteRoutine(final Routine routine, final Continuation<? super Unit> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -214,11 +214,11 @@ public final class RoutineDao_TaskManagerDatabase_Impl implements RoutineDao {
           __db.endTransaction();
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
-  public Object updateRoutine(final Routine routine, final Continuation<? super Unit> arg1) {
+  public Object updateRoutine(final Routine routine, final Continuation<? super Unit> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -232,7 +232,7 @@ public final class RoutineDao_TaskManagerDatabase_Impl implements RoutineDao {
           __db.endTransaction();
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
@@ -430,7 +430,8 @@ public final class RoutineDao_TaskManagerDatabase_Impl implements RoutineDao {
   }
 
   @Override
-  public Object getRoutineById(final long routineId, final Continuation<? super Routine> arg1) {
+  public Object getRoutineById(final long routineId,
+      final Continuation<? super Routine> $completion) {
     final String _sql = "SELECT * FROM routines WHERE id = ?";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
     int _argIndex = 1;
@@ -522,7 +523,7 @@ public final class RoutineDao_TaskManagerDatabase_Impl implements RoutineDao {
           _statement.release();
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override

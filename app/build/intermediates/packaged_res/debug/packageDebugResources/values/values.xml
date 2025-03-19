@@ -8,6 +8,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="white">#FFFFFFFF</color>
     <string name="app_name">TaskManager</string>
-    <string name="maps_api_key">AIzaSyBNs04JofR1M0boP6s-FP7F3lYM9ZL0y2g</string>
+    <string name="maps_api_key">AIzaSyD6JoDURF9gS8cL4u7ukbmUdaJouFOzZFQ</string>
+    <string name="openweather_api_key">bd5e378503939ddaee76f12ad7a97608</string>
     <style name="Theme.Taskmanager" parent="android:Theme.Material.Light.NoActionBar"/>
 </resources>

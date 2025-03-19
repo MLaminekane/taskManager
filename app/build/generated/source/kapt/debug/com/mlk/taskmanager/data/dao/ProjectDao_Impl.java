@@ -135,7 +135,7 @@ public final class ProjectDao_Impl implements ProjectDao {
   }
 
   @Override
-  public Object insertProject(final Project project, final Continuation<? super Long> arg1) {
+  public Object insertProject(final Project project, final Continuation<? super Long> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Long>() {
       @Override
       @NonNull
@@ -149,11 +149,11 @@ public final class ProjectDao_Impl implements ProjectDao {
           __db.endTransaction();
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
-  public Object updateProject(final Project project, final Continuation<? super Unit> arg1) {
+  public Object updateProject(final Project project, final Continuation<? super Unit> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -167,11 +167,11 @@ public final class ProjectDao_Impl implements ProjectDao {
           __db.endTransaction();
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
-  public Object deleteProject(final long projectId, final Continuation<? super Unit> arg1) {
+  public Object deleteProject(final long projectId, final Continuation<? super Unit> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -192,11 +192,12 @@ public final class ProjectDao_Impl implements ProjectDao {
           __preparedStmtOfDeleteProject.release(_stmt);
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
-  public Object incrementTaskCount(final long projectId, final Continuation<? super Unit> arg1) {
+  public Object incrementTaskCount(final long projectId,
+      final Continuation<? super Unit> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -217,11 +218,12 @@ public final class ProjectDao_Impl implements ProjectDao {
           __preparedStmtOfIncrementTaskCount.release(_stmt);
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
-  public Object decrementTaskCount(final long projectId, final Continuation<? super Unit> arg1) {
+  public Object decrementTaskCount(final long projectId,
+      final Continuation<? super Unit> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -242,7 +244,7 @@ public final class ProjectDao_Impl implements ProjectDao {
           __preparedStmtOfDecrementTaskCount.release(_stmt);
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
@@ -305,7 +307,8 @@ public final class ProjectDao_Impl implements ProjectDao {
   }
 
   @Override
-  public Object getProjectById(final long projectId, final Continuation<? super Project> arg1) {
+  public Object getProjectById(final long projectId,
+      final Continuation<? super Project> $completion) {
     final String _sql = "SELECT * FROM projects WHERE id = ?";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
     int _argIndex = 1;
@@ -359,7 +362,7 @@ public final class ProjectDao_Impl implements ProjectDao {
           _statement.release();
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @NonNull

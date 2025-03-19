@@ -53,4 +53,7 @@ interface TaskDao {
     
     @Query("DELETE FROM tasks WHERE isCompleted = 1")
     suspend fun deleteCompletedTasks()
+
+    @Query("SELECT * FROM tasks")
+    suspend fun getAllTasksSync(): List<Task>
 } 

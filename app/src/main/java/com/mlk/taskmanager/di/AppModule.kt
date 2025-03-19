@@ -7,6 +7,8 @@ import com.mlk.taskmanager.data.repository.SettingsRepository
 import com.mlk.taskmanager.data.repository.SettingsRepositoryImpl
 import com.mlk.taskmanager.data.repository.TaskRepository
 import com.mlk.taskmanager.data.repository.TaskRepositoryImpl
+import com.mlk.taskmanager.service.LocationReminderService
+import com.mlk.taskmanager.service.NotificationManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,5 +35,14 @@ object AppModule {
         @ApplicationContext context: Context
     ): SettingsRepository {
         return SettingsRepositoryImpl(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotificationManager(
+        @ApplicationContext context: Context,
+        locationReminderService: LocationReminderService
+    ): NotificationManager {
+        return NotificationManager(context, locationReminderService)
     }
 } 

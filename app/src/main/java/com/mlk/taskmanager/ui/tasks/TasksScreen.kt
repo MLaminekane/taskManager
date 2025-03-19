@@ -139,7 +139,7 @@ fun TasksScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(listOf("All", "Today", "Completed")) { filter ->
+                            items(listOf("All", "Today", "In Progress", "Completed")) { filter ->
                                 val isSelected = selectedFilter == filter
                                 Card(
                                     modifier = Modifier
@@ -222,6 +222,7 @@ fun TasksScreen(
                         it.dueDateTime.toLocalDate() == LocalDateTime.now().toLocalDate()
                     }
                     "Completed" -> uiState.filteredTasks.filter { it.isCompleted }
+                    "In Progress" -> uiState.filteredTasks.filter { !it.isCompleted }
                     else -> uiState.filteredTasks
                 }
 

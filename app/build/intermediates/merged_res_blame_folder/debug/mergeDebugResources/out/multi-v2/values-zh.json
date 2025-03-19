@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-72:/values-zh/values-zh.xml",
+            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-77:/values-zh/values-zh.xml",
             "map": [
                 {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/4b442b763e919d8c5122d07a65d49f4b/transformed/calendar-1.2.0/res/values-zh/values-zh.xml",

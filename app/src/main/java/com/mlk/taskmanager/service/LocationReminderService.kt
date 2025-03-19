@@ -15,6 +15,9 @@ import com.mlk.taskmanager.ui.MainActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import android.graphics.Color
+import androidx.core.app.NotificationCompat.BigTextStyle
+import com.mlk.taskmanager.R
 
 @Singleton
 class LocationReminderService @Inject constructor(
@@ -52,6 +55,7 @@ class LocationReminderService @Inject constructor(
             action = GeofenceBroadcastReceiver.ACTION_GEOFENCE_EVENT
             putExtra("taskId", task.id)
             putExtra("taskTitle", task.title)
+            putExtra("taskDescription", task.description)
         }
         
         val pendingIntent = PendingIntent.getBroadcast(
@@ -72,25 +76,69 @@ class LocationReminderService @Inject constructor(
         geofencingClient.removeGeofences(listOf(taskId.toString()))
     }
     
-    fun showNotification(taskId: Long, title: String) {
-        val intent = Intent(context, MainActivity::class.java).apply {
+    fun showNotification(taskId: Long, title: String, description: String? = null) {
+        // Intent pour ouvrir l'application
+        val contentIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("taskId", taskId)
         }
         
-        val pendingIntent = PendingIntent.getActivity(
+        val contentPendingIntent = PendingIntent.getActivity(
             context,
             taskId.toInt(),
-            intent,
+            contentIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        
+        // Intent pour marquer comme complété
+        val completeIntent = Intent(context, GeofenceBroadcastReceiver::class.java).apply {
+            action = "TaskManager.action.COMPLETE_TASK"
+            putExtra("taskId", taskId)
+        }
+        
+        val completePendingIntent = PendingIntent.getBroadcast(
+            context,
+            (taskId + 1000).toInt(), // Différent ID pour éviter les collisions
+            completeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        
+        // Intent pour snoozer
+        val snoozeIntent = Intent(context, GeofenceBroadcastReceiver::class.java).apply {
+            action = "TaskManager.action.SNOOZE_TASK"
+            putExtra("taskId", taskId)
+        }
+        
+        val snoozePendingIntent = PendingIntent.getBroadcast(
+            context,
+            (taskId + 2000).toInt(), // Différent ID pour éviter les collisions
+            snoozeIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle("Task Reminder")
+            .setSmallIcon(android.R.drawable.ic_dialog_info) // Using system icon for now
+            .setContentTitle("Location Reminder")
             .setContentText("You're near the location for: $title")
+            .setStyle(BigTextStyle()
+                .bigText("You're near the location for: $title\n${description ?: ""}")
+                .setBigContentTitle("Location Reminder")
+                .setSummaryText("Task Manager")
+            )
+            .setColor(Color.parseColor("#613BE7"))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
+            .setContentIntent(contentPendingIntent)
+            .addAction(
+                android.R.drawable.ic_menu_save, // Using system icon for now
+                "Complete", 
+                completePendingIntent
+            )
+            .addAction(
+                android.R.drawable.ic_menu_recent_history, // Using system icon for now
+                "Snooze", 
+                snoozePendingIntent
+            )
             .build()
         
         notificationManager.notify(taskId.toInt(), notification)
@@ -103,6 +151,9 @@ class LocationReminderService @Inject constructor(
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = "Notifications for location-based task reminders"
+            enableLights(true)
+            lightColor = Color.parseColor("#613BE7")
+            enableVibration(true)
         }
         notificationManager.createNotificationChannel(channel)
     }

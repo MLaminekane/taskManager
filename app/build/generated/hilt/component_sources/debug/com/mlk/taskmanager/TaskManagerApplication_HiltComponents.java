@@ -1,10 +1,13 @@
 package com.mlk.taskmanager;
 
+import com.mlk.taskmanager.di.ApiModule;
 import com.mlk.taskmanager.di.AppModule;
 import com.mlk.taskmanager.di.DatabaseModule;
 import com.mlk.taskmanager.di.RepositoryModule;
 import com.mlk.taskmanager.di.ServiceModule;
+import com.mlk.taskmanager.service.BootCompletedReceiver_GeneratedInjector;
 import com.mlk.taskmanager.service.GeofenceBroadcastReceiver_GeneratedInjector;
+import com.mlk.taskmanager.service.TimeNotificationReceiver_GeneratedInjector;
 import com.mlk.taskmanager.ui.MainActivity_GeneratedInjector;
 import com.mlk.taskmanager.ui.calendar.CalendarViewModel_HiltModules;
 import com.mlk.taskmanager.ui.home.HomeViewModel_HiltModules;
@@ -135,6 +138,7 @@ public final class TaskManagerApplication_HiltComponents {
 
   @Component(
       modules = {
+          ApiModule.class,
           AppModule.class,
           ApplicationContextModule.class,
           DatabaseModule.class,
@@ -147,7 +151,9 @@ public final class TaskManagerApplication_HiltComponents {
   )
   @Singleton
   public abstract static class SingletonC implements TaskManagerApplication_GeneratedInjector,
+      BootCompletedReceiver_GeneratedInjector,
       GeofenceBroadcastReceiver_GeneratedInjector,
+      TimeNotificationReceiver_GeneratedInjector,
       FragmentGetContextFix.FragmentGetContextFixEntryPoint,
       HiltWrapper_ActivityRetainedComponentManager_ActivityRetainedComponentBuilderEntryPoint,
       ServiceComponentManager.ServiceComponentBuilderEntryPoint,

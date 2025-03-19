@@ -1,5 +1,7 @@
 package com.mlk.taskmanager.ui.home
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,8 +28,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mlk.taskmanager.R
-import com.mlk.taskmanager.data.model.Task
 import com.mlk.taskmanager.data.model.Project
+import com.mlk.taskmanager.data.model.Routine
+import com.mlk.taskmanager.data.model.Task
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -38,6 +41,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import com.mlk.taskmanager.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,12 +79,156 @@ fun HomeScreen(
                     )
                 )
             }
-            IconButton(onClick = { /* TODO: Show notifications */ }) {
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = "Notifications",
-                    tint = Color.Black
-                )
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(Color.White)
+                    .clickable { viewModel.toggleWeatherModal() },
+                contentAlignment = Alignment.Center
+            ) {
+                if (uiState.weatherLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        strokeWidth = 2.dp
+                    )
+                } else if (uiState.weatherData != null) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_weather),
+                            contentDescription = "Weather",
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
+                        Text(
+                            text = "${uiState.weatherData?.main?.temp?.toInt()}°",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+                } else {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_weather),
+                        contentDescription = "Weather",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+
+        AnimatedVisibility(
+            visible = uiState.weatherModalVisible,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+            ) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    if (uiState.weatherData != null) {
+                        val weatherData = uiState.weatherData!!
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = weatherData.name,
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                                IconButton(onClick = { viewModel.toggleWeatherModal() }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Close"
+                                    )
+                                }
+                            }
+                            
+                            Spacer(modifier = Modifier.height(8.dp))
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                val weatherIcon = when {
+                                    weatherData.weather.firstOrNull()?.main?.contains("rain", ignoreCase = true) == true -> R.drawable.ic_rainy
+                                    else -> R.drawable.ic_weather
+                                }
+                                
+                                Icon(
+                                    painter = painterResource(id = weatherIcon),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(64.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                
+                                Spacer(modifier = Modifier.width(16.dp))
+                                
+                                Column {
+                                    Text(
+                                        text = "${weatherData.main.temp.toInt()}°C",
+                                        style = MaterialTheme.typography.displayMedium
+                                    )
+                                    Text(
+                                        text = weatherData.weather.firstOrNull()?.description ?: "",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = Color.Gray
+                                    )
+                                }
+                            }
+                            
+                            Spacer(modifier = Modifier.height(16.dp))
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                WeatherInfoItem(
+                                    label = "Ressenti",
+                                    value = "${weatherData.main.feelsLike.toInt()}°C"
+                                )
+                                WeatherInfoItem(
+                                    label = "Humidité",
+                                    value = "${weatherData.main.humidity}%"
+                                )
+                                WeatherInfoItem(
+                                    label = "Vent",
+                                    value = "${weatherData.wind.speed.toInt()} km/h"
+                                )
+                            }
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                }
             }
         }
 
@@ -701,5 +850,24 @@ private fun RoutineCardCompact(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun WeatherInfoItem(label: String, value: String) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = FontWeight.Bold
+            )
+        )
     }
 } 

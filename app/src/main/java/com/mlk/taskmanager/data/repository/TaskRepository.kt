@@ -24,4 +24,6 @@ interface TaskRepository {
     suspend fun deleteCompletedTasks()
 
     suspend fun getTasksByDateRange(startDateTime: LocalDateTime, endDateTime: LocalDateTime): List<Task>
+
+    suspend fun getAllTasksSync(): List<Task>
 } 

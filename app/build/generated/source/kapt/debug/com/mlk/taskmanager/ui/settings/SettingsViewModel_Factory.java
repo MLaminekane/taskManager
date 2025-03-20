@@ -1,6 +1,8 @@
 package com.mlk.taskmanager.ui.settings;
 
+import android.content.Context;
 import com.mlk.taskmanager.data.repository.SettingsRepository;
+import com.mlk.taskmanager.service.CalendarSyncService;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.QualifierMetadata;
@@ -9,7 +11,7 @@ import javax.annotation.processing.Generated;
 import javax.inject.Provider;
 
 @ScopeMetadata
-@QualifierMetadata
+@QualifierMetadata("dagger.hilt.android.qualifiers.ApplicationContext")
 @DaggerGenerated
 @Generated(
     value = "dagger.internal.codegen.ComponentProcessor",
@@ -24,21 +26,32 @@ import javax.inject.Provider;
 public final class SettingsViewModel_Factory implements Factory<SettingsViewModel> {
   private final Provider<SettingsRepository> settingsRepositoryProvider;
 
-  public SettingsViewModel_Factory(Provider<SettingsRepository> settingsRepositoryProvider) {
+  private final Provider<CalendarSyncService> calendarSyncServiceProvider;
+
+  private final Provider<Context> contextProvider;
+
+  public SettingsViewModel_Factory(Provider<SettingsRepository> settingsRepositoryProvider,
+      Provider<CalendarSyncService> calendarSyncServiceProvider,
+      Provider<Context> contextProvider) {
     this.settingsRepositoryProvider = settingsRepositoryProvider;
+    this.calendarSyncServiceProvider = calendarSyncServiceProvider;
+    this.contextProvider = contextProvider;
   }
 
   @Override
   public SettingsViewModel get() {
-    return newInstance(settingsRepositoryProvider.get());
+    return newInstance(settingsRepositoryProvider.get(), calendarSyncServiceProvider.get(), contextProvider.get());
   }
 
   public static SettingsViewModel_Factory create(
-      Provider<SettingsRepository> settingsRepositoryProvider) {
-    return new SettingsViewModel_Factory(settingsRepositoryProvider);
+      Provider<SettingsRepository> settingsRepositoryProvider,
+      Provider<CalendarSyncService> calendarSyncServiceProvider,
+      Provider<Context> contextProvider) {
+    return new SettingsViewModel_Factory(settingsRepositoryProvider, calendarSyncServiceProvider, contextProvider);
   }
 
-  public static SettingsViewModel newInstance(SettingsRepository settingsRepository) {
-    return new SettingsViewModel(settingsRepository);
+  public static SettingsViewModel newInstance(SettingsRepository settingsRepository,
+      CalendarSyncService calendarSyncService, Context context) {
+    return new SettingsViewModel(settingsRepository, calendarSyncService, context);
   }
 }

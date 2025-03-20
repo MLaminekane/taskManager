@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-77:/values-ky/values-ky.xml",
+            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-78:/values-ky/values-ky.xml",
             "map": [
                 {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/2807b4f68536fa34c1fd0ec9c5ef6f52/transformed/appcompat-1.0.0/res/values-ky/values-ky.xml",
@@ -89,6 +89,23 @@
                     }
                 },
                 {
+                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/e829fa9cffb7dd207e4060a112beed49/transformed/play-services-basement-18.2.0/res/values-ky/values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "195",
+                        "endColumns": "153",
+                        "endOffsets": "348"
+                    },
+                    "to": {
+                        "startLines": "46",
+                        "startColumns": "4",
+                        "startOffsets": "4695",
+                        "endColumns": "157",
+                        "endOffsets": "4848"
+                    }
+                },
+                {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/45976b5d10d9845cca96c9abc34ef014/transformed/core-1.15.0/res/values-ky/values-ky.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
@@ -103,23 +120,6 @@
                         "startOffsets": "2802,2902,3004,3107,3214,3316,3420,13857",
                         "endColumns": "99,101,102,106,101,103,110,100",
                         "endOffsets": "2897,2999,3102,3209,3311,3415,3526,13953"
-                    }
-                },
-                {
-                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/ba361ed35f8e12924bacc7f7a7d1c1ac/transformed/play-services-basement-18.1.0/res/values-ky/values.xml",
-                    "from": {
-                        "startLines": "4",
-                        "startColumns": "0",
-                        "startOffsets": "195",
-                        "endColumns": "153",
-                        "endOffsets": "348"
-                    },
-                    "to": {
-                        "startLines": "46",
-                        "startColumns": "4",
-                        "startOffsets": "4695",
-                        "endColumns": "157",
-                        "endOffsets": "4848"
                     }
                 },
                 {

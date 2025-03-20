@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-77:/values-lt/values-lt.xml",
+            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-78:/values-lt/values-lt.xml",
             "map": [
                 {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/45976b5d10d9845cca96c9abc34ef014/transformed/core-1.15.0/res/values-lt/values-lt.xml",
@@ -18,6 +18,23 @@
                         "startOffsets": "2895,2993,3103,3202,3305,3416,3526,14005",
                         "endColumns": "97,109,98,102,110,109,119,100",
                         "endOffsets": "2988,3098,3197,3300,3411,3521,3641,14101"
+                    }
+                },
+                {
+                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/e829fa9cffb7dd207e4060a112beed49/transformed/play-services-basement-18.2.0/res/values-lt/values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "195",
+                        "endColumns": "154",
+                        "endOffsets": "349"
+                    },
+                    "to": {
+                        "startLines": "46",
+                        "startColumns": "4",
+                        "startOffsets": "4829",
+                        "endColumns": "158",
+                        "endOffsets": "4983"
                     }
                 },
                 {
@@ -52,23 +69,6 @@
                         "startOffsets": "6555,6674,6794,6911,7029,7130,7224,7335,7467,7583,7727,7811,7910,8006,8105,8230,8348,8452,8591,8726,8865,9061,9191,9309,9435,9562,9659,9760,9882,10011,10109,10212,10319,10457,10605,10714,10818,10902,10998,11094,11182,11272,11383,11463,11550,11650,11759,11855,11954,12042,12153,12249,12349,12487,12571,12674",
                         "endColumns": "118,119,116,117,100,93,110,131,115,143,83,98,95,98,124,117,103,138,134,138,195,129,117,125,126,96,100,121,128,97,102,106,137,147,108,103,83,95,95,87,89,110,79,86,99,108,95,98,87,110,95,99,137,83,102,96",
                         "endOffsets": "6669,6789,6906,7024,7125,7219,7330,7462,7578,7722,7806,7905,8001,8100,8225,8343,8447,8586,8721,8860,9056,9186,9304,9430,9557,9654,9755,9877,10006,10104,10207,10314,10452,10600,10709,10813,10897,10993,11089,11177,11267,11378,11458,11545,11645,11754,11850,11949,12037,12148,12244,12344,12482,12566,12669,12766"
-                    }
-                },
-                {
-                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/ba361ed35f8e12924bacc7f7a7d1c1ac/transformed/play-services-basement-18.1.0/res/values-lt/values.xml",
-                    "from": {
-                        "startLines": "4",
-                        "startColumns": "0",
-                        "startOffsets": "195",
-                        "endColumns": "154",
-                        "endOffsets": "349"
-                    },
-                    "to": {
-                        "startLines": "46",
-                        "startColumns": "4",
-                        "startOffsets": "4829",
-                        "endColumns": "158",
-                        "endOffsets": "4983"
                     }
                 },
                 {

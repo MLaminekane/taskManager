@@ -3,6 +3,7 @@ package com.mlk.taskmanager.data.dao
 import androidx.room.*
 import com.mlk.taskmanager.data.model.Routine
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.time.DayOfWeek
 
 @Dao
@@ -34,6 +35,6 @@ interface RoutineDao {
     @Delete
     suspend fun deleteRoutine(routine: Routine)
     
-    @Query("SELECT * FROM routines WHERE :dayOfWeek IN (repeatDays) AND isEnabled = 1")
-    fun getRoutinesForDay(dayOfWeek: DayOfWeek): Flow<List<Routine>>
+    @Query("SELECT * FROM routines WHERE isEnabled = 1 ORDER BY time ASC")
+    fun getActiveRoutinesForFiltering(): Flow<List<Routine>>
 } 

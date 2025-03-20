@@ -237,6 +237,78 @@ fun SettingsScreen(
                 }
             }
 
+            // Section Google Calendar
+            item {
+                SettingsSectionHeader(title = "Google Calendar")
+                
+                SwitchPreference(
+                    title = "Synchroniser avec Google Calendar",
+                    description = "Vos routines seront automatiquement synchronisées avec Google Calendar",
+                    icon = Icons.Default.CalendarToday,
+                    isChecked = uiState.isCalendarSyncEnabled,
+                    onCheckedChange = { 
+                        if (it && !uiState.isGoogleSignedIn) {
+                            // Si on active la synchro mais qu'on n'est pas connecté, lancer la connexion
+                            viewModel.signInToGoogle()
+                        } else {
+                            // Sinon, juste changer le paramètre
+                            viewModel.setCalendarSyncEnabled(it)
+                        }
+                    }
+                )
+                
+                if (uiState.isCalendarSyncEnabled) {
+                    if (uiState.isGoogleSignedIn) {
+                        // Afficher les informations du compte connecté
+                        ListPreference(
+                            title = "Compte Google",
+                            value = uiState.googleAccountEmail ?: "Non connecté",
+                            icon = Icons.Default.AccountCircle,
+                            onClick = { /* Ne rien faire, juste informatif */ }
+                        )
+                        
+                        ButtonPreference(
+                            title = "Synchroniser maintenant",
+                            description = "Synchroniser toutes vos routines avec Google Calendar",
+                            icon = Icons.Default.Sync,
+                            onClick = { viewModel.syncAllRoutines() }
+                        )
+                        
+                        ButtonPreference(
+                            title = "Se déconnecter",
+                            description = "Se déconnecter de Google Calendar",
+                            icon = Icons.Default.ExitToApp,
+                            onClick = { viewModel.signOutFromGoogle() }
+                        )
+                    } else {
+                        // Afficher un message si la synchronisation est activée mais pas connecté
+                        ButtonPreference(
+                            title = "Se connecter à Google",
+                            description = "Connexion requise pour synchroniser avec Google Calendar",
+                            icon = Icons.Default.Login,
+                            onClick = { viewModel.signInToGoogle() }
+                        )
+                    }
+                }
+                
+                if (uiState.isSyncing) {
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    )
+                }
+                
+                if (uiState.syncError != null) {
+                    Text(
+                        text = uiState.syncError ?: "",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
+            }
+
             item {
                 Spacer(modifier = Modifier.height(32.dp))
             }
@@ -582,4 +654,132 @@ private fun CategoryDialog(
             }
         }
     )
+}
+
+@Composable
+private fun SettingsSectionHeader(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.padding(bottom = 16.dp)
+    )
+}
+
+@Composable
+private fun SwitchPreference(
+    title: String,
+    description: String,
+    icon: ImageVector,
+    isChecked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Switch(
+            checked = isChecked,
+            onCheckedChange = onCheckedChange
+        )
+    }
+}
+
+@Composable
+private fun ListPreference(
+    title: String,
+    value: String,
+    icon: ImageVector,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun ButtonPreference(
+    title: String,
+    description: String,
+    icon: ImageVector,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
 }

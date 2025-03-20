@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-77:/values-my/values-my.xml",
+            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-78:/values-my/values-my.xml",
             "map": [
                 {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/fddddddc79635dc7fe9d895573bc9ca9/transformed/foundation-release/res/values-my/values-my.xml",
@@ -38,23 +38,6 @@
                     }
                 },
                 {
-                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/ba361ed35f8e12924bacc7f7a7d1c1ac/transformed/play-services-basement-18.1.0/res/values-my/values.xml",
-                    "from": {
-                        "startLines": "4",
-                        "startColumns": "0",
-                        "startOffsets": "195",
-                        "endColumns": "149",
-                        "endOffsets": "344"
-                    },
-                    "to": {
-                        "startLines": "46",
-                        "startColumns": "4",
-                        "startOffsets": "4847",
-                        "endColumns": "153",
-                        "endOffsets": "4996"
-                    }
-                },
-                {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/2eedc387ce78ed91a6996f9c22fe0021/transformed/places-3.3.0/res/values-my/values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11",
@@ -69,6 +52,23 @@
                         "startOffsets": "13222,13302,13370,13462,13532,13584,13660,13742",
                         "endColumns": "79,67,91,69,51,75,81,55",
                         "endOffsets": "13297,13365,13457,13527,13579,13655,13737,13793"
+                    }
+                },
+                {
+                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/e829fa9cffb7dd207e4060a112beed49/transformed/play-services-basement-18.2.0/res/values-my/values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "195",
+                        "endColumns": "149",
+                        "endOffsets": "344"
+                    },
+                    "to": {
+                        "startLines": "46",
+                        "startColumns": "4",
+                        "startOffsets": "4847",
+                        "endColumns": "153",
+                        "endOffsets": "4996"
                     }
                 },
                 {

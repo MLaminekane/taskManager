@@ -33,6 +33,7 @@ class SettingsRepositoryImpl @Inject constructor(
         val DEFAULT_LOCATION_RADIUS = floatPreferencesKey("default_location_radius")
         val CATEGORIES = stringPreferencesKey("categories")
         val DEFAULT_REMINDER_TIME = stringPreferencesKey("default_reminder_time")
+        val CALENDAR_SYNC_ENABLED = booleanPreferencesKey("calendar_sync_enabled")
     }
 
     override suspend fun isDarkMode(): Flow<Boolean> {
@@ -140,6 +141,18 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setDefaultReminderTime(time: LocalTime) {
         context.settingsDataStore.edit { preferences ->
             preferences[PreferencesKeys.DEFAULT_REMINDER_TIME] = time.toString()
+        }
+    }
+
+    override suspend fun isCalendarSyncEnabled(): Flow<Boolean> {
+        return context.settingsDataStore.data.map { preferences ->
+            preferences[PreferencesKeys.CALENDAR_SYNC_ENABLED] ?: false
+        }
+    }
+
+    override suspend fun setCalendarSyncEnabled(enabled: Boolean) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[PreferencesKeys.CALENDAR_SYNC_ENABLED] = enabled
         }
     }
 }

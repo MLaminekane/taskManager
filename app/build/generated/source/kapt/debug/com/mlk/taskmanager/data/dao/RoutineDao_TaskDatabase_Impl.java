@@ -12,13 +12,13 @@ import androidx.room.RoomSQLiteQuery;
 import androidx.room.util.CursorUtil;
 import androidx.room.util.DBUtil;
 import androidx.sqlite.db.SupportSQLiteStatement;
+import com.mlk.taskmanager.data.converter.DayOfWeekConverter;
 import com.mlk.taskmanager.data.model.Routine;
 import com.mlk.taskmanager.data.util.Converters;
 import java.lang.Class;
 import java.lang.Double;
 import java.lang.Exception;
 import java.lang.Float;
-import java.lang.IllegalArgumentException;
 import java.lang.Long;
 import java.lang.Object;
 import java.lang.Override;
@@ -29,7 +29,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import javax.annotation.processing.Generated;
 import kotlin.Unit;
@@ -45,6 +44,8 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
 
   private final Converters __converters = new Converters();
 
+  private final DayOfWeekConverter __dayOfWeekConverter = new DayOfWeekConverter();
+
   private final EntityDeletionOrUpdateAdapter<Routine> __deletionAdapterOfRoutine;
 
   private final EntityDeletionOrUpdateAdapter<Routine> __updateAdapterOfRoutine;
@@ -55,7 +56,7 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR ABORT INTO `routines` (`id`,`title`,`description`,`time`,`repeatDays`,`isEnabled`,`latitude`,`longitude`,`locationRadius`,`categoryId`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?,?)";
+        return "INSERT OR ABORT INTO `routines` (`id`,`title`,`description`,`time`,`repeatDays`,`isEnabled`,`category`,`isLocationBased`,`latitude`,`longitude`,`locationRadius`,`calendarEventId`,`isSyncedWithCalendar`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?,?,?,?,?)";
       }
 
       @Override
@@ -78,7 +79,7 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
         } else {
           statement.bindString(4, _tmp);
         }
-        final String _tmp_1 = __converters.fromDayOfWeekSet(entity.getRepeatDays());
+        final String _tmp_1 = __dayOfWeekConverter.fromDayOfWeekList(entity.getRepeatDays());
         if (_tmp_1 == null) {
           statement.bindNull(5);
         } else {
@@ -86,26 +87,35 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
         }
         final int _tmp_2 = entity.isEnabled() ? 1 : 0;
         statement.bindLong(6, _tmp_2);
-        if (entity.getLatitude() == null) {
+        if (entity.getCategory() == null) {
           statement.bindNull(7);
         } else {
-          statement.bindDouble(7, entity.getLatitude());
+          statement.bindString(7, entity.getCategory());
         }
-        if (entity.getLongitude() == null) {
-          statement.bindNull(8);
-        } else {
-          statement.bindDouble(8, entity.getLongitude());
-        }
-        if (entity.getLocationRadius() == null) {
+        final int _tmp_3 = entity.isLocationBased() ? 1 : 0;
+        statement.bindLong(8, _tmp_3);
+        if (entity.getLatitude() == null) {
           statement.bindNull(9);
         } else {
-          statement.bindDouble(9, entity.getLocationRadius());
+          statement.bindDouble(9, entity.getLatitude());
         }
-        if (entity.getCategoryId() == null) {
+        if (entity.getLongitude() == null) {
           statement.bindNull(10);
         } else {
-          statement.bindLong(10, entity.getCategoryId());
+          statement.bindDouble(10, entity.getLongitude());
         }
+        if (entity.getLocationRadius() == null) {
+          statement.bindNull(11);
+        } else {
+          statement.bindDouble(11, entity.getLocationRadius());
+        }
+        if (entity.getCalendarEventId() == null) {
+          statement.bindNull(12);
+        } else {
+          statement.bindString(12, entity.getCalendarEventId());
+        }
+        final int _tmp_4 = entity.isSyncedWithCalendar() ? 1 : 0;
+        statement.bindLong(13, _tmp_4);
       }
     };
     this.__deletionAdapterOfRoutine = new EntityDeletionOrUpdateAdapter<Routine>(__db) {
@@ -125,7 +135,7 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "UPDATE OR ABORT `routines` SET `id` = ?,`title` = ?,`description` = ?,`time` = ?,`repeatDays` = ?,`isEnabled` = ?,`latitude` = ?,`longitude` = ?,`locationRadius` = ?,`categoryId` = ? WHERE `id` = ?";
+        return "UPDATE OR ABORT `routines` SET `id` = ?,`title` = ?,`description` = ?,`time` = ?,`repeatDays` = ?,`isEnabled` = ?,`category` = ?,`isLocationBased` = ?,`latitude` = ?,`longitude` = ?,`locationRadius` = ?,`calendarEventId` = ?,`isSyncedWithCalendar` = ? WHERE `id` = ?";
       }
 
       @Override
@@ -148,7 +158,7 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
         } else {
           statement.bindString(4, _tmp);
         }
-        final String _tmp_1 = __converters.fromDayOfWeekSet(entity.getRepeatDays());
+        final String _tmp_1 = __dayOfWeekConverter.fromDayOfWeekList(entity.getRepeatDays());
         if (_tmp_1 == null) {
           statement.bindNull(5);
         } else {
@@ -156,27 +166,36 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
         }
         final int _tmp_2 = entity.isEnabled() ? 1 : 0;
         statement.bindLong(6, _tmp_2);
-        if (entity.getLatitude() == null) {
+        if (entity.getCategory() == null) {
           statement.bindNull(7);
         } else {
-          statement.bindDouble(7, entity.getLatitude());
+          statement.bindString(7, entity.getCategory());
         }
-        if (entity.getLongitude() == null) {
-          statement.bindNull(8);
-        } else {
-          statement.bindDouble(8, entity.getLongitude());
-        }
-        if (entity.getLocationRadius() == null) {
+        final int _tmp_3 = entity.isLocationBased() ? 1 : 0;
+        statement.bindLong(8, _tmp_3);
+        if (entity.getLatitude() == null) {
           statement.bindNull(9);
         } else {
-          statement.bindDouble(9, entity.getLocationRadius());
+          statement.bindDouble(9, entity.getLatitude());
         }
-        if (entity.getCategoryId() == null) {
+        if (entity.getLongitude() == null) {
           statement.bindNull(10);
         } else {
-          statement.bindLong(10, entity.getCategoryId());
+          statement.bindDouble(10, entity.getLongitude());
         }
-        statement.bindLong(11, entity.getId());
+        if (entity.getLocationRadius() == null) {
+          statement.bindNull(11);
+        } else {
+          statement.bindDouble(11, entity.getLocationRadius());
+        }
+        if (entity.getCalendarEventId() == null) {
+          statement.bindNull(12);
+        } else {
+          statement.bindString(12, entity.getCalendarEventId());
+        }
+        final int _tmp_4 = entity.isSyncedWithCalendar() ? 1 : 0;
+        statement.bindLong(13, _tmp_4);
+        statement.bindLong(14, entity.getId());
       }
     };
   }
@@ -251,10 +270,13 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
           final int _cursorIndexOfTime = CursorUtil.getColumnIndexOrThrow(_cursor, "time");
           final int _cursorIndexOfRepeatDays = CursorUtil.getColumnIndexOrThrow(_cursor, "repeatDays");
           final int _cursorIndexOfIsEnabled = CursorUtil.getColumnIndexOrThrow(_cursor, "isEnabled");
+          final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
+          final int _cursorIndexOfIsLocationBased = CursorUtil.getColumnIndexOrThrow(_cursor, "isLocationBased");
           final int _cursorIndexOfLatitude = CursorUtil.getColumnIndexOrThrow(_cursor, "latitude");
           final int _cursorIndexOfLongitude = CursorUtil.getColumnIndexOrThrow(_cursor, "longitude");
           final int _cursorIndexOfLocationRadius = CursorUtil.getColumnIndexOrThrow(_cursor, "locationRadius");
-          final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
+          final int _cursorIndexOfCalendarEventId = CursorUtil.getColumnIndexOrThrow(_cursor, "calendarEventId");
+          final int _cursorIndexOfIsSyncedWithCalendar = CursorUtil.getColumnIndexOrThrow(_cursor, "isSyncedWithCalendar");
           final List<Routine> _result = new ArrayList<Routine>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Routine _item;
@@ -280,18 +302,28 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
               _tmp = _cursor.getString(_cursorIndexOfTime);
             }
             _tmpTime = __converters.fromTimeString(_tmp);
-            final Set<DayOfWeek> _tmpRepeatDays;
+            final List<DayOfWeek> _tmpRepeatDays;
             final String _tmp_1;
             if (_cursor.isNull(_cursorIndexOfRepeatDays)) {
               _tmp_1 = null;
             } else {
               _tmp_1 = _cursor.getString(_cursorIndexOfRepeatDays);
             }
-            _tmpRepeatDays = __converters.toDayOfWeekSet(_tmp_1);
+            _tmpRepeatDays = __dayOfWeekConverter.toDayOfWeekList(_tmp_1);
             final boolean _tmpIsEnabled;
             final int _tmp_2;
             _tmp_2 = _cursor.getInt(_cursorIndexOfIsEnabled);
             _tmpIsEnabled = _tmp_2 != 0;
+            final String _tmpCategory;
+            if (_cursor.isNull(_cursorIndexOfCategory)) {
+              _tmpCategory = null;
+            } else {
+              _tmpCategory = _cursor.getString(_cursorIndexOfCategory);
+            }
+            final boolean _tmpIsLocationBased;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsLocationBased);
+            _tmpIsLocationBased = _tmp_3 != 0;
             final Double _tmpLatitude;
             if (_cursor.isNull(_cursorIndexOfLatitude)) {
               _tmpLatitude = null;
@@ -310,13 +342,17 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
             } else {
               _tmpLocationRadius = _cursor.getFloat(_cursorIndexOfLocationRadius);
             }
-            final Long _tmpCategoryId;
-            if (_cursor.isNull(_cursorIndexOfCategoryId)) {
-              _tmpCategoryId = null;
+            final String _tmpCalendarEventId;
+            if (_cursor.isNull(_cursorIndexOfCalendarEventId)) {
+              _tmpCalendarEventId = null;
             } else {
-              _tmpCategoryId = _cursor.getLong(_cursorIndexOfCategoryId);
+              _tmpCalendarEventId = _cursor.getString(_cursorIndexOfCalendarEventId);
             }
-            _item = new Routine(_tmpId,_tmpTitle,_tmpDescription,_tmpTime,_tmpRepeatDays,_tmpIsEnabled,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpCategoryId);
+            final boolean _tmpIsSyncedWithCalendar;
+            final int _tmp_4;
+            _tmp_4 = _cursor.getInt(_cursorIndexOfIsSyncedWithCalendar);
+            _tmpIsSyncedWithCalendar = _tmp_4 != 0;
+            _item = new Routine(_tmpId,_tmpTitle,_tmpDescription,_tmpTime,_tmpRepeatDays,_tmpIsEnabled,_tmpCategory,_tmpIsLocationBased,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpCalendarEventId,_tmpIsSyncedWithCalendar);
             _result.add(_item);
           }
           return _result;
@@ -348,10 +384,13 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
           final int _cursorIndexOfTime = CursorUtil.getColumnIndexOrThrow(_cursor, "time");
           final int _cursorIndexOfRepeatDays = CursorUtil.getColumnIndexOrThrow(_cursor, "repeatDays");
           final int _cursorIndexOfIsEnabled = CursorUtil.getColumnIndexOrThrow(_cursor, "isEnabled");
+          final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
+          final int _cursorIndexOfIsLocationBased = CursorUtil.getColumnIndexOrThrow(_cursor, "isLocationBased");
           final int _cursorIndexOfLatitude = CursorUtil.getColumnIndexOrThrow(_cursor, "latitude");
           final int _cursorIndexOfLongitude = CursorUtil.getColumnIndexOrThrow(_cursor, "longitude");
           final int _cursorIndexOfLocationRadius = CursorUtil.getColumnIndexOrThrow(_cursor, "locationRadius");
-          final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
+          final int _cursorIndexOfCalendarEventId = CursorUtil.getColumnIndexOrThrow(_cursor, "calendarEventId");
+          final int _cursorIndexOfIsSyncedWithCalendar = CursorUtil.getColumnIndexOrThrow(_cursor, "isSyncedWithCalendar");
           final List<Routine> _result = new ArrayList<Routine>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Routine _item;
@@ -377,18 +416,28 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
               _tmp = _cursor.getString(_cursorIndexOfTime);
             }
             _tmpTime = __converters.fromTimeString(_tmp);
-            final Set<DayOfWeek> _tmpRepeatDays;
+            final List<DayOfWeek> _tmpRepeatDays;
             final String _tmp_1;
             if (_cursor.isNull(_cursorIndexOfRepeatDays)) {
               _tmp_1 = null;
             } else {
               _tmp_1 = _cursor.getString(_cursorIndexOfRepeatDays);
             }
-            _tmpRepeatDays = __converters.toDayOfWeekSet(_tmp_1);
+            _tmpRepeatDays = __dayOfWeekConverter.toDayOfWeekList(_tmp_1);
             final boolean _tmpIsEnabled;
             final int _tmp_2;
             _tmp_2 = _cursor.getInt(_cursorIndexOfIsEnabled);
             _tmpIsEnabled = _tmp_2 != 0;
+            final String _tmpCategory;
+            if (_cursor.isNull(_cursorIndexOfCategory)) {
+              _tmpCategory = null;
+            } else {
+              _tmpCategory = _cursor.getString(_cursorIndexOfCategory);
+            }
+            final boolean _tmpIsLocationBased;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsLocationBased);
+            _tmpIsLocationBased = _tmp_3 != 0;
             final Double _tmpLatitude;
             if (_cursor.isNull(_cursorIndexOfLatitude)) {
               _tmpLatitude = null;
@@ -407,13 +456,17 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
             } else {
               _tmpLocationRadius = _cursor.getFloat(_cursorIndexOfLocationRadius);
             }
-            final Long _tmpCategoryId;
-            if (_cursor.isNull(_cursorIndexOfCategoryId)) {
-              _tmpCategoryId = null;
+            final String _tmpCalendarEventId;
+            if (_cursor.isNull(_cursorIndexOfCalendarEventId)) {
+              _tmpCalendarEventId = null;
             } else {
-              _tmpCategoryId = _cursor.getLong(_cursorIndexOfCategoryId);
+              _tmpCalendarEventId = _cursor.getString(_cursorIndexOfCalendarEventId);
             }
-            _item = new Routine(_tmpId,_tmpTitle,_tmpDescription,_tmpTime,_tmpRepeatDays,_tmpIsEnabled,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpCategoryId);
+            final boolean _tmpIsSyncedWithCalendar;
+            final int _tmp_4;
+            _tmp_4 = _cursor.getInt(_cursorIndexOfIsSyncedWithCalendar);
+            _tmpIsSyncedWithCalendar = _tmp_4 != 0;
+            _item = new Routine(_tmpId,_tmpTitle,_tmpDescription,_tmpTime,_tmpRepeatDays,_tmpIsEnabled,_tmpCategory,_tmpIsLocationBased,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpCalendarEventId,_tmpIsSyncedWithCalendar);
             _result.add(_item);
           }
           return _result;
@@ -449,10 +502,13 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
           final int _cursorIndexOfTime = CursorUtil.getColumnIndexOrThrow(_cursor, "time");
           final int _cursorIndexOfRepeatDays = CursorUtil.getColumnIndexOrThrow(_cursor, "repeatDays");
           final int _cursorIndexOfIsEnabled = CursorUtil.getColumnIndexOrThrow(_cursor, "isEnabled");
+          final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
+          final int _cursorIndexOfIsLocationBased = CursorUtil.getColumnIndexOrThrow(_cursor, "isLocationBased");
           final int _cursorIndexOfLatitude = CursorUtil.getColumnIndexOrThrow(_cursor, "latitude");
           final int _cursorIndexOfLongitude = CursorUtil.getColumnIndexOrThrow(_cursor, "longitude");
           final int _cursorIndexOfLocationRadius = CursorUtil.getColumnIndexOrThrow(_cursor, "locationRadius");
-          final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
+          final int _cursorIndexOfCalendarEventId = CursorUtil.getColumnIndexOrThrow(_cursor, "calendarEventId");
+          final int _cursorIndexOfIsSyncedWithCalendar = CursorUtil.getColumnIndexOrThrow(_cursor, "isSyncedWithCalendar");
           final Routine _result;
           if (_cursor.moveToFirst()) {
             final long _tmpId;
@@ -477,18 +533,28 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
               _tmp = _cursor.getString(_cursorIndexOfTime);
             }
             _tmpTime = __converters.fromTimeString(_tmp);
-            final Set<DayOfWeek> _tmpRepeatDays;
+            final List<DayOfWeek> _tmpRepeatDays;
             final String _tmp_1;
             if (_cursor.isNull(_cursorIndexOfRepeatDays)) {
               _tmp_1 = null;
             } else {
               _tmp_1 = _cursor.getString(_cursorIndexOfRepeatDays);
             }
-            _tmpRepeatDays = __converters.toDayOfWeekSet(_tmp_1);
+            _tmpRepeatDays = __dayOfWeekConverter.toDayOfWeekList(_tmp_1);
             final boolean _tmpIsEnabled;
             final int _tmp_2;
             _tmp_2 = _cursor.getInt(_cursorIndexOfIsEnabled);
             _tmpIsEnabled = _tmp_2 != 0;
+            final String _tmpCategory;
+            if (_cursor.isNull(_cursorIndexOfCategory)) {
+              _tmpCategory = null;
+            } else {
+              _tmpCategory = _cursor.getString(_cursorIndexOfCategory);
+            }
+            final boolean _tmpIsLocationBased;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsLocationBased);
+            _tmpIsLocationBased = _tmp_3 != 0;
             final Double _tmpLatitude;
             if (_cursor.isNull(_cursorIndexOfLatitude)) {
               _tmpLatitude = null;
@@ -507,13 +573,17 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
             } else {
               _tmpLocationRadius = _cursor.getFloat(_cursorIndexOfLocationRadius);
             }
-            final Long _tmpCategoryId;
-            if (_cursor.isNull(_cursorIndexOfCategoryId)) {
-              _tmpCategoryId = null;
+            final String _tmpCalendarEventId;
+            if (_cursor.isNull(_cursorIndexOfCalendarEventId)) {
+              _tmpCalendarEventId = null;
             } else {
-              _tmpCategoryId = _cursor.getLong(_cursorIndexOfCategoryId);
+              _tmpCalendarEventId = _cursor.getString(_cursorIndexOfCalendarEventId);
             }
-            _result = new Routine(_tmpId,_tmpTitle,_tmpDescription,_tmpTime,_tmpRepeatDays,_tmpIsEnabled,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpCategoryId);
+            final boolean _tmpIsSyncedWithCalendar;
+            final int _tmp_4;
+            _tmp_4 = _cursor.getInt(_cursorIndexOfIsSyncedWithCalendar);
+            _tmpIsSyncedWithCalendar = _tmp_4 != 0;
+            _result = new Routine(_tmpId,_tmpTitle,_tmpDescription,_tmpTime,_tmpRepeatDays,_tmpIsEnabled,_tmpCategory,_tmpIsLocationBased,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpCalendarEventId,_tmpIsSyncedWithCalendar);
           } else {
             _result = null;
           }
@@ -548,10 +618,13 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
           final int _cursorIndexOfTime = CursorUtil.getColumnIndexOrThrow(_cursor, "time");
           final int _cursorIndexOfRepeatDays = CursorUtil.getColumnIndexOrThrow(_cursor, "repeatDays");
           final int _cursorIndexOfIsEnabled = CursorUtil.getColumnIndexOrThrow(_cursor, "isEnabled");
+          final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
+          final int _cursorIndexOfIsLocationBased = CursorUtil.getColumnIndexOrThrow(_cursor, "isLocationBased");
           final int _cursorIndexOfLatitude = CursorUtil.getColumnIndexOrThrow(_cursor, "latitude");
           final int _cursorIndexOfLongitude = CursorUtil.getColumnIndexOrThrow(_cursor, "longitude");
           final int _cursorIndexOfLocationRadius = CursorUtil.getColumnIndexOrThrow(_cursor, "locationRadius");
-          final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
+          final int _cursorIndexOfCalendarEventId = CursorUtil.getColumnIndexOrThrow(_cursor, "calendarEventId");
+          final int _cursorIndexOfIsSyncedWithCalendar = CursorUtil.getColumnIndexOrThrow(_cursor, "isSyncedWithCalendar");
           final List<Routine> _result = new ArrayList<Routine>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Routine _item;
@@ -577,18 +650,28 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
               _tmp = _cursor.getString(_cursorIndexOfTime);
             }
             _tmpTime = __converters.fromTimeString(_tmp);
-            final Set<DayOfWeek> _tmpRepeatDays;
+            final List<DayOfWeek> _tmpRepeatDays;
             final String _tmp_1;
             if (_cursor.isNull(_cursorIndexOfRepeatDays)) {
               _tmp_1 = null;
             } else {
               _tmp_1 = _cursor.getString(_cursorIndexOfRepeatDays);
             }
-            _tmpRepeatDays = __converters.toDayOfWeekSet(_tmp_1);
+            _tmpRepeatDays = __dayOfWeekConverter.toDayOfWeekList(_tmp_1);
             final boolean _tmpIsEnabled;
             final int _tmp_2;
             _tmp_2 = _cursor.getInt(_cursorIndexOfIsEnabled);
             _tmpIsEnabled = _tmp_2 != 0;
+            final String _tmpCategory;
+            if (_cursor.isNull(_cursorIndexOfCategory)) {
+              _tmpCategory = null;
+            } else {
+              _tmpCategory = _cursor.getString(_cursorIndexOfCategory);
+            }
+            final boolean _tmpIsLocationBased;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsLocationBased);
+            _tmpIsLocationBased = _tmp_3 != 0;
             final Double _tmpLatitude;
             if (_cursor.isNull(_cursorIndexOfLatitude)) {
               _tmpLatitude = null;
@@ -607,13 +690,17 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
             } else {
               _tmpLocationRadius = _cursor.getFloat(_cursorIndexOfLocationRadius);
             }
-            final Long _tmpCategoryId;
-            if (_cursor.isNull(_cursorIndexOfCategoryId)) {
-              _tmpCategoryId = null;
+            final String _tmpCalendarEventId;
+            if (_cursor.isNull(_cursorIndexOfCalendarEventId)) {
+              _tmpCalendarEventId = null;
             } else {
-              _tmpCategoryId = _cursor.getLong(_cursorIndexOfCategoryId);
+              _tmpCalendarEventId = _cursor.getString(_cursorIndexOfCalendarEventId);
             }
-            _item = new Routine(_tmpId,_tmpTitle,_tmpDescription,_tmpTime,_tmpRepeatDays,_tmpIsEnabled,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpCategoryId);
+            final boolean _tmpIsSyncedWithCalendar;
+            final int _tmp_4;
+            _tmp_4 = _cursor.getInt(_cursorIndexOfIsSyncedWithCalendar);
+            _tmpIsSyncedWithCalendar = _tmp_4 != 0;
+            _item = new Routine(_tmpId,_tmpTitle,_tmpDescription,_tmpTime,_tmpRepeatDays,_tmpIsEnabled,_tmpCategory,_tmpIsLocationBased,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpCalendarEventId,_tmpIsSyncedWithCalendar);
             _result.add(_item);
           }
           return _result;
@@ -630,11 +717,9 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
   }
 
   @Override
-  public Flow<List<Routine>> getRoutinesForDay(final DayOfWeek dayOfWeek) {
-    final String _sql = "SELECT * FROM routines WHERE ? IN (repeatDays) AND isEnabled = 1";
-    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
-    int _argIndex = 1;
-    _statement.bindString(_argIndex, __DayOfWeek_enumToString(dayOfWeek));
+  public Flow<List<Routine>> getActiveRoutinesForFiltering() {
+    final String _sql = "SELECT * FROM routines WHERE isEnabled = 1 ORDER BY time ASC";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
     return CoroutinesRoom.createFlow(__db, false, new String[] {"routines"}, new Callable<List<Routine>>() {
       @Override
       @NonNull
@@ -647,10 +732,13 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
           final int _cursorIndexOfTime = CursorUtil.getColumnIndexOrThrow(_cursor, "time");
           final int _cursorIndexOfRepeatDays = CursorUtil.getColumnIndexOrThrow(_cursor, "repeatDays");
           final int _cursorIndexOfIsEnabled = CursorUtil.getColumnIndexOrThrow(_cursor, "isEnabled");
+          final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
+          final int _cursorIndexOfIsLocationBased = CursorUtil.getColumnIndexOrThrow(_cursor, "isLocationBased");
           final int _cursorIndexOfLatitude = CursorUtil.getColumnIndexOrThrow(_cursor, "latitude");
           final int _cursorIndexOfLongitude = CursorUtil.getColumnIndexOrThrow(_cursor, "longitude");
           final int _cursorIndexOfLocationRadius = CursorUtil.getColumnIndexOrThrow(_cursor, "locationRadius");
-          final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
+          final int _cursorIndexOfCalendarEventId = CursorUtil.getColumnIndexOrThrow(_cursor, "calendarEventId");
+          final int _cursorIndexOfIsSyncedWithCalendar = CursorUtil.getColumnIndexOrThrow(_cursor, "isSyncedWithCalendar");
           final List<Routine> _result = new ArrayList<Routine>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Routine _item;
@@ -676,18 +764,28 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
               _tmp = _cursor.getString(_cursorIndexOfTime);
             }
             _tmpTime = __converters.fromTimeString(_tmp);
-            final Set<DayOfWeek> _tmpRepeatDays;
+            final List<DayOfWeek> _tmpRepeatDays;
             final String _tmp_1;
             if (_cursor.isNull(_cursorIndexOfRepeatDays)) {
               _tmp_1 = null;
             } else {
               _tmp_1 = _cursor.getString(_cursorIndexOfRepeatDays);
             }
-            _tmpRepeatDays = __converters.toDayOfWeekSet(_tmp_1);
+            _tmpRepeatDays = __dayOfWeekConverter.toDayOfWeekList(_tmp_1);
             final boolean _tmpIsEnabled;
             final int _tmp_2;
             _tmp_2 = _cursor.getInt(_cursorIndexOfIsEnabled);
             _tmpIsEnabled = _tmp_2 != 0;
+            final String _tmpCategory;
+            if (_cursor.isNull(_cursorIndexOfCategory)) {
+              _tmpCategory = null;
+            } else {
+              _tmpCategory = _cursor.getString(_cursorIndexOfCategory);
+            }
+            final boolean _tmpIsLocationBased;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsLocationBased);
+            _tmpIsLocationBased = _tmp_3 != 0;
             final Double _tmpLatitude;
             if (_cursor.isNull(_cursorIndexOfLatitude)) {
               _tmpLatitude = null;
@@ -706,13 +804,17 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
             } else {
               _tmpLocationRadius = _cursor.getFloat(_cursorIndexOfLocationRadius);
             }
-            final Long _tmpCategoryId;
-            if (_cursor.isNull(_cursorIndexOfCategoryId)) {
-              _tmpCategoryId = null;
+            final String _tmpCalendarEventId;
+            if (_cursor.isNull(_cursorIndexOfCalendarEventId)) {
+              _tmpCalendarEventId = null;
             } else {
-              _tmpCategoryId = _cursor.getLong(_cursorIndexOfCategoryId);
+              _tmpCalendarEventId = _cursor.getString(_cursorIndexOfCalendarEventId);
             }
-            _item = new Routine(_tmpId,_tmpTitle,_tmpDescription,_tmpTime,_tmpRepeatDays,_tmpIsEnabled,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpCategoryId);
+            final boolean _tmpIsSyncedWithCalendar;
+            final int _tmp_4;
+            _tmp_4 = _cursor.getInt(_cursorIndexOfIsSyncedWithCalendar);
+            _tmpIsSyncedWithCalendar = _tmp_4 != 0;
+            _item = new Routine(_tmpId,_tmpTitle,_tmpDescription,_tmpTime,_tmpRepeatDays,_tmpIsEnabled,_tmpCategory,_tmpIsLocationBased,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpCalendarEventId,_tmpIsSyncedWithCalendar);
             _result.add(_item);
           }
           return _result;
@@ -731,18 +833,5 @@ public final class RoutineDao_TaskDatabase_Impl implements RoutineDao {
   @NonNull
   public static List<Class<?>> getRequiredConverters() {
     return Collections.emptyList();
-  }
-
-  private String __DayOfWeek_enumToString(@NonNull final DayOfWeek _value) {
-    switch (_value) {
-      case MONDAY: return "MONDAY";
-      case TUESDAY: return "TUESDAY";
-      case WEDNESDAY: return "WEDNESDAY";
-      case THURSDAY: return "THURSDAY";
-      case FRIDAY: return "FRIDAY";
-      case SATURDAY: return "SATURDAY";
-      case SUNDAY: return "SUNDAY";
-      default: throw new IllegalArgumentException("Can't convert enum to string, unknown enum value: " + _value);
-    }
   }
 }

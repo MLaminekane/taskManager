@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-77:/values-ka/values-ka.xml",
+            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-78:/values-ka/values-ka.xml",
             "map": [
                 {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/2807b4f68536fa34c1fd0ec9c5ef6f52/transformed/appcompat-1.0.0/res/values-ka/values-ka.xml",
@@ -72,6 +72,23 @@
                     }
                 },
                 {
+                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/e829fa9cffb7dd207e4060a112beed49/transformed/play-services-basement-18.2.0/res/values-ka/values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "195",
+                        "endColumns": "138",
+                        "endOffsets": "333"
+                    },
+                    "to": {
+                        "startLines": "46",
+                        "startColumns": "4",
+                        "startOffsets": "4734",
+                        "endColumns": "142",
+                        "endOffsets": "4872"
+                    }
+                },
+                {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/501e27abcb87b839fe2a3b7f61122c70/transformed/play-services-base-18.1.0/res/values-ka/values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
@@ -120,23 +137,6 @@
                         "startOffsets": "2818,2914,3016,3115,3214,3320,3424,13820",
                         "endColumns": "95,101,98,98,105,103,117,100",
                         "endOffsets": "2909,3011,3110,3209,3315,3419,3537,13916"
-                    }
-                },
-                {
-                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/ba361ed35f8e12924bacc7f7a7d1c1ac/transformed/play-services-basement-18.1.0/res/values-ka/values.xml",
-                    "from": {
-                        "startLines": "4",
-                        "startColumns": "0",
-                        "startOffsets": "195",
-                        "endColumns": "138",
-                        "endOffsets": "333"
-                    },
-                    "to": {
-                        "startLines": "46",
-                        "startColumns": "4",
-                        "startOffsets": "4734",
-                        "endColumns": "142",
-                        "endOffsets": "4872"
                     }
                 }
             ]

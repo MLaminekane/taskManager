@@ -1,110 +1,110 @@
 [
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/xml_backup_rules.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/xml/backup_rules.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/mipmap-hdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/xml_data_extraction_rules.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/xml/data_extraction_rules.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/drawable_ic_sunny.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/drawable/ic_sunny.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/drawable_ic_launcher_foreground.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/drawable/ic_launcher_foreground.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/drawable_task_illustration.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/drawable/task_illustration.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/drawable_ic_sunny.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/drawable/ic_sunny.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/drawable_ic_weather.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/drawable/ic_weather.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/drawable_ic_clock.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/drawable/ic_clock.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/drawable_ic_cloudy.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/drawable/ic_cloudy.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/mipmap-xhdpi_ic_launcher_round.webp.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/mipmap-xhdpi/ic_launcher_round.webp"
+        "merged": "com.mlk.taskmanager.app-debug-80:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/drawable/ic_launcher_background.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/mipmap-xxxhdpi/ic_launcher_round.webp"
+        "merged": "com.mlk.taskmanager.app-debug-80:/mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/mipmap-mdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/drawable_ic_launcher_background.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/drawable/ic_launcher_background.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/mipmap-xxxhdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/drawable_ic_rainy.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/drawable/ic_rainy.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/xml_backup_rules.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/xml/backup_rules.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/mipmap-xxxhdpi_ic_launcher.webp.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/mipmap-xxxhdpi/ic_launcher.webp"
+        "merged": "com.mlk.taskmanager.app-debug-80:/drawable_ic_rainy.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/drawable/ic_rainy.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/mipmap-xxhdpi/ic_launcher_round.webp"
+        "merged": "com.mlk.taskmanager.app-debug-80:/mipmap-anydpi_ic_launcher.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/mipmap-anydpi/ic_launcher.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/mipmap-xhdpi_ic_launcher.webp.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/mipmap-xhdpi/ic_launcher.webp"
+        "merged": "com.mlk.taskmanager.app-debug-80:/drawable_ic_location.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/drawable/ic_location.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/mipmap-mdpi_ic_launcher.webp.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/mipmap-mdpi/ic_launcher.webp"
+        "merged": "com.mlk.taskmanager.app-debug-80:/drawable_ic_clock.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/drawable/ic_clock.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/mipmap-mdpi_ic_launcher_round.webp.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/mipmap-mdpi/ic_launcher_round.webp"
+        "merged": "com.mlk.taskmanager.app-debug-80:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/drawable/ic_launcher_foreground.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/drawable_car_project.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/drawable/car_project.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/mipmap-xxhdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/drawable_ic_calendar.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/drawable/ic_calendar.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/mipmap-mdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/mipmap-anydpi_ic_launcher.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/mipmap-anydpi/ic_launcher.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/mipmap-xhdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/mipmap-hdpi_ic_launcher.webp.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/mipmap-hdpi/ic_launcher.webp"
+        "merged": "com.mlk.taskmanager.app-debug-80:/drawable_ic_calendar.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/drawable/ic_calendar.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/mipmap-hdpi_ic_launcher_round.webp.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/mipmap-hdpi/ic_launcher_round.webp"
+        "merged": "com.mlk.taskmanager.app-debug-80:/drawable_design_project.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/drawable/design_project.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/drawable_ic_location.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/drawable/ic_location.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/drawable_car_project.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/drawable/car_project.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/mipmap-xxhdpi_ic_launcher.webp.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/mipmap-xxhdpi/ic_launcher.webp"
+        "merged": "com.mlk.taskmanager.app-debug-80:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/mipmap-xxhdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/drawable_design_project.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/drawable/design_project.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/mipmap-xxxhdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/mipmap-anydpi_ic_launcher_round.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/mipmap-anydpi/ic_launcher_round.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/mipmap-xhdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/drawable_task_illustration.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/drawable/task_illustration.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/mipmap-anydpi_ic_launcher_round.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/mipmap-anydpi/ic_launcher_round.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/drawable_ic_snowy.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/drawable/ic_snowy.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/drawable_ic_snowy.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/drawable/ic_snowy.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/drawable_ic_cloudy.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/drawable/ic_cloudy.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/xml_data_extraction_rules.xml.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/xml/data_extraction_rules.xml"
     },
     {
-        "merged": "com.mlk.taskmanager.app-debug-79:/drawable_ic_weather.xml.flat",
-        "source": "com.mlk.taskmanager.app-main-81:/drawable/ic_weather.xml"
+        "merged": "com.mlk.taskmanager.app-debug-80:/mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "com.mlk.taskmanager.app-main-82:/mipmap-hdpi/ic_launcher.webp"
     }
 ]

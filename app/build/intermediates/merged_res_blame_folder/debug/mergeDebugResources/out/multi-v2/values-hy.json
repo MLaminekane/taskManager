@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-77:/values-hy/values-hy.xml",
+            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-78:/values-hy/values-hy.xml",
             "map": [
                 {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/2eedc387ce78ed91a6996f9c22fe0021/transformed/places-3.3.0/res/values-hy/values.xml",
@@ -21,6 +21,23 @@
                     }
                 },
                 {
+                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/e829fa9cffb7dd207e4060a112beed49/transformed/play-services-basement-18.2.0/res/values-hy/values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "195",
+                        "endColumns": "146",
+                        "endOffsets": "341"
+                    },
+                    "to": {
+                        "startLines": "46",
+                        "startColumns": "4",
+                        "startOffsets": "4746",
+                        "endColumns": "150",
+                        "endOffsets": "4892"
+                    }
+                },
+                {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/45976b5d10d9845cca96c9abc34ef014/transformed/core-1.15.0/res/values-hy/values-hy.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
@@ -35,23 +52,6 @@
                         "startOffsets": "2802,2902,3007,3105,3204,3309,3411,13845",
                         "endColumns": "99,104,97,98,104,101,110,100",
                         "endOffsets": "2897,3002,3100,3199,3304,3406,3517,13941"
-                    }
-                },
-                {
-                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/ba361ed35f8e12924bacc7f7a7d1c1ac/transformed/play-services-basement-18.1.0/res/values-hy/values.xml",
-                    "from": {
-                        "startLines": "4",
-                        "startColumns": "0",
-                        "startOffsets": "195",
-                        "endColumns": "146",
-                        "endOffsets": "341"
-                    },
-                    "to": {
-                        "startLines": "46",
-                        "startColumns": "4",
-                        "startOffsets": "4746",
-                        "endColumns": "150",
-                        "endOffsets": "4892"
                     }
                 },
                 {

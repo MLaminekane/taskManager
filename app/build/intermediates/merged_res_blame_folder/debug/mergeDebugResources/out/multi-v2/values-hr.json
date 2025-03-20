@@ -1,8 +1,25 @@
 {
     "logs": [
         {
-            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-77:/values-hr/values-hr.xml",
+            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-78:/values-hr/values-hr.xml",
             "map": [
+                {
+                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/e829fa9cffb7dd207e4060a112beed49/transformed/play-services-basement-18.2.0/res/values-hr/values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "195",
+                        "endColumns": "127",
+                        "endOffsets": "322"
+                    },
+                    "to": {
+                        "startLines": "46",
+                        "startColumns": "4",
+                        "startOffsets": "4767",
+                        "endColumns": "131",
+                        "endOffsets": "4894"
+                    }
+                },
                 {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/501e27abcb87b839fe2a3b7f61122c70/transformed/play-services-base-18.1.0/res/values-hr/values.xml",
                     "from": {
@@ -120,23 +137,6 @@
                         "startOffsets": "14209,14292",
                         "endColumns": "82,84",
                         "endOffsets": "14287,14372"
-                    }
-                },
-                {
-                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/ba361ed35f8e12924bacc7f7a7d1c1ac/transformed/play-services-basement-18.1.0/res/values-hr/values.xml",
-                    "from": {
-                        "startLines": "4",
-                        "startColumns": "0",
-                        "startOffsets": "195",
-                        "endColumns": "127",
-                        "endOffsets": "322"
-                    },
-                    "to": {
-                        "startLines": "46",
-                        "startColumns": "4",
-                        "startOffsets": "4767",
-                        "endColumns": "131",
-                        "endOffsets": "4894"
                     }
                 }
             ]

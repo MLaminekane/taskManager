@@ -7,6 +7,9 @@ import android.view.View;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.mlk.taskmanager.data.api.WeatherApiService;
 import com.mlk.taskmanager.data.dao.ProjectDao;
 import com.mlk.taskmanager.data.dao.RoutineDao;
@@ -23,12 +26,14 @@ import com.mlk.taskmanager.di.ApiModule_ProvideWeatherApiServiceFactory;
 import com.mlk.taskmanager.di.AppModule_ProvideNotificationManagerFactory;
 import com.mlk.taskmanager.di.AppModule_ProvideSettingsRepositoryFactory;
 import com.mlk.taskmanager.di.AppModule_ProvideTaskRepositoryFactory;
+import com.mlk.taskmanager.di.AppModule_ProvideWeatherRepositoryFactory;
 import com.mlk.taskmanager.di.DatabaseModule_ProvideProjectDaoFactory;
 import com.mlk.taskmanager.di.DatabaseModule_ProvideRoutineDaoFactory;
 import com.mlk.taskmanager.di.DatabaseModule_ProvideTaskDatabaseFactory;
 import com.mlk.taskmanager.di.ServiceModule_ProvideNotificationManagerFactory;
 import com.mlk.taskmanager.service.BootCompletedReceiver;
 import com.mlk.taskmanager.service.BootCompletedReceiver_MembersInjector;
+import com.mlk.taskmanager.service.CalendarSyncService;
 import com.mlk.taskmanager.service.GeofenceBroadcastReceiver;
 import com.mlk.taskmanager.service.GeofenceBroadcastReceiver_MembersInjector;
 import com.mlk.taskmanager.service.LocationReminderService;
@@ -39,6 +44,8 @@ import com.mlk.taskmanager.ui.calendar.CalendarViewModel;
 import com.mlk.taskmanager.ui.calendar.CalendarViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.mlk.taskmanager.ui.home.HomeViewModel;
 import com.mlk.taskmanager.ui.home.HomeViewModel_HiltModules_KeyModule_ProvideFactory;
+import com.mlk.taskmanager.ui.routines.RoutineDetailViewModel;
+import com.mlk.taskmanager.ui.routines.RoutineDetailViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.mlk.taskmanager.ui.routines.RoutinesViewModel;
 import com.mlk.taskmanager.ui.routines.RoutinesViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.mlk.taskmanager.ui.settings.SettingsViewModel;
@@ -62,11 +69,8 @@ import dagger.hilt.android.internal.modules.ApplicationContextModule;
 import dagger.hilt.android.internal.modules.ApplicationContextModule_ProvideContextFactory;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.DoubleCheck;
-import dagger.internal.MapBuilder;
 import dagger.internal.Preconditions;
 import dagger.internal.Provider;
-import dagger.internal.SetBuilder;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.Generated;
@@ -404,7 +408,7 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
 
     @Override
     public Set<String> getViewModelKeys() {
-      return SetBuilder.<String>newSetBuilder(5).add(CalendarViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(HomeViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(RoutinesViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(SettingsViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(TasksViewModel_HiltModules_KeyModule_ProvideFactory.provide()).build();
+      return ImmutableSet.<String>of(CalendarViewModel_HiltModules_KeyModule_ProvideFactory.provide(), HomeViewModel_HiltModules_KeyModule_ProvideFactory.provide(), RoutineDetailViewModel_HiltModules_KeyModule_ProvideFactory.provide(), RoutinesViewModel_HiltModules_KeyModule_ProvideFactory.provide(), SettingsViewModel_HiltModules_KeyModule_ProvideFactory.provide(), TasksViewModel_HiltModules_KeyModule_ProvideFactory.provide());
     }
 
     @Override
@@ -424,6 +428,8 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
   }
 
   private static final class ViewModelCImpl extends TaskManagerApplication_HiltComponents.ViewModelC {
+    private final SavedStateHandle savedStateHandle;
+
     private final SingletonCImpl singletonCImpl;
 
     private final ActivityRetainedCImpl activityRetainedCImpl;
@@ -433,6 +439,8 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
     private Provider<CalendarViewModel> calendarViewModelProvider;
 
     private Provider<HomeViewModel> homeViewModelProvider;
+
+    private Provider<RoutineDetailViewModel> routineDetailViewModelProvider;
 
     private Provider<RoutinesViewModel> routinesViewModelProvider;
 
@@ -445,7 +453,7 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
         ViewModelLifecycle viewModelLifecycleParam) {
       this.singletonCImpl = singletonCImpl;
       this.activityRetainedCImpl = activityRetainedCImpl;
-
+      this.savedStateHandle = savedStateHandleParam;
       initialize(savedStateHandleParam, viewModelLifecycleParam);
 
     }
@@ -455,19 +463,20 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
         final ViewModelLifecycle viewModelLifecycleParam) {
       this.calendarViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 0);
       this.homeViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 1);
-      this.routinesViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 2);
-      this.settingsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 3);
-      this.tasksViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 4);
+      this.routineDetailViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 2);
+      this.routinesViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 3);
+      this.settingsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 4);
+      this.tasksViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 5);
     }
 
     @Override
     public Map<String, javax.inject.Provider<ViewModel>> getHiltViewModelMap() {
-      return MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(5).put("com.mlk.taskmanager.ui.calendar.CalendarViewModel", ((Provider) calendarViewModelProvider)).put("com.mlk.taskmanager.ui.home.HomeViewModel", ((Provider) homeViewModelProvider)).put("com.mlk.taskmanager.ui.routines.RoutinesViewModel", ((Provider) routinesViewModelProvider)).put("com.mlk.taskmanager.ui.settings.SettingsViewModel", ((Provider) settingsViewModelProvider)).put("com.mlk.taskmanager.ui.tasks.TasksViewModel", ((Provider) tasksViewModelProvider)).build();
+      return ImmutableMap.<String, javax.inject.Provider<ViewModel>>builderWithExpectedSize(6).put("com.mlk.taskmanager.ui.calendar.CalendarViewModel", ((Provider) calendarViewModelProvider)).put("com.mlk.taskmanager.ui.home.HomeViewModel", ((Provider) homeViewModelProvider)).put("com.mlk.taskmanager.ui.routines.RoutineDetailViewModel", ((Provider) routineDetailViewModelProvider)).put("com.mlk.taskmanager.ui.routines.RoutinesViewModel", ((Provider) routinesViewModelProvider)).put("com.mlk.taskmanager.ui.settings.SettingsViewModel", ((Provider) settingsViewModelProvider)).put("com.mlk.taskmanager.ui.tasks.TasksViewModel", ((Provider) tasksViewModelProvider)).build();
     }
 
     @Override
     public Map<String, Object> getHiltViewModelAssistedMap() {
-      return Collections.<String, Object>emptyMap();
+      return ImmutableMap.<String, Object>of();
     }
 
     private static final class SwitchingProvider<T> implements Provider<T> {
@@ -495,15 +504,18 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
           return (T) new CalendarViewModel(singletonCImpl.provideTaskRepositoryProvider.get());
 
           case 1: // com.mlk.taskmanager.ui.home.HomeViewModel 
-          return (T) new HomeViewModel(singletonCImpl.provideTaskRepositoryProvider.get(), singletonCImpl.routineRepositoryImplProvider.get(), singletonCImpl.bindProjectRepositoryProvider.get(), singletonCImpl.weatherRepositoryProvider.get(), ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+          return (T) new HomeViewModel(singletonCImpl.provideTaskRepositoryProvider.get(), singletonCImpl.routineRepositoryImplProvider.get(), singletonCImpl.bindProjectRepositoryProvider.get(), singletonCImpl.provideWeatherRepositoryProvider.get(), ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
-          case 2: // com.mlk.taskmanager.ui.routines.RoutinesViewModel 
-          return (T) new RoutinesViewModel(singletonCImpl.routineRepositoryImplProvider.get());
+          case 2: // com.mlk.taskmanager.ui.routines.RoutineDetailViewModel 
+          return (T) new RoutineDetailViewModel(singletonCImpl.routineRepositoryImplProvider.get(), singletonCImpl.calendarSyncServiceProvider.get(), singletonCImpl.provideSettingsRepositoryProvider.get(), viewModelCImpl.savedStateHandle);
 
-          case 3: // com.mlk.taskmanager.ui.settings.SettingsViewModel 
-          return (T) new SettingsViewModel(singletonCImpl.provideSettingsRepositoryProvider.get());
+          case 3: // com.mlk.taskmanager.ui.routines.RoutinesViewModel 
+          return (T) new RoutinesViewModel(singletonCImpl.routineRepositoryImplProvider.get(), singletonCImpl.calendarSyncServiceProvider.get());
 
-          case 4: // com.mlk.taskmanager.ui.tasks.TasksViewModel 
+          case 4: // com.mlk.taskmanager.ui.settings.SettingsViewModel 
+          return (T) new SettingsViewModel(singletonCImpl.provideSettingsRepositoryProvider.get(), singletonCImpl.calendarSyncServiceProvider.get(), ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 5: // com.mlk.taskmanager.ui.tasks.TasksViewModel 
           return (T) new TasksViewModel(singletonCImpl.provideTaskRepositoryProvider.get(), singletonCImpl.locationReminderServiceProvider.get(), singletonCImpl.provideNotificationManagerProvider2.get());
 
           default: throw new AssertionError(id);
@@ -612,7 +624,9 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
 
     private Provider<WeatherApiService> provideWeatherApiServiceProvider;
 
-    private Provider<WeatherRepository> weatherRepositoryProvider;
+    private Provider<WeatherRepository> provideWeatherRepositoryProvider;
+
+    private Provider<CalendarSyncService> calendarSyncServiceProvider;
 
     private Provider<SettingsRepository> provideSettingsRepositoryProvider;
 
@@ -637,8 +651,9 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
       this.provideOkHttpClientProvider = DoubleCheck.provider(new SwitchingProvider<OkHttpClient>(singletonCImpl, 12));
       this.provideRetrofitProvider = DoubleCheck.provider(new SwitchingProvider<Retrofit>(singletonCImpl, 11));
       this.provideWeatherApiServiceProvider = DoubleCheck.provider(new SwitchingProvider<WeatherApiService>(singletonCImpl, 10));
-      this.weatherRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<WeatherRepository>(singletonCImpl, 9));
-      this.provideSettingsRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<SettingsRepository>(singletonCImpl, 13));
+      this.provideWeatherRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<WeatherRepository>(singletonCImpl, 9));
+      this.calendarSyncServiceProvider = DoubleCheck.provider(new SwitchingProvider<CalendarSyncService>(singletonCImpl, 13));
+      this.provideSettingsRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<SettingsRepository>(singletonCImpl, 14));
     }
 
     @Override
@@ -663,7 +678,7 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
 
     @Override
     public Set<Boolean> getDisableFragmentGetContextFix() {
-      return Collections.<Boolean>emptySet();
+      return ImmutableSet.<Boolean>of();
     }
 
     @Override
@@ -676,12 +691,14 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
       return new ServiceCBuilder(singletonCImpl);
     }
 
+    @CanIgnoreReturnValue
     private BootCompletedReceiver injectBootCompletedReceiver2(BootCompletedReceiver instance) {
       BootCompletedReceiver_MembersInjector.injectTaskRepository(instance, provideTaskRepositoryProvider.get());
       BootCompletedReceiver_MembersInjector.injectNotificationManager(instance, provideNotificationManagerProvider2.get());
       return instance;
     }
 
+    @CanIgnoreReturnValue
     private GeofenceBroadcastReceiver injectGeofenceBroadcastReceiver2(
         GeofenceBroadcastReceiver instance) {
       GeofenceBroadcastReceiver_MembersInjector.injectLocationReminderService(instance, locationReminderServiceProvider.get());
@@ -689,6 +706,7 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
       return instance;
     }
 
+    @CanIgnoreReturnValue
     private TimeNotificationReceiver injectTimeNotificationReceiver2(
         TimeNotificationReceiver instance) {
       TimeNotificationReceiver_MembersInjector.injectNotificationManager(instance, provideNotificationManagerProvider2.get());
@@ -737,7 +755,7 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
           return (T) DatabaseModule_ProvideRoutineDaoFactory.provideRoutineDao(singletonCImpl.provideTaskDatabaseProvider.get());
 
           case 9: // com.mlk.taskmanager.data.repository.WeatherRepository 
-          return (T) new WeatherRepository(singletonCImpl.provideWeatherApiServiceProvider.get(), ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+          return (T) AppModule_ProvideWeatherRepositoryFactory.provideWeatherRepository(singletonCImpl.provideWeatherApiServiceProvider.get(), ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
           case 10: // com.mlk.taskmanager.data.api.WeatherApiService 
           return (T) ApiModule_ProvideWeatherApiServiceFactory.provideWeatherApiService(singletonCImpl.provideRetrofitProvider.get());
@@ -748,7 +766,10 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
           case 12: // okhttp3.OkHttpClient 
           return (T) ApiModule_ProvideOkHttpClientFactory.provideOkHttpClient();
 
-          case 13: // com.mlk.taskmanager.data.repository.SettingsRepository 
+          case 13: // com.mlk.taskmanager.service.CalendarSyncService 
+          return (T) new CalendarSyncService(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.routineRepositoryImplProvider.get());
+
+          case 14: // com.mlk.taskmanager.data.repository.SettingsRepository 
           return (T) AppModule_ProvideSettingsRepositoryFactory.provideSettingsRepository(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
           default: throw new AssertionError(id);

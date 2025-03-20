@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-77:/values-en-rAU/values-en-rAU.xml",
+            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-78:/values-en-rAU/values-en-rAU.xml",
             "map": [
                 {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/dfb5f05b79d7d91a3a40e5d1ee656404/transformed/material3-release/res/values-en-rAU/values-en-rAU.xml",

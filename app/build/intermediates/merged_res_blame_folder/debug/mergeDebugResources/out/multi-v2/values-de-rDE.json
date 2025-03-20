@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-77:/values-de-rDE/values-de-rDE.xml",
+            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-78:/values-de-rDE/values-de-rDE.xml",
             "map": [
                 {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/e82b22133edee689cba0bc439917c156/transformed/core-1.2.0/res/values-de-rDE/values-de-rDE.xml",

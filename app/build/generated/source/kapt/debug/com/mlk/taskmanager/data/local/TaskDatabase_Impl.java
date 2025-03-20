@@ -45,10 +45,10 @@ public final class TaskDatabase_Impl extends TaskDatabase {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS `tasks` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `dueDateTime` TEXT NOT NULL, `isCompleted` INTEGER NOT NULL, `priority` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `locationRadius` REAL, `reminderEnabled` INTEGER NOT NULL, `categoryId` INTEGER, `category` TEXT, `projectId` INTEGER)");
-        db.execSQL("CREATE TABLE IF NOT EXISTS `routines` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `time` TEXT NOT NULL, `repeatDays` TEXT NOT NULL, `isEnabled` INTEGER NOT NULL, `latitude` REAL, `longitude` REAL, `locationRadius` REAL, `categoryId` INTEGER)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `routines` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `time` TEXT NOT NULL, `repeatDays` TEXT NOT NULL, `isEnabled` INTEGER NOT NULL, `category` TEXT, `isLocationBased` INTEGER NOT NULL, `latitude` REAL, `longitude` REAL, `locationRadius` REAL, `calendarEventId` TEXT, `isSyncedWithCalendar` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `projects` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `icon` TEXT NOT NULL, `color` INTEGER NOT NULL, `taskCount` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6f9f25195b9f81fcc96e82b0e09ffa11')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5b7cee7ac573ad1ca67f3c7503ea3b65')");
       }
 
       @Override
@@ -122,17 +122,20 @@ public final class TaskDatabase_Impl extends TaskDatabase {
                   + " Expected:\n" + _infoTasks + "\n"
                   + " Found:\n" + _existingTasks);
         }
-        final HashMap<String, TableInfo.Column> _columnsRoutines = new HashMap<String, TableInfo.Column>(10);
+        final HashMap<String, TableInfo.Column> _columnsRoutines = new HashMap<String, TableInfo.Column>(13);
         _columnsRoutines.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsRoutines.put("title", new TableInfo.Column("title", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsRoutines.put("description", new TableInfo.Column("description", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsRoutines.put("time", new TableInfo.Column("time", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsRoutines.put("repeatDays", new TableInfo.Column("repeatDays", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsRoutines.put("isEnabled", new TableInfo.Column("isEnabled", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsRoutines.put("category", new TableInfo.Column("category", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsRoutines.put("isLocationBased", new TableInfo.Column("isLocationBased", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsRoutines.put("latitude", new TableInfo.Column("latitude", "REAL", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsRoutines.put("longitude", new TableInfo.Column("longitude", "REAL", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsRoutines.put("locationRadius", new TableInfo.Column("locationRadius", "REAL", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
-        _columnsRoutines.put("categoryId", new TableInfo.Column("categoryId", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsRoutines.put("calendarEventId", new TableInfo.Column("calendarEventId", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsRoutines.put("isSyncedWithCalendar", new TableInfo.Column("isSyncedWithCalendar", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         final HashSet<TableInfo.ForeignKey> _foreignKeysRoutines = new HashSet<TableInfo.ForeignKey>(0);
         final HashSet<TableInfo.Index> _indicesRoutines = new HashSet<TableInfo.Index>(0);
         final TableInfo _infoRoutines = new TableInfo("routines", _columnsRoutines, _foreignKeysRoutines, _indicesRoutines);
@@ -160,7 +163,7 @@ public final class TaskDatabase_Impl extends TaskDatabase {
         }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "6f9f25195b9f81fcc96e82b0e09ffa11", "e9020944500d5bd57282b7aef2d6d203");
+    }, "5b7cee7ac573ad1ca67f3c7503ea3b65", "211fc75b07f1e1c19edea453c01b9778");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;

@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-77:/values-ml/values-ml.xml",
+            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-78:/values-ml/values-ml.xml",
             "map": [
                 {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/2eedc387ce78ed91a6996f9c22fe0021/transformed/places-3.3.0/res/values-ml/values.xml",
@@ -35,23 +35,6 @@
                         "startOffsets": "14619,14707",
                         "endColumns": "87,91",
                         "endOffsets": "14702,14794"
-                    }
-                },
-                {
-                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/ba361ed35f8e12924bacc7f7a7d1c1ac/transformed/play-services-basement-18.1.0/res/values-ml/values.xml",
-                    "from": {
-                        "startLines": "4",
-                        "startColumns": "0",
-                        "startOffsets": "195",
-                        "endColumns": "155",
-                        "endOffsets": "350"
-                    },
-                    "to": {
-                        "startLines": "46",
-                        "startColumns": "4",
-                        "startOffsets": "4850",
-                        "endColumns": "159",
-                        "endOffsets": "5005"
                     }
                 },
                 {
@@ -137,6 +120,23 @@
                         "startOffsets": "3610,3705,6153,6252,6356,6446,6532,13009,13096,13184,13251,13923,14009,14178,14357,14433,14500",
                         "endColumns": "94,86,98,103,89,85,100,86,87,66,66,85,86,77,75,66,118",
                         "endOffsets": "3700,3787,6247,6351,6441,6527,6628,13091,13179,13246,13313,14004,14091,14251,14428,14495,14614"
+                    }
+                },
+                {
+                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/e829fa9cffb7dd207e4060a112beed49/transformed/play-services-basement-18.2.0/res/values-ml/values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "195",
+                        "endColumns": "155",
+                        "endOffsets": "350"
+                    },
+                    "to": {
+                        "startLines": "46",
+                        "startColumns": "4",
+                        "startOffsets": "4850",
+                        "endColumns": "159",
+                        "endOffsets": "5005"
                     }
                 }
             ]

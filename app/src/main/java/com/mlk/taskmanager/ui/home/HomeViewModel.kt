@@ -189,18 +189,29 @@ class HomeViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(weatherLoading = true, weatherError = null)
             
             try {
-                fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-                    location?.let {
-                        fetchWeatherForLocation(it.latitude, it.longitude)
-                    } ?: run {
-                        // Utiliser des coordonnées par défaut si la localisation n'est pas disponible
-                        fetchWeatherForLocation(48.8566, 2.3522) // Paris par défaut
+                fusedLocationClient.lastLocation
+                    .addOnSuccessListener { location: Location? ->
+                        viewModelScope.launch {
+                            location?.let {
+                                fetchWeatherForLocation(it.latitude, it.longitude)
+                            } ?: run {
+                                // Utiliser des coordonnées par défaut si la localisation n'est pas disponible
+                                fetchWeatherForLocation(48.8566, 2.3522) // Paris par défaut
+                            }
+                        }
                     }
-                }
+                    .addOnFailureListener { e ->
+                        viewModelScope.launch {
+                            _uiState.value = _uiState.value.copy(
+                                weatherLoading = false,
+                                weatherError = "Erreur de localisation: ${e.message}"
+                            )
+                        }
+                    }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     weatherLoading = false,
-                    weatherError = "Impossible d'obtenir la localisation"
+                    weatherError = "Erreur: ${e.message}"
                 )
             }
         }
@@ -208,27 +219,34 @@ class HomeViewModel @Inject constructor(
     
     private fun fetchWeatherForLocation(latitude: Double, longitude: Double) {
         viewModelScope.launch {
-            weatherRepository.getCurrentWeather(latitude, longitude)
-                .catch { e ->
-                    _uiState.value = _uiState.value.copy(
-                        weatherLoading = false,
-                        weatherError = e.message ?: "Erreur lors de la récupération des données météo"
-                    )
-                }
-                .collect { result ->
-                    result.onSuccess { weatherResponse ->
-                        _uiState.value = _uiState.value.copy(
-                            weatherData = weatherResponse,
-                            weatherLoading = false,
-                            weatherError = null
-                        )
-                    }.onFailure { error ->
+            try {
+                weatherRepository.getCurrentWeather(latitude, longitude)
+                    .catch { e ->
                         _uiState.value = _uiState.value.copy(
                             weatherLoading = false,
-                            weatherError = error.message ?: "Erreur lors de la récupération des données météo"
+                            weatherError = "Erreur météo: ${e.message}"
                         )
                     }
-                }
+                    .collect { result ->
+                        result.onSuccess { weatherResponse ->
+                            _uiState.value = _uiState.value.copy(
+                                weatherData = weatherResponse,
+                                weatherLoading = false,
+                                weatherError = null
+                            )
+                        }.onFailure { error ->
+                            _uiState.value = _uiState.value.copy(
+                                weatherLoading = false,
+                                weatherError = "Erreur météo: ${error.message}"
+                            )
+                        }
+                    }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    weatherLoading = false,
+                    weatherError = "Erreur inattendue: ${e.message}"
+                )
+            }
         }
     }
     

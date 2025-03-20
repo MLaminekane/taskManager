@@ -11,6 +11,7 @@ import com.mlk.taskmanager.service.TimeNotificationReceiver_GeneratedInjector;
 import com.mlk.taskmanager.ui.MainActivity_GeneratedInjector;
 import com.mlk.taskmanager.ui.calendar.CalendarViewModel_HiltModules;
 import com.mlk.taskmanager.ui.home.HomeViewModel_HiltModules;
+import com.mlk.taskmanager.ui.routines.RoutineDetailViewModel_HiltModules;
 import com.mlk.taskmanager.ui.routines.RoutinesViewModel_HiltModules;
 import com.mlk.taskmanager.ui.settings.SettingsViewModel_HiltModules;
 import com.mlk.taskmanager.ui.tasks.TasksViewModel_HiltModules;
@@ -176,6 +177,7 @@ public final class TaskManagerApplication_HiltComponents {
           HiltWrapper_ActivityRetainedComponentManager_LifecycleModule.class,
           HiltWrapper_SavedStateHandleModule.class,
           HomeViewModel_HiltModules.KeyModule.class,
+          RoutineDetailViewModel_HiltModules.KeyModule.class,
           RoutinesViewModel_HiltModules.KeyModule.class,
           SettingsViewModel_HiltModules.KeyModule.class,
           ActivityCBuilderModule.class,
@@ -219,6 +221,7 @@ public final class TaskManagerApplication_HiltComponents {
           CalendarViewModel_HiltModules.BindsModule.class,
           HiltWrapper_HiltViewModelFactory_ViewModelModule.class,
           HomeViewModel_HiltModules.BindsModule.class,
+          RoutineDetailViewModel_HiltModules.BindsModule.class,
           RoutinesViewModel_HiltModules.BindsModule.class,
           SettingsViewModel_HiltModules.BindsModule.class,
           TasksViewModel_HiltModules.BindsModule.class

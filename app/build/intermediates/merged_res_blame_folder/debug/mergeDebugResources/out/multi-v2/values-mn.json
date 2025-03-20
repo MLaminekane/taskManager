@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-77:/values-mn/values-mn.xml",
+            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-78:/values-mn/values-mn.xml",
             "map": [
                 {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/3000287055fe7ac98ada46c98269f9f9/transformed/ui-release/res/values-mn/values-mn.xml",
@@ -89,7 +89,7 @@
                     }
                 },
                 {
-                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/ba361ed35f8e12924bacc7f7a7d1c1ac/transformed/play-services-basement-18.1.0/res/values-mn/values.xml",
+                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/e829fa9cffb7dd207e4060a112beed49/transformed/play-services-basement-18.2.0/res/values-mn/values.xml",
                     "from": {
                         "startLines": "4",
                         "startColumns": "0",

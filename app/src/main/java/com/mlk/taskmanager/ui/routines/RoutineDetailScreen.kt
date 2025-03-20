@@ -1,6 +1,7 @@
 package com.mlk.taskmanager.ui.routines
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -45,13 +46,13 @@ fun RoutineDetailScreen(
     val settingsState by settingsViewModel.uiState.collectAsState()
     val categories = settingsState.categories
     
-    // Récupérer le nom de la catégorie à partir de l'ID
-    val categoryName = routine?.categoryId?.let { categoryId ->
-        categories.find { it.hashCode().toLong() == categoryId }
-    }
+    // Récupérer le nom de la catégorie
+    val categoryName = routine?.category
     
     val scrollState = rememberScrollState()
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var isSyncing by remember { mutableStateOf(false) }
+    var syncError by remember { mutableStateOf<String?>(null) }
     
     if (showDeleteDialog) {
         AlertDialog(
@@ -355,6 +356,72 @@ fun RoutineDetailScreen(
                                 }
                             }
                         }
+                    }
+                    
+                    // Calendar sync section
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    SectionTitle(icon = Icons.Outlined.CalendarToday, title = "Calendar Sync")
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { 
+                                if (!isSyncing) {
+                                    isSyncing = true
+                                    syncError = null
+                                    routine?.let { viewModel.toggleCalendarSync(it) }
+                                }
+                            }
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.CalendarToday,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Column {
+                                Text(
+                                    text = if (routine.isSyncedWithCalendar) "Synced with Calendar" else "Not Synced",
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                                Text(
+                                    text = if (routine.isSyncedWithCalendar) "Tap to unsync" else "Tap to sync",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        
+                        if (isSyncing) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        } else {
+                            Icon(
+                                imageVector = if (routine.isSyncedWithCalendar) Icons.Default.Check else Icons.Default.Sync,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                    
+                    syncError?.let { error ->
+                        Text(
+                            text = error,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
                     }
                     
                     Spacer(modifier = Modifier.height(80.dp)) // Espace pour le FAB

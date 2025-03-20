@@ -1,12 +1,9 @@
 package com.mlk.taskmanager.di
 
 import android.content.Context
+import com.mlk.taskmanager.data.api.WeatherApiService
 import com.mlk.taskmanager.data.local.TaskDatabase
-import com.mlk.taskmanager.data.repository.ProjectRepository
-import com.mlk.taskmanager.data.repository.SettingsRepository
-import com.mlk.taskmanager.data.repository.SettingsRepositoryImpl
-import com.mlk.taskmanager.data.repository.TaskRepository
-import com.mlk.taskmanager.data.repository.TaskRepositoryImpl
+import com.mlk.taskmanager.data.repository.*
 import com.mlk.taskmanager.service.LocationReminderService
 import com.mlk.taskmanager.service.NotificationManager
 import dagger.Module
@@ -44,5 +41,14 @@ object AppModule {
         locationReminderService: LocationReminderService
     ): NotificationManager {
         return NotificationManager(context, locationReminderService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWeatherRepository(
+        weatherApiService: WeatherApiService,
+        @ApplicationContext context: Context
+    ): WeatherRepository {
+        return WeatherRepository(weatherApiService, context)
     }
 } 

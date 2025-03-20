@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-77:/values-en-rXC/values-en-rXC.xml",
+            "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-78:/values-en-rXC/values-en-rXC.xml",
             "map": [
                 {
                     "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/fddddddc79635dc7fe9d895573bc9ca9/transformed/foundation-release/res/values-en-rXC/values-en-rXC.xml",

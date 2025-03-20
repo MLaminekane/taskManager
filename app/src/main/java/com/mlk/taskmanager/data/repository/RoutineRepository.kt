@@ -4,6 +4,7 @@ import com.mlk.taskmanager.data.dao.RoutineDao
 import com.mlk.taskmanager.data.model.Routine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import java.time.DayOfWeek
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,7 +31,11 @@ class RoutineRepositoryImpl @Inject constructor(
     override fun getLocationBasedRoutines(): Flow<List<Routine>> = routineDao.getLocationBasedRoutines()
     
     override fun getRoutinesForDay(dayOfWeek: DayOfWeek): Flow<List<Routine>> =
-        routineDao.getRoutinesForDay(dayOfWeek)
+        routineDao.getActiveRoutinesForFiltering().map { routines ->
+            routines.filter { routine ->
+                routine.repeatDays.contains(dayOfWeek)
+            }
+        }
     
     override fun getRoutineById(id: Long): Flow<Routine?> = flow {
         emit(routineDao.getRoutineById(id))

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mlk.taskmanager.data.model.Routine
 import com.mlk.taskmanager.data.repository.RoutineRepository
+import com.mlk.taskmanager.service.CalendarSyncService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -19,7 +20,8 @@ data class RoutinesUiState(
 
 @HiltViewModel
 class RoutinesViewModel @Inject constructor(
-    private val routineRepository: RoutineRepository
+    private val routineRepository: RoutineRepository,
+    private val calendarSyncService: CalendarSyncService
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(RoutinesUiState(isLoading = true))
@@ -34,17 +36,17 @@ class RoutinesViewModel @Inject constructor(
             try {
                 routineRepository.getAllRoutines()
                     .collect { routines ->
-                        _uiState.update { it.copy(
+                        _uiState.value = _uiState.value.copy(
                             routines = routines,
                             isLoading = false,
                             error = null
-                        ) }
+                        )
                     }
             } catch (e: Exception) {
-                _uiState.update { it.copy(
+                _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     error = e.message
-                ) }
+                )
             }
         }
     }
@@ -53,7 +55,7 @@ class RoutinesViewModel @Inject constructor(
         title: String,
         description: String,
         time: LocalTime,
-        repeatDays: Set<DayOfWeek>,
+        repeatDays: List<DayOfWeek>,
         category: String? = null,
         latitude: Double? = null,
         longitude: Double? = null,
@@ -61,33 +63,26 @@ class RoutinesViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             try {
-                // Pour l'instant, on stocke simplement la catégorie comme un entier long 
-                // qui pourrait être converti plus tard en une entité de catégorie
-                val categoryId: Long? = if (category != null) {
-                    // On pourrait simplement utiliser un hashCode pour stocker la catégorie
-                    // ou mettre en place un système plus robuste avec une table séparée
-                    category.hashCode().toLong()
-                } else {
-                    null
-                }
-                
                 val routine = Routine(
                     title = title,
                     description = description,
                     time = time,
                     repeatDays = repeatDays,
-                    categoryId = categoryId,
+                    category = category,
                     latitude = latitude,
                     longitude = longitude,
-                    locationRadius = locationRadius
+                    locationRadius = locationRadius,
+                    isEnabled = true,
+                    isSyncedWithCalendar = false,
+                    calendarEventId = null
                 )
                 
                 routineRepository.insertRoutine(routine)
                 loadRoutines()
             } catch (e: Exception) {
-                _uiState.update { 
-                    it.copy(error = e.message ?: "Failed to create routine") 
-                }
+                _uiState.value = _uiState.value.copy(
+                    error = e.message ?: "Failed to create routine"
+                )
             }
         }
     }
@@ -98,7 +93,7 @@ class RoutinesViewModel @Inject constructor(
                 routineRepository.updateRoutine(routine)
                 loadRoutines()
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.value = _uiState.value.copy(error = e.message)
             }
         }
     }
@@ -109,7 +104,7 @@ class RoutinesViewModel @Inject constructor(
                 routineRepository.updateRoutine(routine.copy(isEnabled = !routine.isEnabled))
                 loadRoutines()
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.value = _uiState.value.copy(error = e.message)
             }
         }
     }
@@ -120,12 +115,27 @@ class RoutinesViewModel @Inject constructor(
                 routineRepository.deleteRoutine(routine)
                 loadRoutines()
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.value = _uiState.value.copy(error = e.message)
+            }
+        }
+    }
+    
+    fun toggleCalendarSync(routine: Routine) {
+        viewModelScope.launch {
+            try {
+                if (routine.isSyncedWithCalendar) {
+                    calendarSyncService.deleteCalendarEvent(routine)
+                } else {
+                    calendarSyncService.syncRoutineWithCalendar(routine)
+                }
+                loadRoutines()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(error = e.message)
             }
         }
     }
     
     fun clearError() {
-        _uiState.update { it.copy(error = null) }
+        _uiState.value = _uiState.value.copy(error = null)
     }
 } 

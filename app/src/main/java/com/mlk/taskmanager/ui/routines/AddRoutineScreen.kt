@@ -144,7 +144,7 @@ fun AddRoutineScreen(
                                 title = title,
                                 description = description,
                                 time = time,
-                                repeatDays = selectedDays,
+                                repeatDays = selectedDays.toList(),
                                 category = selectedCategory
                             )
                             navController.navigateUp()

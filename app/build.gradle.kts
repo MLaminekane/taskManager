@@ -25,6 +25,12 @@ android {
         manifestPlaceholders["MAPS_API_KEY"] = properties.getProperty("MAPS_API_KEY", "")
     }
 
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1,DEPENDENCIES}"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -131,4 +137,10 @@ dependencies {
     testImplementation("com.google.truth:truth:1.1.5") // Assertions plus lisibles
     // Room testing
     testImplementation("androidx.room:room-testing:2.6.1")
+
+    // Google Calendar API
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("com.google.api-client:google-api-client-android:2.2.0")
+    implementation("com.google.apis:google-api-services-calendar:v3-rev20220715-2.0.0")
+    implementation("com.google.http-client:google-http-client-gson:1.42.3")
 }

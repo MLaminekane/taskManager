@@ -763,8 +763,13 @@
     <string name="abc_shareactionprovider_share_with">Share with</string>
     <string name="abc_shareactionprovider_share_with_application">Share with <ns1:g example="Mail" id="application_name">%s</ns1:g></string>
     <string name="abc_toolbar_collapse_description">Collapse</string>
+    <string name="add">Ajouter</string>
     <string name="androidx_startup" translatable="false">androidx.startup</string>
-    <string name="app_name">TaskManager</string>
+    <string name="app_name">Task Manager</string>
+    <string name="calendar_sign_in">Se connecter avec Google</string>
+    <string name="calendar_sign_out">Se déconnecter</string>
+    <string name="calendar_sync">Synchronisation avec Google Calendar</string>
+    <string name="calendar_sync_description">Vos routines seront automatiquement synchronisées avec votre calendrier Google</string>
     <string name="call_notification_answer_action">Answer</string>
     <string name="call_notification_answer_video_action">Video</string>
     <string name="call_notification_decline_action">Decline</string>
@@ -772,7 +777,7 @@
     <string name="call_notification_incoming_text">Incoming call</string>
     <string name="call_notification_ongoing_text">Ongoing call</string>
     <string name="call_notification_screening_text">Screening an incoming call</string>
-    <string name="cancel">Cancel</string>
+    <string name="cancel">Annuler</string>
     <string name="close_drawer">"Close navigation menu"</string>
     <string name="close_sheet">"Close sheet"</string>
     <string msgid="2523291102206661146" name="common_google_play_services_enable_button">Enable</string>
@@ -795,7 +800,10 @@
     <string name="common_signin_button_text_long">Sign in with Google</string>
     <string name="default_error_message">"Invalid input"</string>
     <string name="default_popup_window_title" ns2:ignore="ExtraTranslation">"Pop-Up Window"</string>
+    <string name="delete">Supprimer</string>
     <string name="dropdown_menu">"Dropdown menu"</string>
+    <string name="edit">Modifier</string>
+    <string name="google_client_id">557560762744-85j9upqja4em8mq8keid8brdh7dn0cf8.apps.googleusercontent.com</string>
     <string name="in_progress">In progress</string>
     <string name="indeterminate">Partially checked</string>
     <string name="m3c_bottom_sheet_collapse_description">Collapse bottom sheet</string>
@@ -875,6 +883,11 @@
     <string name="places_try_again">Try again</string>
     <string name="range_end">"Range end"</string>
     <string name="range_start">"Range start"</string>
+    <string name="routine_description">Description</string>
+    <string name="routine_repeat">Répéter</string>
+    <string name="routine_time">Heure</string>
+    <string name="routine_title">Titre de la routine</string>
+    <string name="save">Enregistrer</string>
     <string name="scd_calendar_dialog_next_month" translatable="true">Next month</string>
     <string name="scd_calendar_dialog_next_week" translatable="true">Next week</string>
     <string name="scd_calendar_dialog_prev_month" translatable="true">Next month</string>
@@ -895,9 +908,19 @@
     <string name="scd_clock_dialog_seconds">Seconds</string>
     <string name="search_menu_title">Search</string>
     <string name="selected">Selected</string>
+    <string name="settings_language">Langue</string>
+    <string name="settings_location">Localisation</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_sound">Son</string>
+    <string name="settings_theme">Thème</string>
+    <string name="settings_vibration">Vibration</string>
     <string name="status_bar_notification_info_overflow">999+</string>
     <string name="switch_role">Switch</string>
     <string name="tab">Tab</string>
+    <string name="task_description">Description</string>
+    <string name="task_due_date">Date d\'échéance</string>
+    <string name="task_priority">Priorité</string>
+    <string name="task_title">Titre de la tâche</string>
     <string name="template_percent"><ns1:g id="percentage">%1$d</ns1:g> percent.</string>
     <string name="tooltip_description">tooltip</string>
     <string name="tooltip_label">show tooltip</string>

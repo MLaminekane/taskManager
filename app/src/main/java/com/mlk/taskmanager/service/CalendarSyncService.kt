@@ -5,13 +5,16 @@ import android.util.Log
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.Scopes
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Scope
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
-import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.CalendarScopes
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
+import com.mlk.taskmanager.R
 import com.mlk.taskmanager.data.model.Routine
 import com.mlk.taskmanager.data.repository.RoutineRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,7 +23,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.time.ZoneId
-import java.util.Collections
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,49 +32,66 @@ class CalendarSyncService @Inject constructor(
     private val routineRepository: RoutineRepository
 ) {
     private val tag = "CalendarSyncService"
-
-    // Client Google Calendar
     private var calendarService: Calendar? = null
     private var currentAccount: GoogleSignInAccount? = null
 
-    // Initialiser le client Google Calendar avec le compte connecté
-    suspend fun initializeCalendarService(account: GoogleSignInAccount) {
+    suspend fun initializeCalendarService(signInAccount: GoogleSignInAccount) {
         try {
-            val credential = GoogleCredential.Builder()
-                .setTransport(GoogleNetHttpTransport.newTrustedTransport())
-                .setJsonFactory(GsonFactory.getDefaultInstance())
-                .build()
-            credential.accessToken = account.idToken
+            Log.d(tag, "Initializing Calendar service for account: ${signInAccount.email}")
             
-            calendarService = Calendar.Builder(
-                GoogleNetHttpTransport.newTrustedTransport(),
-                GsonFactory.getDefaultInstance(),
-                credential
+            val transport = GoogleNetHttpTransport.newTrustedTransport()
+            val jsonFactory = GsonFactory.getDefaultInstance()
+            
+            val credential = GoogleAccountCredential.usingOAuth2(
+                context,
+                listOf(CalendarScopes.CALENDAR)
             )
+
+            credential.selectedAccountName = signInAccount.email
+            
+            Log.d(tag, "Creating Calendar service with credential")
+            calendarService = Calendar.Builder(transport, jsonFactory, credential)
                 .setApplicationName("TaskManager")
                 .build()
                 
-            currentAccount = account
+            currentAccount = signInAccount
             
-            Log.d(tag, "Calendar service initialized for account: ${account.email}")
+            Log.d(tag, "Calendar service initialized successfully")
         } catch (e: Exception) {
             Log.e(tag, "Error initializing calendar service", e)
             calendarService = null
             currentAccount = null
+            when (e) {
+                is ApiException -> {
+                    val errorMessage = when (e.statusCode) {
+                        7 -> "Network error - Vérifiez votre connexion internet"
+                        16 -> "Erreur d'authentification - Réessayez de vous connecter"
+                        else -> "Erreur de connexion (${e.statusCode}): ${e.message}"
+                    }
+                    throw Exception(errorMessage)
+                }
+                else -> throw e
+            }
         }
     }
     
     // Vérifier si l'utilisateur est connecté à Google
     fun isSignedIn(): Boolean {
         val account = GoogleSignIn.getLastSignedInAccount(context)
-        return account != null && !account.isExpired
+        val isValid = account != null && !account.isExpired
+        Log.d(tag, "Checking if signed in: $isValid")
+        return isValid
     }
     
     // Obtenir les options de connexion Google
     fun getGoogleSignInOptions(): GoogleSignInOptions {
+        Log.d(tag, "Configuring Google Sign-In options")
         return GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            .requestScopes(com.google.android.gms.common.api.Scope(CalendarScopes.CALENDAR))
+            .requestProfile()
+            .requestScopes(Scope(CalendarScopes.CALENDAR))
+            .requestId()
+            .requestIdToken(context.getString(R.string.google_client_id))
             .build()
     }
     

@@ -206,8 +206,9 @@ class SettingsViewModel @Inject constructor(
     }
     
     // Google Sign-In
-    fun signInToGoogle() {
+    fun signInToGoogle(): GoogleSignInClient {
         googleSignInClient = GoogleSignIn.getClient(context, calendarSyncService.getGoogleSignInOptions())
+        return googleSignInClient!!
     }
     
     fun handleSignInResult(result: ActivityResult) {

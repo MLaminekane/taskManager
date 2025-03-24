@@ -143,4 +143,8 @@ dependencies {
     implementation("com.google.api-client:google-api-client-android:2.2.0")
     implementation("com.google.apis:google-api-services-calendar:v3-rev20220715-2.0.0")
     implementation("com.google.http-client:google-http-client-gson:1.42.3")
+    implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
+
+    // Activity Result API
+    implementation("androidx.activity:activity-compose:1.8.2")
 }

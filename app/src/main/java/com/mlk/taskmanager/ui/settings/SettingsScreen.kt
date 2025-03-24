@@ -1,5 +1,7 @@
 package com.mlk.taskmanager.ui.settings
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,6 +39,13 @@ fun SettingsScreen(
     var showCategoryDialog by remember { mutableStateOf(false) }
 
     val uiState by viewModel.uiState.collectAsState()
+    
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { result ->
+            viewModel.handleSignInResult(result)
+        }
+    )
 
     val notificationPermissionState = rememberPermissionState(
         android.Manifest.permission.POST_NOTIFICATIONS
@@ -241,71 +250,113 @@ fun SettingsScreen(
             item {
                 SettingsSectionHeader(title = "Google Calendar")
                 
-                SwitchPreference(
-                    title = "Synchroniser avec Google Calendar",
-                    description = "Vos routines seront automatiquement synchronisées avec Google Calendar",
-                    icon = Icons.Default.CalendarToday,
-                    isChecked = uiState.isCalendarSyncEnabled,
-                    onCheckedChange = { 
-                        if (it && !uiState.isGoogleSignedIn) {
-                            // Si on active la synchro mais qu'on n'est pas connecté, lancer la connexion
-                            viewModel.signInToGoogle()
-                        } else {
-                            // Sinon, juste changer le paramètre
-                            viewModel.setCalendarSyncEnabled(it)
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.CalendarToday,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Column {
+                                    Text(
+                                        text = "Synchroniser avec Google Calendar",
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                    Text(
+                                        text = "Vos routines seront automatiquement synchronisées avec Google Calendar",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                            Switch(
+                                checked = uiState.isCalendarSyncEnabled,
+                                onCheckedChange = { enabled ->
+                                    if (enabled && !uiState.isGoogleSignedIn) {
+                                        // Si on active la synchro mais qu'on n'est pas connecté, lancer la connexion
+                                        val signInClient = viewModel.signInToGoogle()
+                                        launcher.launch(signInClient.signInIntent)
+                                    } else {
+                                        // Sinon, juste changer le paramètre
+                                        viewModel.setCalendarSyncEnabled(enabled)
+                                    }
+                                }
+                            )
+                        }
+
+                        if (uiState.isCalendarSyncEnabled) {
+                            if (uiState.isGoogleSignedIn) {
+                                // Afficher les informations du compte connecté
+                                ListPreference(
+                                    title = "Compte Google",
+                                    value = uiState.googleAccountEmail ?: "Non connecté",
+                                    icon = Icons.Default.AccountCircle,
+                                    onClick = { /* Ne rien faire, juste informatif */ }
+                                )
+                                
+                                ButtonPreference(
+                                    title = "Synchroniser maintenant",
+                                    description = "Synchroniser toutes vos routines avec Google Calendar",
+                                    icon = Icons.Default.Sync,
+                                    onClick = { viewModel.syncAllRoutines() }
+                                )
+                                
+                                ButtonPreference(
+                                    title = "Se déconnecter",
+                                    description = "Se déconnecter de Google Calendar",
+                                    icon = Icons.Default.ExitToApp,
+                                    onClick = { viewModel.signOutFromGoogle() }
+                                )
+                            } else {
+                                // Afficher un message si la synchronisation est activée mais pas connecté
+                                ButtonPreference(
+                                    title = "Se connecter à Google",
+                                    description = "Connexion requise pour synchroniser avec Google Calendar",
+                                    icon = Icons.Default.Login,
+                                    onClick = { 
+                                        val signInClient = viewModel.signInToGoogle()
+                                        launcher.launch(signInClient.signInIntent)
+                                    }
+                                )
+                            }
+                        }
+                        
+                        if (uiState.isSyncing) {
+                            LinearProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                            )
+                        }
+                        
+                        if (uiState.syncError != null) {
+                            Text(
+                                text = uiState.syncError ?: "",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
                         }
                     }
-                )
-                
-                if (uiState.isCalendarSyncEnabled) {
-                    if (uiState.isGoogleSignedIn) {
-                        // Afficher les informations du compte connecté
-                        ListPreference(
-                            title = "Compte Google",
-                            value = uiState.googleAccountEmail ?: "Non connecté",
-                            icon = Icons.Default.AccountCircle,
-                            onClick = { /* Ne rien faire, juste informatif */ }
-                        )
-                        
-                        ButtonPreference(
-                            title = "Synchroniser maintenant",
-                            description = "Synchroniser toutes vos routines avec Google Calendar",
-                            icon = Icons.Default.Sync,
-                            onClick = { viewModel.syncAllRoutines() }
-                        )
-                        
-                        ButtonPreference(
-                            title = "Se déconnecter",
-                            description = "Se déconnecter de Google Calendar",
-                            icon = Icons.Default.ExitToApp,
-                            onClick = { viewModel.signOutFromGoogle() }
-                        )
-                    } else {
-                        // Afficher un message si la synchronisation est activée mais pas connecté
-                        ButtonPreference(
-                            title = "Se connecter à Google",
-                            description = "Connexion requise pour synchroniser avec Google Calendar",
-                            icon = Icons.Default.Login,
-                            onClick = { viewModel.signInToGoogle() }
-                        )
-                    }
-                }
-                
-                if (uiState.isSyncing) {
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                    )
-                }
-                
-                if (uiState.syncError != null) {
-                    Text(
-                        text = uiState.syncError ?: "",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
                 }
             }
 

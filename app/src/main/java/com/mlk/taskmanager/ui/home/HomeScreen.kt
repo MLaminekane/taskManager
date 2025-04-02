@@ -79,46 +79,79 @@ fun HomeScreen(
                     )
                 )
             }
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(Color.White)
-                    .clickable { viewModel.toggleWeatherModal() },
-                contentAlignment = Alignment.Center
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                if (uiState.weatherLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        strokeWidth = 2.dp
-                    )
-                } else if (uiState.weatherData != null) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
+                // Weather button
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color.White)
+                        .clickable { viewModel.toggleWeatherModal() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (uiState.weatherLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            strokeWidth = 2.dp
+                        )
+                    } else if (uiState.weatherData != null) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_weather),
+                                contentDescription = "Weather",
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(2.dp))
+                            Text(
+                                text = "${uiState.weatherData?.main?.temp?.toInt()}°",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    } else {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_weather),
                             contentDescription = "Weather",
-                            modifier = Modifier.size(16.dp),
                             tint = MaterialTheme.colorScheme.primary
                         )
-                        Spacer(modifier = Modifier.width(2.dp))
+                    }
+                }
+
+                // Pomodoro button
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color.White)
+                        .clickable { navController.navigate(Screen.Pomodoro.route) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Timer,
+                            contentDescription = "Focus",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
                         Text(
-                            text = "${uiState.weatherData?.main?.temp?.toInt()}°",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.Bold
-                            ),
-                            color = MaterialTheme.colorScheme.onBackground
+                            text = "Focus",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
-                } else {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_weather),
-                        contentDescription = "Weather",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
                 }
             }
         }

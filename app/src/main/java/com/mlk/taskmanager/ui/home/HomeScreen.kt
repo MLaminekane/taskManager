@@ -290,7 +290,7 @@ fun HomeScreen(
             items(uiState.projects) { project ->
                 ProjectCard(
                     project = project,
-                    onClick = { /* Navigate to project details */ }
+                    onClick = { navController.navigate(Screen.ProjectDetail.createRoute(project.id)) }
                 )
             }
         }

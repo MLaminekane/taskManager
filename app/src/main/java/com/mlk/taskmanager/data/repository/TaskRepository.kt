@@ -26,4 +26,6 @@ interface TaskRepository {
     suspend fun getTasksByDateRange(startDateTime: LocalDateTime, endDateTime: LocalDateTime): List<Task>
 
     suspend fun getAllTasksSync(): List<Task>
+
+    fun getTasksByProject(projectId: Long): Flow<List<Task>>
 } 

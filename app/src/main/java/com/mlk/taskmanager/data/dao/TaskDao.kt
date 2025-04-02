@@ -56,4 +56,7 @@ interface TaskDao {
 
     @Query("SELECT * FROM tasks")
     suspend fun getAllTasksSync(): List<Task>
+
+    @Query("SELECT * FROM tasks WHERE projectId = :projectId ORDER BY dueDateTime ASC")
+    fun getTasksByProject(projectId: Long): Flow<List<Task>>
 } 

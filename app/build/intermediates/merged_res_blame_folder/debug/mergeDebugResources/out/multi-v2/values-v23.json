@@ -4,7 +4,7 @@
             "outputFile": "com.mlk.taskmanager.app-mergeDebugResources-78:/values-v23/values-v23.xml",
             "map": [
                 {
-                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/2807b4f68536fa34c1fd0ec9c5ef6f52/transformed/appcompat-1.0.0/res/values-v23/values-v23.xml",
+                    "source": "/Users/lamine/.gradle/caches/8.11.1/transforms/e36b99f620762eef1fa9e8c148319714/transformed/appcompat-1.0.0/res/values-v23/values-v23.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,19,32,33,34,35,36",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4",
@@ -23,7 +23,7 @@
                     }
                 },
                 {
-                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/a216b66c366f160a19517985ba09e8d9/transformed/cardview-1.0.0/res/values-v23/values-v23.xml",
+                    "source": "/Users/lamine/.gradle/caches/8.11.1/transforms/1f235d7f33e044f24bf68f1ca0836750/transformed/cardview-1.0.0/res/values-v23/values-v23.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -42,7 +42,7 @@
                     }
                 },
                 {
-                    "source": "/Users/lamine/.gradle/caches/8.10.2/transforms/41f5ea47ddeb79b374e03057cdcbed15/transformed/work-runtime-2.9.0/res/values-v23/values-v23.xml",
+                    "source": "/Users/lamine/.gradle/caches/8.11.1/transforms/dc447380ed778aef56fd3f70d2dceb72/transformed/work-runtime-2.9.0/res/values-v23/values-v23.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",

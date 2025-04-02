@@ -3,6 +3,7 @@ package com.mlk.taskmanager.ui.home
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -75,11 +76,14 @@ class HomeViewModel @Inject constructor(
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         
         viewModelScope.launch {
+            Log.d("HomeViewModel", "Starting to collect data streams")
             combine(
                 projectRepository.getAllProjects(),
                 taskRepository.getAllTasks(),
                 routineRepository.getRoutinesForDay(LocalDate.now().dayOfWeek)
             ) { projects, tasks, routines ->
+                Log.d("HomeViewModel", "Data received - Projects: ${projects.size}, Tasks: ${tasks.size}, Routines: ${routines.size}")
+                Log.d("HomeViewModel", "Projects: $projects")
                 HomeUiState(
                     assignedTasks = tasks.count { !it.isCompleted },
                     completedTasks = tasks.count { it.isCompleted },
@@ -92,6 +96,7 @@ class HomeViewModel @Inject constructor(
                     weatherModalVisible = _uiState.value.weatherModalVisible
                 )
             }.collect { newState ->
+                Log.d("HomeViewModel", "Updating UI state with ${newState.projects.size} projects")
                 _uiState.value = newState
             }
         }
@@ -172,14 +177,20 @@ class HomeViewModel @Inject constructor(
     
     fun createProject(name: String, description: String, icon: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val newProject = Project(
-                name = name,
-                description = description,
-                icon = icon,
-                color = 0xFF613BE7L, // Valeur Long sans conversion en Int
-                taskCount = 0
-            )
-            projectRepository.insertProject(newProject)
+            try {
+                Log.d("HomeViewModel", "Creating new project: $name")
+                val newProject = Project(
+                    name = name,
+                    description = description,
+                    icon = icon,
+                    color = 0xFF613BE7L,
+                    taskCount = 0
+                )
+                val projectId = projectRepository.insertProject(newProject)
+                Log.d("HomeViewModel", "Project created with ID: $projectId")
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error creating project", e)
+            }
         }
     }
     

@@ -153,29 +153,29 @@ fun SettingsScreen(
                 }
             }
 
-            // Appearance Section
-            item {
-                SettingsSection(
-                    title = "Appearance",
-                    icon = Icons.Filled.Palette,
-                    iconTint = Color(0xFFFF4081)
-                ) {
-                    SettingsItem(
-                        title = "Theme",
-                        subtitle = "Choose your preferred theme",
-                        icon = Icons.Outlined.DarkMode,
-                        onClick = { showThemePicker = true }
-                    )
-
-                    SettingsSwitch(
-                        title = "Dynamic Colors",
-                        subtitle = "Use system accent colors",
-                        icon = Icons.Outlined.ColorLens,
-                        checked = uiState.useDynamicColors,
-                        onCheckedChange = { viewModel.setDynamicColors(it) }
-                    )
-                }
-            }
+//            // Appearance Section
+//            item {
+//                SettingsSection(
+//                    title = "Appearance",
+//                    icon = Icons.Filled.Palette,
+//                    iconTint = Color(0xFFFF4081)
+//                ) {
+//                    SettingsItem(
+//                        title = "Theme",
+//                        subtitle = "Choose your preferred theme",
+//                        icon = Icons.Outlined.DarkMode,
+//                        onClick = { showThemePicker = true }
+//                    )
+//
+//                    SettingsSwitch(
+//                        title = "Dynamic Colors",
+//                        subtitle = "Use system accent colors",
+//                        icon = Icons.Outlined.ColorLens,
+//                        checked = uiState.useDynamicColors,
+//                        onCheckedChange = { viewModel.setDynamicColors(it) }
+//                    )
+//                }
+//            }
 
             // Task Management Section
             item {
@@ -191,12 +191,12 @@ fun SettingsScreen(
                         onClick = { showCategoryDialog = true }
                     )
 
-                    SettingsItem(
-                        title = "Default Reminder Time",
-                        subtitle = uiState.defaultReminderTime.toString(),
-                        icon = Icons.Outlined.Schedule,
-                        onClick = { /* Show time picker */ }
-                    )
+//                    SettingsItem(
+//                        title = "Default Reminder Time",
+//                        subtitle = uiState.defaultReminderTime.toString(),
+//                        icon = Icons.Outlined.Schedule,
+//                        onClick = { /* Show time picker */ }
+//                    )
                 }
             }
 
@@ -232,7 +232,7 @@ fun SettingsScreen(
                 ) {
                     SettingsItem(
                         title = "Version",
-                        subtitle = "1.0.0",
+                        subtitle = "2.0.4",
                         icon = Icons.Outlined.Update,
                         onClick = { }
                     )

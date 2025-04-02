@@ -33,7 +33,7 @@ class TaskRepositoryImpl @Inject constructor(
             
             // Incrémenter le compteur de tâches du projet si un projectId est spécifié
             task.projectId?.let { projectId ->
-                projectRepository.incrementTaskCount(projectId.toInt())
+                projectRepository.incrementTaskCount(projectId)
             }
             
             return id
@@ -54,12 +54,12 @@ class TaskRepositoryImpl @Inject constructor(
         if (oldTask != null && oldTask.projectId != task.projectId) {
             // Décrémenter l'ancien projet
             oldTask.projectId?.let { projectId ->
-                projectRepository.decrementTaskCount(projectId.toInt())
+                projectRepository.decrementTaskCount(projectId)
             }
             
             // Incrémenter le nouveau projet
             task.projectId?.let { projectId ->
-                projectRepository.incrementTaskCount(projectId.toInt())
+                projectRepository.incrementTaskCount(projectId)
             }
         }
     }
@@ -69,7 +69,7 @@ class TaskRepositoryImpl @Inject constructor(
         
         // Décrémenter le compteur de tâches du projet si un projectId est spécifié
         task.projectId?.let { projectId ->
-            projectRepository.decrementTaskCount(projectId.toInt())
+            projectRepository.decrementTaskCount(projectId)
         }
     }
     
@@ -83,7 +83,7 @@ class TaskRepositoryImpl @Inject constructor(
         // Décrémenter les compteurs de projets
         completedTasks.forEach { task ->
             task.projectId?.let { projectId ->
-                projectRepository.decrementTaskCount(projectId.toInt())
+                projectRepository.decrementTaskCount(projectId)
             }
         }
     }
@@ -94,5 +94,9 @@ class TaskRepositoryImpl @Inject constructor(
     override suspend fun getAllTasksSync(): List<Task> = withContext(Dispatchers.IO) {
         // Récupération synchrone de toutes les tâches (sans Flow)
         taskDao.getAllTasksSync()
+    }
+
+    override fun getTasksByProject(projectId: Long): Flow<List<Task>> {
+        return taskDao.getTasksByProject(projectId)
     }
 } 

@@ -14,6 +14,7 @@ import com.mlk.taskmanager.ui.tasks.TaskDetailScreen
 import com.mlk.taskmanager.ui.routines.AddRoutineScreen
 import com.mlk.taskmanager.ui.routines.RoutineDetailScreen
 import com.mlk.taskmanager.ui.routines.RoutinesScreen
+import com.mlk.taskmanager.ui.project.ProjectDetailScreen
 
 sealed class Screen(val route: String) {
     object Welcome : Screen("welcome")
@@ -29,6 +30,9 @@ sealed class Screen(val route: String) {
     }
     object RoutineDetail : Screen("routine_detail/{routineId}") {
         fun createRoute(routineId: Long) = "routine_detail/$routineId"
+    }
+    object ProjectDetail : Screen("project_detail/{projectId}") {
+        fun createRoute(projectId: Long) = "project_detail/$projectId"
     }
 }
 
@@ -84,6 +88,18 @@ fun TaskManagerNavGraph(
             val routineId = backStackEntry.arguments?.getString("routineId")?.toLongOrNull()
             if (routineId != null) {
                 RoutineDetailScreen(routineId, navController)
+            }
+        }
+        
+        composable(Screen.ProjectDetail.route) { backStackEntry ->
+            val projectId = backStackEntry.arguments?.getString("projectId")?.toLongOrNull()
+            if (projectId != null) {
+                ProjectDetailScreen(
+                    projectId = projectId,
+                    onNavigateToTask = { taskId ->
+                        navController.navigate(Screen.TaskDetail.createRoute(taskId))
+                    }
+                )
             }
         }
     }

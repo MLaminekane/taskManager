@@ -3,15 +3,12 @@ package com.mlk.taskmanager.ui.pomodoro
 import android.app.NotificationManager
 import android.content.Context
 import android.os.CountDownTimer
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class PomodoroUiState(
@@ -44,18 +41,16 @@ class PomodoroViewModel @Inject constructor(
             val totalMillis = minutes * 60 * 1000L
             timer = object : CountDownTimer(totalMillis, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
-                    viewModelScope.launch {
-                        val minutesRemaining = (millisUntilFinished / 1000 / 60).toInt()
-                        val secondsRemaining = ((millisUntilFinished / 1000) % 60).toInt()
-                        _uiState.update { it.copy(
-                            minutes = minutesRemaining,
-                            seconds = secondsRemaining
-                        ) }
-                    }
+                    val minutesRemaining = (millisUntilFinished / 1000 / 60).toInt()
+                    val secondsRemaining = ((millisUntilFinished / 1000) % 60).toInt()
+                    _uiState.update { it.copy(
+                        minutes = minutesRemaining,
+                        seconds = secondsRemaining
+                    ) }
                 }
 
                 override fun onFinish() {
-                    viewModelScope.launch {
+                    try {
                         if (!_uiState.value.isBreak) {
                             // Session completed
                             _uiState.update { it.copy(
@@ -77,6 +72,8 @@ class PomodoroViewModel @Inject constructor(
                             ) }
                         }
                         updateNotificationSettings()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
                 }
             }.start()
@@ -84,103 +81,97 @@ class PomodoroViewModel @Inject constructor(
             _uiState.update { it.copy(isRunning = true) }
             updateNotificationSettings()
         } catch (e: Exception) {
-            Log.e("PomodoroViewModel", "Error starting countdown", e)
-            resetTimer()
+            e.printStackTrace()
+            _uiState.update { it.copy(isRunning = false) }
         }
     }
 
     private fun calculateFocusRate(sessions: Int, totalMinutes: Int): Int {
-        if (sessions == 0) return 0
-        val expectedMinutes = sessions * 25
-        return ((totalMinutes.toFloat() / expectedMinutes.toFloat()) * 100).toInt()
+        return try {
+            if (sessions == 0) 0
+            else {
+                val expectedMinutes = sessions * 25
+                ((totalMinutes.toFloat() / expectedMinutes.toFloat()) * 100).toInt()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            0
+        }
     }
 
     fun startTimer() {
-        viewModelScope.launch {
-            try {
-                startCountdown(_uiState.value.minutes)
-            } catch (e: Exception) {
-                Log.e("PomodoroViewModel", "Error in startTimer", e)
-                resetTimer()
-            }
+        try {
+            startCountdown(_uiState.value.minutes)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     fun pauseTimer() {
-        viewModelScope.launch {
-            try {
-                timer?.cancel()
-                _uiState.update { it.copy(isRunning = false) }
-                updateNotificationSettings()
-            } catch (e: Exception) {
-                Log.e("PomodoroViewModel", "Error in pauseTimer", e)
-            }
+        try {
+            timer?.cancel()
+            _uiState.update { it.copy(isRunning = false) }
+            updateNotificationSettings()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     fun resetTimer() {
-        viewModelScope.launch {
-            try {
-                timer?.cancel()
-                _uiState.update { it.copy(
-                    minutes = if (_uiState.value.isBreak) 5 else 25,
-                    seconds = 0,
-                    isRunning = false
-                ) }
-                updateNotificationSettings()
-            } catch (e: Exception) {
-                Log.e("PomodoroViewModel", "Error in resetTimer", e)
-            }
+        try {
+            timer?.cancel()
+            _uiState.update { it.copy(
+                minutes = if (_uiState.value.isBreak) 5 else 25,
+                seconds = 0,
+                isRunning = false
+            ) }
+            updateNotificationSettings()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     fun skipSession() {
-        viewModelScope.launch {
-            try {
-                timer?.cancel()
-                if (_uiState.value.isBreak) {
-                    _uiState.update { it.copy(
-                        isBreak = false,
-                        minutes = 25,
-                        seconds = 0,
-                        isRunning = false
-                    ) }
-                } else {
-                    _uiState.update { it.copy(
-                        isBreak = true,
-                        minutes = 5,
-                        seconds = 0,
-                        isRunning = false,
-                        completedSessions = it.completedSessions + 1,
-                        totalFocusMinutes = it.totalFocusMinutes + ((25 - it.minutes) + (it.seconds / 60))
-                    ) }
-                }
-                updateNotificationSettings()
-            } catch (e: Exception) {
-                Log.e("PomodoroViewModel", "Error in skipSession", e)
+        try {
+            timer?.cancel()
+            if (_uiState.value.isBreak) {
+                _uiState.update { it.copy(
+                    isBreak = false,
+                    minutes = 25,
+                    seconds = 0,
+                    isRunning = false
+                ) }
+            } else {
+                _uiState.update { it.copy(
+                    isBreak = true,
+                    minutes = 5,
+                    seconds = 0,
+                    isRunning = false,
+                    completedSessions = it.completedSessions + 1,
+                    totalFocusMinutes = it.totalFocusMinutes + ((25 - it.minutes) + (it.seconds / 60))
+                ) }
             }
+            updateNotificationSettings()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     fun toggleDnd() {
-        viewModelScope.launch {
-            try {
-                _uiState.update { it.copy(dndEnabled = !it.dndEnabled) }
-                updateNotificationSettings()
-            } catch (e: Exception) {
-                Log.e("PomodoroViewModel", "Error in toggleDnd", e)
-            }
+        try {
+            _uiState.update { it.copy(dndEnabled = !it.dndEnabled) }
+            updateNotificationSettings()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     fun toggleNotificationBlocking() {
-        viewModelScope.launch {
-            try {
-                _uiState.update { it.copy(notificationBlocked = !it.notificationBlocked) }
-                updateNotificationSettings()
-            } catch (e: Exception) {
-                Log.e("PomodoroViewModel", "Error in toggleNotificationBlocking", e)
-            }
+        try {
+            _uiState.update { it.copy(notificationBlocked = !it.notificationBlocked) }
+            updateNotificationSettings()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -194,17 +185,17 @@ class PomodoroViewModel @Inject constructor(
                 notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL)
             }
         } catch (e: Exception) {
-            Log.e("PomodoroViewModel", "Error in updateNotificationSettings", e)
+            e.printStackTrace()
         }
     }
 
     override fun onCleared() {
-        super.onCleared()
         try {
+            super.onCleared()
             timer?.cancel()
             notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL)
         } catch (e: Exception) {
-            Log.e("PomodoroViewModel", "Error in onCleared", e)
+            e.printStackTrace()
         }
     }
 } 

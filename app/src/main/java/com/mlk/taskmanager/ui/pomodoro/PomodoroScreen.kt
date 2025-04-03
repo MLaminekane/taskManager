@@ -3,6 +3,7 @@ package com.mlk.taskmanager.ui.pomodoro
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -30,7 +31,7 @@ fun PomodoroScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Focus",
+                        "Mode Focus",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold
                         )
@@ -47,14 +48,14 @@ fun PomodoroScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(padding)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Timer Circle
             Box(
                 modifier = Modifier
-                    .size(300.dp)
+                    .size(200.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
@@ -64,29 +65,24 @@ fun PomodoroScreen(
                 ) {
                     Text(
                         text = "${uiState.minutes}:${String.format("%02d", uiState.seconds)}",
-                        fontSize = 64.sp,
+                        fontSize = 48.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
                         text = if (uiState.isBreak) "Pause" else "Focus",
-                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // Controls
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                // Reset button
                 IconButton(
                     onClick = { viewModel.resetTimer() },
                     modifier = Modifier
@@ -101,7 +97,6 @@ fun PomodoroScreen(
                     )
                 }
 
-                // Play/Pause button
                 IconButton(
                     onClick = { 
                         if (uiState.isRunning) viewModel.pauseTimer() else viewModel.startTimer() 
@@ -119,7 +114,6 @@ fun PomodoroScreen(
                     )
                 }
 
-                // Skip button
                 IconButton(
                     onClick = { viewModel.skipSession() },
                     modifier = Modifier
@@ -137,43 +131,108 @@ fun PomodoroScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Session info
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
+            // Settings Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    Text(
-                        text = "${uiState.completedSessions}",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Sessions",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Mode Ne pas déranger",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Switch(
+                            checked = uiState.dndEnabled,
+                            onCheckedChange = { viewModel.toggleDnd() }
+                        )
+                    }
 
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Bloquer les notifications",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Switch(
+                            checked = uiState.notificationBlocked,
+                            onCheckedChange = { viewModel.toggleNotificationBlocking() }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Statistics Card
+            Card(
+                modifier = Modifier.fillMaxWidth(). height(150.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface),
+            ) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "${uiState.totalFocusMinutes}",
-                        style = MaterialTheme.typography.titleLarge,
+                        "Statistiques",
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(
-                        text = "Minutes",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        StatisticItem(
+                            title = "Sessions",
+                            value = "${uiState.completedSessions}"
+                        )
+                        StatisticItem(
+                            title = "Minutes Focus",
+                            value = "${uiState.totalFocusMinutes}"
+                        )
+                        StatisticItem(
+                            title = "Taux Focus",
+                            value = "${uiState.focusRate}%"
+                        )
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun StatisticItem(
+    title: String,
+    value: String
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 } 

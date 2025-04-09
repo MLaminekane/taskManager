@@ -13,7 +13,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ServiceModule {
-    
+
     @Provides
     @Singleton
     fun provideNotificationManager(
@@ -21,7 +21,7 @@ object ServiceModule {
     ): NotificationManager {
         return context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
-    
+
     @Provides
     @Singleton
     fun provideWorkManager(
@@ -29,4 +29,4 @@ object ServiceModule {
     ): WorkManager {
         return WorkManager.getInstance(context)
     }
-} 
+}

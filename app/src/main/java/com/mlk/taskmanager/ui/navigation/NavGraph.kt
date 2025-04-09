@@ -16,6 +16,7 @@ import com.mlk.taskmanager.ui.routines.RoutineDetailScreen
 import com.mlk.taskmanager.ui.routines.RoutinesScreen
 import com.mlk.taskmanager.ui.project.ProjectDetailScreen
 import com.mlk.taskmanager.ui.pomodoro.PomodoroScreen
+import com.mlk.taskmanager.ui.steps.StepCounterScreen
 
 sealed class Screen(val route: String) {
     object Welcome : Screen("welcome")
@@ -36,6 +37,7 @@ sealed class Screen(val route: String) {
         fun createRoute(projectId: Long) = "project_detail/$projectId"
     }
     object Pomodoro : Screen("pomodoro")
+    object StepCounter : Screen("step_counter")
 }
 
 @Composable
@@ -54,6 +56,8 @@ fun TaskManagerNavGraph(
         composable(Screen.Home.route) {
             HomeScreen(navController)
         }
+
+      
         
         composable(Screen.Tasks.route) {
             TasksScreen(navController)
@@ -107,6 +111,10 @@ fun TaskManagerNavGraph(
         
         composable(Screen.Pomodoro.route) {
             PomodoroScreen(navController = navController)
+        }
+
+        composable(Screen.StepCounter.route) {
+            StepCounterScreen(navController = navController)
         }
     }
 } 

@@ -48,6 +48,9 @@ class NotificationManager @Inject constructor(
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) 
             as AlarmManager
     
+    private var isNotificationsPaused = false
+    private val pausedNotifications = mutableListOf<Long>()
+    
     init {
         createNotificationChannels()
     }
@@ -187,6 +190,9 @@ class NotificationManager @Inject constructor(
         minutesRemaining: Int,
         notificationId: Int
     ) {
+        if (!shouldShowNotification()) {
+            return
+        }
         // Créer l'intent pour ouvrir l'application
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -271,6 +277,9 @@ class NotificationManager @Inject constructor(
         notificationId: Int,
         context: ContextType
     ) {
+        if (!shouldShowNotification()) {
+            return
+        }
         // Créer l'intent pour ouvrir l'application
         val intent = Intent(this.context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -361,5 +370,90 @@ class NotificationManager @Inject constructor(
         LOCATION_ONLY,
         TIME_ONLY,
         LOCATION_AND_TIME
+    }
+
+    fun pauseNonEssentialNotifications() {
+        if (!isNotificationsPaused) {
+            Log.d(TAG, "Pausing non-essential notifications")
+            isNotificationsPaused = true
+            // Stocker l'état actuel des notifications programmées
+            // Note: Dans une implémentation réelle, vous voudrez peut-être stocker ces informations
+            // dans une base de données ou des préférences partagées
+        } else {
+            Log.d(TAG, "Notifications are already paused")
+        }
+    }
+
+    fun resumeNonEssentialNotifications() {
+        if (isNotificationsPaused) {
+            Log.d(TAG, "Resuming non-essential notifications")
+            isNotificationsPaused = false
+            // Reprogrammer les notifications qui ont été mises en pause
+            // Note: Dans une implémentation réelle, vous voudrez peut-être restaurer ces notifications
+            // à partir de la base de données ou des préférences partagées
+        } else {
+            Log.d(TAG, "Notifications are already active")
+        }
+    }
+
+    private fun shouldShowNotification(): Boolean {
+        val shouldShow = !isNotificationsPaused
+        Log.d(TAG, "Checking if should show notification: $shouldShow")
+        return shouldShow
+    }
+
+    /**
+     * Planifie une notification unique pour une tâche
+     * @param task La tâche concernée
+     * @param notificationTime Le moment où la notification doit être affichée
+     * @param title Le titre de la notification
+     * @param message Le message de la notification
+     */
+    fun scheduleSingleNotification(
+        task: Task,
+        notificationTime: LocalDateTime,
+        title: String,
+        message: String
+    ) {
+        Log.d(TAG, "Scheduling single notification for task ${task.id} at $notificationTime")
+        
+        val triggerTimeMillis = notificationTime
+            .atZone(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+        
+        val notificationId = "${task.id}_single".hashCode()
+        
+        // Créer l'intent pour la notification
+        val intent = Intent(context, TimeNotificationReceiver::class.java).apply {
+            putExtra(EXTRA_TASK_ID, task.id)
+            putExtra(EXTRA_TASK_TITLE, title)
+            putExtra(EXTRA_TASK_DESCRIPTION, message)
+            putExtra("notification_id", notificationId)
+        }
+        
+        val pendingIntent = PendingIntent.getBroadcast(
+            context, 
+            notificationId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        
+        // Programmer l'alarme
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                triggerTimeMillis,
+                pendingIntent
+            )
+        } else {
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                triggerTimeMillis,
+                pendingIntent
+            )
+        }
+        
+        Log.d(TAG, "Single notification scheduled for task ${task.id}")
     }
 } 

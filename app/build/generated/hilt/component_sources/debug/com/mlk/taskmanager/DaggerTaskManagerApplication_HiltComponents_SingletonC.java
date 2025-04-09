@@ -54,6 +54,8 @@ import com.mlk.taskmanager.ui.routines.RoutinesViewModel;
 import com.mlk.taskmanager.ui.routines.RoutinesViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.mlk.taskmanager.ui.settings.SettingsViewModel;
 import com.mlk.taskmanager.ui.settings.SettingsViewModel_HiltModules_KeyModule_ProvideFactory;
+import com.mlk.taskmanager.ui.steps.StepCounterViewModel;
+import com.mlk.taskmanager.ui.steps.StepCounterViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.mlk.taskmanager.ui.tasks.TasksViewModel;
 import com.mlk.taskmanager.ui.tasks.TasksViewModel_HiltModules_KeyModule_ProvideFactory;
 import dagger.hilt.android.ActivityRetainedLifecycle;
@@ -412,7 +414,7 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
 
     @Override
     public Set<String> getViewModelKeys() {
-      return ImmutableSet.<String>of(CalendarViewModel_HiltModules_KeyModule_ProvideFactory.provide(), HomeViewModel_HiltModules_KeyModule_ProvideFactory.provide(), PomodoroViewModel_HiltModules_KeyModule_ProvideFactory.provide(), ProjectDetailViewModel_HiltModules_KeyModule_ProvideFactory.provide(), RoutineDetailViewModel_HiltModules_KeyModule_ProvideFactory.provide(), RoutinesViewModel_HiltModules_KeyModule_ProvideFactory.provide(), SettingsViewModel_HiltModules_KeyModule_ProvideFactory.provide(), TasksViewModel_HiltModules_KeyModule_ProvideFactory.provide());
+      return ImmutableSet.<String>of(CalendarViewModel_HiltModules_KeyModule_ProvideFactory.provide(), HomeViewModel_HiltModules_KeyModule_ProvideFactory.provide(), PomodoroViewModel_HiltModules_KeyModule_ProvideFactory.provide(), ProjectDetailViewModel_HiltModules_KeyModule_ProvideFactory.provide(), RoutineDetailViewModel_HiltModules_KeyModule_ProvideFactory.provide(), RoutinesViewModel_HiltModules_KeyModule_ProvideFactory.provide(), SettingsViewModel_HiltModules_KeyModule_ProvideFactory.provide(), StepCounterViewModel_HiltModules_KeyModule_ProvideFactory.provide(), TasksViewModel_HiltModules_KeyModule_ProvideFactory.provide());
     }
 
     @Override
@@ -454,6 +456,8 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
 
     private Provider<SettingsViewModel> settingsViewModelProvider;
 
+    private Provider<StepCounterViewModel> stepCounterViewModelProvider;
+
     private Provider<TasksViewModel> tasksViewModelProvider;
 
     private ViewModelCImpl(SingletonCImpl singletonCImpl,
@@ -476,12 +480,13 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
       this.routineDetailViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 4);
       this.routinesViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 5);
       this.settingsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 6);
-      this.tasksViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 7);
+      this.stepCounterViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 7);
+      this.tasksViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 8);
     }
 
     @Override
     public Map<String, javax.inject.Provider<ViewModel>> getHiltViewModelMap() {
-      return ImmutableMap.<String, javax.inject.Provider<ViewModel>>builderWithExpectedSize(8).put("com.mlk.taskmanager.ui.calendar.CalendarViewModel", ((Provider) calendarViewModelProvider)).put("com.mlk.taskmanager.ui.home.HomeViewModel", ((Provider) homeViewModelProvider)).put("com.mlk.taskmanager.ui.pomodoro.PomodoroViewModel", ((Provider) pomodoroViewModelProvider)).put("com.mlk.taskmanager.ui.project.ProjectDetailViewModel", ((Provider) projectDetailViewModelProvider)).put("com.mlk.taskmanager.ui.routines.RoutineDetailViewModel", ((Provider) routineDetailViewModelProvider)).put("com.mlk.taskmanager.ui.routines.RoutinesViewModel", ((Provider) routinesViewModelProvider)).put("com.mlk.taskmanager.ui.settings.SettingsViewModel", ((Provider) settingsViewModelProvider)).put("com.mlk.taskmanager.ui.tasks.TasksViewModel", ((Provider) tasksViewModelProvider)).build();
+      return ImmutableMap.<String, javax.inject.Provider<ViewModel>>builderWithExpectedSize(9).put("com.mlk.taskmanager.ui.calendar.CalendarViewModel", ((Provider) calendarViewModelProvider)).put("com.mlk.taskmanager.ui.home.HomeViewModel", ((Provider) homeViewModelProvider)).put("com.mlk.taskmanager.ui.pomodoro.PomodoroViewModel", ((Provider) pomodoroViewModelProvider)).put("com.mlk.taskmanager.ui.project.ProjectDetailViewModel", ((Provider) projectDetailViewModelProvider)).put("com.mlk.taskmanager.ui.routines.RoutineDetailViewModel", ((Provider) routineDetailViewModelProvider)).put("com.mlk.taskmanager.ui.routines.RoutinesViewModel", ((Provider) routinesViewModelProvider)).put("com.mlk.taskmanager.ui.settings.SettingsViewModel", ((Provider) settingsViewModelProvider)).put("com.mlk.taskmanager.ui.steps.StepCounterViewModel", ((Provider) stepCounterViewModelProvider)).put("com.mlk.taskmanager.ui.tasks.TasksViewModel", ((Provider) tasksViewModelProvider)).build();
     }
 
     @Override
@@ -517,7 +522,7 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
           return (T) new HomeViewModel(singletonCImpl.provideTaskRepositoryProvider.get(), singletonCImpl.routineRepositoryImplProvider.get(), singletonCImpl.bindProjectRepositoryProvider.get(), singletonCImpl.provideWeatherRepositoryProvider.get(), ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
           case 2: // com.mlk.taskmanager.ui.pomodoro.PomodoroViewModel 
-          return (T) new PomodoroViewModel(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+          return (T) new PomodoroViewModel(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.provideNotificationManagerProvider2.get(), singletonCImpl.provideNotificationManagerProvider.get());
 
           case 3: // com.mlk.taskmanager.ui.project.ProjectDetailViewModel 
           return (T) new ProjectDetailViewModel(singletonCImpl.bindProjectRepositoryProvider.get(), singletonCImpl.provideTaskRepositoryProvider.get());
@@ -531,8 +536,11 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
           case 6: // com.mlk.taskmanager.ui.settings.SettingsViewModel 
           return (T) new SettingsViewModel(singletonCImpl.provideSettingsRepositoryProvider.get(), singletonCImpl.calendarSyncServiceProvider.get(), ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
-          case 7: // com.mlk.taskmanager.ui.tasks.TasksViewModel 
-          return (T) new TasksViewModel(singletonCImpl.provideTaskRepositoryProvider.get(), singletonCImpl.locationReminderServiceProvider.get(), singletonCImpl.provideNotificationManagerProvider2.get());
+          case 7: // com.mlk.taskmanager.ui.steps.StepCounterViewModel 
+          return (T) new StepCounterViewModel(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 8: // com.mlk.taskmanager.ui.tasks.TasksViewModel 
+          return (T) new TasksViewModel(singletonCImpl.provideTaskRepositoryProvider.get(), singletonCImpl.bindProjectRepositoryProvider.get(), singletonCImpl.locationReminderServiceProvider.get(), singletonCImpl.provideNotificationManagerProvider2.get());
 
           default: throw new AssertionError(id);
         }

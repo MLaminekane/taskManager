@@ -1,16 +1,19 @@
 package com.mlk.taskmanager.ui.tasks
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mlk.taskmanager.data.model.Priority
 import com.mlk.taskmanager.data.model.Task
 import com.mlk.taskmanager.data.repository.TaskRepository
+import com.mlk.taskmanager.data.repository.ProjectRepository
 import com.mlk.taskmanager.service.LocationReminderService
 import com.mlk.taskmanager.service.NotificationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import okhttp3.internal.notify
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -35,6 +38,7 @@ data class TasksUiState(
 @HiltViewModel
 class TasksViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
+    private val projectRepository: ProjectRepository,
     private val locationReminderService: LocationReminderService,
     private val notificationManager: NotificationManager
 ) : ViewModel() {
@@ -179,9 +183,7 @@ class TasksViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             try {
-                println("DEBUG: Starting task creation process")
-                println("DEBUG: Creating task with title: $title, due date: $dueDateTime, category: $category, projectId: $projectId")
-                
+                Log.d("TasksViewModel", "Adding new task: $title")
                 val task = Task(
                     title = title,
                     description = description,
@@ -194,23 +196,29 @@ class TasksViewModel @Inject constructor(
                     projectId = projectId
                 )
                 
-                println("DEBUG: Task object created, inserting into database")
                 val taskId = taskRepository.insertTask(task)
-                println("DEBUG: Task inserted successfully with ID: $taskId")
+                Log.d("TasksViewModel", "Task inserted with ID: $taskId")
                 
-                // Utiliser le gestionnaire de notifications pour configurer toutes les notifications
-                val taskWithId = task.copy(id = taskId)
-                notificationManager.scheduleTaskNotifications(taskWithId)
-                println("DEBUG: Notifications scheduled for task")
+                // Planifier une notification 24h avant l'échéance
+                val notificationTime = dueDateTime.minusDays(1)
+                Log.d("TasksViewModel", "Scheduling notification for task $taskId at $notificationTime")
+                notificationManager.scheduleSingleNotification(
+                    task = task.copy(id = taskId),
+                    notificationTime = notificationTime,
+                    title = "Rappel de tâche",
+                    message = "La tâche \"${title}\" est due demain"
+                )
+                
+                // Mettre à jour le compteur de tâches du projet si nécessaire
+                projectId?.let { 
+                    Log.d("TasksViewModel", "Incrementing task count for project $it")
+                    projectRepository.incrementTaskCount(it) 
+                }
                 
                 loadTasks()
-                println("DEBUG: Tasks reloaded after insertion")
             } catch (e: Exception) {
-                println("DEBUG: Error creating task: ${e.message}")
-                e.printStackTrace()
-                _uiState.update { 
-                    it.copy(error = e.message ?: "Failed to create task") 
-                }
+                Log.e("TasksViewModel", "Error adding task: ${e.message}", e)
+                _uiState.update { it.copy(error = e.message) }
             }
         }
     }
@@ -218,7 +226,29 @@ class TasksViewModel @Inject constructor(
     fun toggleTaskCompletion(task: Task) {
         viewModelScope.launch {
             try {
-                taskRepository.updateTask(task.copy(isCompleted = !task.isCompleted))
+                val updatedTask = task.copy(isCompleted = !task.isCompleted)
+                taskRepository.updateTask(updatedTask)
+                
+                // Si la tâche est marquée comme terminée, envoyer une notification de félicitations
+                if (updatedTask.isCompleted) {
+                    notificationManager.scheduleSingleNotification(
+                        task = updatedTask,
+                        notificationTime = LocalDateTime.now(),
+                        title = "Félicitations ! 🎉",
+                        message = "Vous avez terminé la tâche \"${updatedTask.title}\""
+                    )
+                }
+                
+                // Mettre à jour le compteur de tâches du projet si nécessaire
+                updatedTask.projectId?.let { projectId ->
+                    if (updatedTask.isCompleted) {
+                        projectRepository.decrementTaskCount(projectId)
+                    } else {
+                        projectRepository.incrementTaskCount(projectId)
+                    }
+                }
+                
+                loadTasks()
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.message) }
             }
@@ -238,6 +268,8 @@ class TasksViewModel @Inject constructor(
     fun clearError() {
         _uiState.update { it.copy(error = null) }
     }
+
+
     
     // Méthode pour rafraîchir l'interface après un court délai
     fun delayedRefresh() {

@@ -22,6 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.BorderStroke
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -29,6 +31,11 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.mlk.taskmanager.ui.navigation.Screen
+import com.mlk.taskmanager.ui.theme.Background
+import com.mlk.taskmanager.ui.theme.TextColor
+import com.mlk.taskmanager.ui.theme.PrimaryColor
+import com.mlk.taskmanager.ui.theme.SecondaryColor
+import com.mlk.taskmanager.ui.theme.AccentColor
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -66,23 +73,25 @@ fun SettingsScreen(
                     Text(
                         text = "Settings",
                         style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = TextColor
                         )
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                    containerColor = Background,
+                    titleContentColor = TextColor
                 )
             )
         },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = Background
     ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .background(Background),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Profile Section
@@ -146,13 +155,6 @@ fun SettingsScreen(
                             }
                             viewModel.setLocationEnabled(checked)
                         }
-                    )
-
-                    SettingsItem(
-                        title = "Default Radius",
-                        subtitle = "${uiState.defaultLocationRadius.toInt()} meters",
-                        icon = Icons.Outlined.RadioButtonChecked,
-                        onClick = { /* Show radius picker */ }
                     )
                 }
             }
@@ -376,133 +378,137 @@ fun ProfileCard(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
+    
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        )
+            containerColor = Background.copy(alpha = 0.6f),
+            contentColor = TextColor
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
                 .padding(16.dp)
+                .fillMaxWidth()
         ) {
+            // User info section
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Profile Image
+                // User avatar
                 Box(
                     modifier = Modifier
                         .size(64.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary)
-                        .padding(8.dp),
+                        .background(PrimaryColor.copy(alpha = 0.2f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (uiState.isUserLoggedIn && uiState.currentUser != null) {
-                        // Display first letter of email as avatar if no profile picture
-                        val userEmail = uiState.currentUser?.email ?: ""
-                        if (userEmail.isNotEmpty()) {
-                            Text(
-                                text = userEmail.first().uppercase(),
-                                style = MaterialTheme.typography.headlineMedium,
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Profile",
-                                modifier = Modifier.size(32.dp),
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                    } else {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Profile",
-                            modifier = Modifier.size(32.dp),
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Avatar",
+                        tint = PrimaryColor,
+                        modifier = Modifier.size(32.dp)
+                    )
                 }
                 
                 Spacer(modifier = Modifier.width(16.dp))
                 
-                // User Info
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    if (uiState.isUserLoggedIn && uiState.currentUser != null) {
-                        Text(
-                            text = uiState.currentUser?.name ?: "Lamine",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
+                // User name and email
+                Column {
+                    Text(
+                        text = if (uiState.isUserLoggedIn && uiState.currentUser?.name?.isNotBlank() == true) 
+                                  uiState.currentUser?.name ?: "Utilisateur"
+                              else 
+                                  "Utilisateur",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = TextColor
                         )
-                        uiState.currentUser?.email?.let { email ->
-                            Text(
-                                text = email,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    } else {
-                        Text(
-                            text = "Non connecté",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Connectez-vous pour synchroniser vos données",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    )
+                    
+                    Text(
+                        text = if (uiState.isUserLoggedIn && uiState.currentUser?.email?.isNotBlank() == true)
+                                  uiState.currentUser?.email ?: "Non connecté"
+                              else
+                                  "Non connecté",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextColor.copy(alpha = 0.7f)
+                    )
                 }
             }
             
             Spacer(modifier = Modifier.height(16.dp))
             
+            // Authentication actions
             if (uiState.isUserLoggedIn) {
-                // Logout Button
+                // Si l'utilisateur est connecté, afficher le bouton de déconnexion
                 Button(
                     onClick = { 
                         viewModel.logout()
-                        navController.navigate("login") {
-                            popUpTo("home") { inclusive = true }
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Home.route) { inclusive = true }
                         }
                     },
-                    modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer
-                    )
+                        containerColor = AccentColor,
+                        contentColor = TextColor
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
                         imageVector = Icons.Default.Logout,
-                        contentDescription = "Logout",
+                        contentDescription = "Se déconnecter",
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Se déconnecter")
                 }
             } else {
-                // Login Button
-                Button(
-                    onClick = { navController.navigate("login") },
-                    modifier = Modifier.fillMaxWidth()
+                // Si l'utilisateur n'est pas connecté, afficher les boutons de connexion et d'inscription
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Login,
-                        contentDescription = "Login",
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Se connecter")
+                    // Bouton de connexion
+                    Button(
+                        onClick = { navController.navigate(Screen.Login.route) },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = PrimaryColor,
+                            contentColor = TextColor
+                        ),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Login,
+                            contentDescription = "Se connecter",
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Connexion")
+                    }
+                    
+                    // Bouton d'inscription
+                    Button(
+                        onClick = { navController.navigate(Screen.Register.route) },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = SecondaryColor,
+                            contentColor = Color.Black
+                        ),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PersonAdd,
+                            contentDescription = "S'inscrire",
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Inscription")
+                    }
                 }
             }
         }
@@ -521,35 +527,51 @@ fun SettingsSection(
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+            containerColor = Background.copy(alpha = 0.6f),
+            contentColor = TextColor
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
                 .padding(16.dp)
+                .fillMaxWidth()
         ) {
+            // Section header
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = iconTint,
-                    modifier = Modifier.size(24.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(SecondaryColor.copy(alpha = 0.2f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = PrimaryColor,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
                 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(16.dp))
                 
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = TextColor
+                    )
                 )
             }
             
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Section content
             content()
         }
     }
@@ -565,38 +587,37 @@ fun SettingsItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable(onClick = onClick)
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = PrimaryColor,
             modifier = Modifier.size(24.dp)
         )
         
         Spacer(modifier = Modifier.width(16.dp))
         
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = TextColor
             )
+            
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = TextColor.copy(alpha = 0.7f)
             )
         }
         
         Icon(
             imageVector = Icons.Default.ChevronRight,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = TextColor.copy(alpha = 0.5f)
         )
     }
 }
@@ -618,30 +639,35 @@ fun SettingsSwitch(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = PrimaryColor,
             modifier = Modifier.size(24.dp)
         )
         
         Spacer(modifier = Modifier.width(16.dp))
         
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = TextColor
             )
+            
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = TextColor.copy(alpha = 0.7f)
             )
         }
         
         Switch(
             checked = checked,
-            onCheckedChange = onCheckedChange
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = PrimaryColor,
+                checkedTrackColor = PrimaryColor.copy(alpha = 0.5f),
+                uncheckedThumbColor = TextColor.copy(alpha = 0.7f),
+                uncheckedTrackColor = Background
+            )
         )
     }
 }
@@ -658,8 +684,10 @@ fun ThemePickerDialog(
         title = {
             Text(
                 text = "Choose Theme",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = TextColor
+                )
             )
         },
         text = {
@@ -668,30 +696,49 @@ fun ThemePickerDialog(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onThemeSelected(theme) }
+                            .clickable { 
+                                onThemeSelected(theme)
+                                onDismiss()
+                            }
                             .padding(vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
                             selected = false,
-                            onClick = { onThemeSelected(theme) }
+                            onClick = {
+                                onThemeSelected(theme)
+                                onDismiss()
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = PrimaryColor,
+                                unselectedColor = TextColor.copy(alpha = 0.6f)
+                            )
                         )
                         
                         Spacer(modifier = Modifier.width(8.dp))
                         
                         Text(
                             text = theme,
-                            style = MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = TextColor
                         )
                     }
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = PrimaryColor
+                )
+            ) {
                 Text("Cancel")
             }
-        }
+        },
+        containerColor = Background,
+        titleContentColor = TextColor,
+        textContentColor = TextColor
     )
 }
 
@@ -912,6 +959,7 @@ fun SettingsSectionHeader(title: String) {
         text = title,
         style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Medium,
+        color = TextColor,
         modifier = Modifier.padding(vertical = 8.dp)
     )
 }
@@ -933,7 +981,7 @@ fun SwitchPreference(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = PrimaryColor,
             modifier = Modifier
                 .size(24.dp)
                 .padding(end = 16.dp)
@@ -942,19 +990,26 @@ fun SwitchPreference(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                color = TextColor
             )
             
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = TextColor.copy(alpha = 0.7f)
             )
         }
         
         Switch(
             checked = isChecked,
-            onCheckedChange = onCheckedChange
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = PrimaryColor,
+                checkedTrackColor = PrimaryColor.copy(alpha = 0.5f),
+                uncheckedThumbColor = TextColor.copy(alpha = 0.7f),
+                uncheckedTrackColor = Background
+            )
         )
     }
 }
@@ -976,7 +1031,7 @@ fun ListPreference(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = PrimaryColor,
             modifier = Modifier
                 .size(24.dp)
                 .padding(end = 16.dp)
@@ -985,20 +1040,21 @@ fun ListPreference(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                color = TextColor
             )
             
             Text(
                 text = value,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = TextColor.copy(alpha = 0.7f)
             )
         }
         
         Icon(
             imageVector = Icons.Default.KeyboardArrowRight,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            tint = TextColor.copy(alpha = 0.6f)
         )
     }
 }
@@ -1020,7 +1076,7 @@ fun ButtonPreference(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = PrimaryColor,
             modifier = Modifier
                 .size(24.dp)
                 .padding(end = 16.dp)
@@ -1029,13 +1085,14 @@ fun ButtonPreference(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                color = TextColor
             )
             
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = TextColor.copy(alpha = 0.7f)
             )
         }
     }

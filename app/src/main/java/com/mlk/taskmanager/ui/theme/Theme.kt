@@ -11,41 +11,60 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.mlk.taskmanager.ui.theme.Background
+import com.mlk.taskmanager.ui.theme.TextColor
+import com.mlk.taskmanager.ui.theme.PrimaryColor
+import com.mlk.taskmanager.ui.theme.SecondaryColor
+import com.mlk.taskmanager.ui.theme.AccentColor
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF006C51),
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFF89F8D0),
-    onPrimaryContainer = Color(0xFF002117),
-    secondary = Color(0xFF4C6358),
-    onSecondary = Color.White,
-    secondaryContainer = Color(0xFFCEE9DB),
-    onSecondaryContainer = Color(0xFF082017),
-    tertiary = Color(0xFF3D6373),
-    onTertiary = Color.White,
-    tertiaryContainer = Color(0xFFC1E8FB),
-    onTertiaryContainer = Color(0xFF001F29)
+    primary = PrimaryColor,
+    onPrimary = TextColor,
+    primaryContainer = PrimaryColor.copy(alpha = 0.7f),
+    onPrimaryContainer = TextColor,
+    secondary = SecondaryColor,
+    onSecondary = Color.Black,
+    secondaryContainer = SecondaryColor.copy(alpha = 0.7f),
+    onSecondaryContainer = Color.Black,
+    tertiary = AccentColor,
+    onTertiary = TextColor,
+    tertiaryContainer = AccentColor.copy(alpha = 0.7f),
+    onTertiaryContainer = TextColor,
+    background = Background,
+    onBackground = TextColor,
+    surface = Background,
+    onSurface = TextColor,
+    surfaceVariant = Background.copy(alpha = 0.7f),
+    onSurfaceVariant = TextColor,
+    outline = PrimaryColor
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF6CDBB4),
-    onPrimary = Color(0xFF00382A),
-    primaryContainer = Color(0xFF00513D),
-    onPrimaryContainer = Color(0xFF89F8D0),
-    secondary = Color(0xFFB3CCBF),
-    onSecondary = Color(0xFF1E352B),
-    secondaryContainer = Color(0xFF344B41),
-    onSecondaryContainer = Color(0xFFCEE9DB),
-    tertiary = Color(0xFFA5CCDE),
-    onTertiary = Color(0xFF063544),
-    tertiaryContainer = Color(0xFF244B5B),
-    onTertiaryContainer = Color(0xFFC1E8FB)
+    primary = PrimaryColor,
+    onPrimary = TextColor,
+    primaryContainer = PrimaryColor.copy(alpha = 0.7f),
+    onPrimaryContainer = TextColor,
+    secondary = SecondaryColor,
+    onSecondary = Color.Black,
+    secondaryContainer = SecondaryColor.copy(alpha = 0.7f),
+    onSecondaryContainer = Color.Black,
+    tertiary = AccentColor,
+    onTertiary = TextColor,
+    tertiaryContainer = AccentColor.copy(alpha = 0.7f),
+    onTertiaryContainer = TextColor,
+    background = Background,
+    onBackground = TextColor,
+    surface = Background,
+    onSurface = TextColor,
+    surfaceVariant = Background.copy(alpha = 0.7f),
+    onSurfaceVariant = TextColor,
+    outline = PrimaryColor
 )
 
 @Composable
 fun TaskManagerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false, 
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -61,8 +80,8 @@ fun TaskManagerTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            window.statusBarColor = Background.toArgb() 
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false 
         }
     }
 

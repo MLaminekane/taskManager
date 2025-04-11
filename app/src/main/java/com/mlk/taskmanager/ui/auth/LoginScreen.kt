@@ -22,6 +22,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mlk.taskmanager.ui.theme.Background
+import com.mlk.taskmanager.ui.theme.TextColor
+import com.mlk.taskmanager.ui.theme.PrimaryColor
+import com.mlk.taskmanager.ui.theme.SecondaryColor
+import com.mlk.taskmanager.ui.theme.AccentColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,16 +53,18 @@ fun LoginScreen(
                     Text(
                         text = "Connexion",
                         style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = TextColor
                         )
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                    containerColor = Background,
+                    titleContentColor = TextColor
                 )
             )
-        }
+        },
+        containerColor = Background
     ) { padding ->
         Column(
             modifier = Modifier
@@ -71,7 +78,7 @@ fun LoginScreen(
                 text = "Bienvenue",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = PrimaryColor
             )
             
             Spacer(modifier = Modifier.height(8.dp))
@@ -80,7 +87,7 @@ fun LoginScreen(
                 text = "Connectez-vous pour accéder à vos tâches",
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = TextColor
             )
             
             Spacer(modifier = Modifier.height(32.dp))
@@ -95,9 +102,19 @@ fun LoginScreen(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Email,
-                        contentDescription = "Email Icon"
+                        contentDescription = "Email Icon",
+                        tint = PrimaryColor
                     )
                 },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryColor,
+                    unfocusedBorderColor = PrimaryColor.copy(alpha = 0.5f),
+                    focusedLabelColor = PrimaryColor,
+                    unfocusedLabelColor = TextColor.copy(alpha = 0.7f),
+                    cursorColor = PrimaryColor,
+                    focusedTextColor = TextColor,
+                    unfocusedTextColor = TextColor
+                ),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
@@ -119,17 +136,28 @@ fun LoginScreen(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Lock,
-                        contentDescription = "Password Icon"
+                        contentDescription = "Password Icon",
+                        tint = PrimaryColor
                     )
                 },
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
                             imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = if (passwordVisible) "Hide Password" else "Show Password"
+                            contentDescription = if (passwordVisible) "Hide Password" else "Show Password",
+                            tint = PrimaryColor
                         )
                     }
                 },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryColor,
+                    unfocusedBorderColor = PrimaryColor.copy(alpha = 0.5f),
+                    focusedLabelColor = PrimaryColor,
+                    unfocusedLabelColor = TextColor.copy(alpha = 0.7f),
+                    cursorColor = PrimaryColor,
+                    focusedTextColor = TextColor,
+                    unfocusedTextColor = TextColor
+                ),
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
@@ -149,7 +177,7 @@ fun LoginScreen(
             uiState.errorMessage?.let { error ->
                 Text(
                     text = error,
-                    color = MaterialTheme.colorScheme.error,
+                    color = AccentColor,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
@@ -161,12 +189,18 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                enabled = !uiState.isLoading
+                enabled = !uiState.isLoading,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PrimaryColor,
+                    contentColor = TextColor,
+                    disabledContainerColor = PrimaryColor.copy(alpha = 0.3f),
+                    disabledContentColor = TextColor.copy(alpha = 0.5f)
+                )
             ) {
                 if (uiState.isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = TextColor
                     )
                 } else {
                     Text("Se connecter")
@@ -178,7 +212,10 @@ fun LoginScreen(
             // Register link
             TextButton(
                 onClick = onNavigateToRegister,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = SecondaryColor
+                )
             ) {
                 Text("Pas encore de compte ? S'inscrire")
             }

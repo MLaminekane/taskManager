@@ -56,49 +56,49 @@ fun TaskManagerNavGraph(
         composable(Screen.Welcome.route) {
             WelcomeScreen(navController)
         }
-        
+
         composable(Screen.Home.route) {
             HomeScreen(navController)
         }
-        
+
         composable(Screen.Tasks.route) {
             TasksScreen(navController)
         }
-        
+
         composable(Screen.Calendar.route) {
             CalendarScreen(navController)
         }
-        
+
         composable(Screen.Settings.route) {
             SettingsScreen(navController)
         }
-        
+
         composable(Screen.AddTask.route) {
             AddTaskScreen(navController)
         }
-        
+
         composable(Screen.AddRoutine.route) {
             AddRoutineScreen(navController)
         }
-        
+
         composable(Screen.Routines.route) {
             RoutinesScreen(navController)
         }
-        
+
         composable(Screen.TaskDetail.route) { backStackEntry ->
             val taskId = backStackEntry.arguments?.getString("taskId")?.toLongOrNull()
             if (taskId != null) {
                 TaskDetailScreen(taskId, navController)
             }
         }
-        
+
         composable(Screen.RoutineDetail.route) { backStackEntry ->
             val routineId = backStackEntry.arguments?.getString("routineId")?.toLongOrNull()
             if (routineId != null) {
                 RoutineDetailScreen(routineId, navController)
             }
         }
-        
+
         composable(Screen.ProjectDetail.route) { backStackEntry ->
             val projectId = backStackEntry.arguments?.getString("projectId")?.toLongOrNull()
             if (projectId != null) {
@@ -110,7 +110,7 @@ fun TaskManagerNavGraph(
                 )
             }
         }
-        
+
         composable(Screen.Pomodoro.route) {
             PomodoroScreen(navController = navController)
         }
@@ -118,7 +118,7 @@ fun TaskManagerNavGraph(
         composable(Screen.StepCounter.route) {
             StepCounterScreen(navController = navController)
         }
-        
+
         composable(Screen.Login.route) {
             LoginScreen(
                 onNavigateToRegister = { navController.navigate(Screen.Register.route) },
@@ -127,7 +127,7 @@ fun TaskManagerNavGraph(
                 }}
             )
         }
-        
+
         composable(Screen.Register.route) {
             RegisterScreen(
                 onNavigateToLogin = { navController.navigate(Screen.Login.route) },

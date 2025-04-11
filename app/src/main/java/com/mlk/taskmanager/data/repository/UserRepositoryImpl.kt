@@ -22,14 +22,14 @@ class UserRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : UserRepository {
 
-    override suspend fun registerUser(email: String, password: String): Result<Long> {
+    override suspend fun registerUser(email: String, password: String, name: String): Result<Long> {
         return try {
             // Check if user already exists
             val existingUser = userDao.getUserByEmail(email)
             if (existingUser != null) {
                 Result.failure(Exception("Un utilisateur avec cet email existe déjà"))
             } else {
-                val userId = userDao.insertUser(User(email = email, password = password))
+                val userId = userDao.insertUser(User(email = email, password = password, name = name))
                 Result.success(userId)
             }
         } catch (e: Exception) {

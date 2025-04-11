@@ -29,6 +29,11 @@ import androidx.core.content.ContextCompat
 import com.mlk.taskmanager.ui.navigation.Screen
 import com.mlk.taskmanager.ui.navigation.TaskManagerNavGraph
 import com.mlk.taskmanager.ui.theme.TaskmanagerTheme
+import com.mlk.taskmanager.ui.theme.Background
+import com.mlk.taskmanager.ui.theme.TextColor
+import com.mlk.taskmanager.ui.theme.PrimaryColor
+import com.mlk.taskmanager.ui.theme.SecondaryColor
+import com.mlk.taskmanager.ui.theme.AccentColor
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -60,7 +65,7 @@ class MainActivity : ComponentActivity() {
             TaskmanagerTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = Background
                 ) {
                     TaskManagerApp()
                 }
@@ -139,7 +144,7 @@ fun TaskManagerApp() {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(32.dp))
-                                .background(Color.White)
+                                .background(Background) 
                                 .padding(12.dp),
                             horizontalArrangement = Arrangement.SpaceAround,
                             verticalAlignment = Alignment.CenterVertically
@@ -164,7 +169,7 @@ fun TaskManagerApp() {
                                         Icon(
                                             imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
                                             contentDescription = item.label,
-                                            tint = if (selected) Color(0xFF613BE7) else Color.Gray,
+                                            tint = if (selected) PrimaryColor else TextColor.copy(alpha = 0.6f), 
                                             modifier = Modifier.size(24.dp)
                                         )
                                     }
@@ -174,11 +179,11 @@ fun TaskManagerApp() {
                     }
                 }
             },
-            containerColor = Color(0xFFF8F8F8)
+            containerColor = Background 
         ) { innerPadding ->
             Surface(
                 modifier = Modifier.padding(innerPadding),
-                color = Color(0xFFF8F8F8)
+                color = Background 
             ) {
                 TaskManagerNavGraph(navController = navController)
             }
@@ -192,13 +197,13 @@ fun TaskManagerApp() {
                     .align(Alignment.BottomCenter)
                     .offset(y = (-36).dp)
                     .zIndex(1f),
-                containerColor = Color(0xFF613BE7),
+                containerColor = PrimaryColor, 
                 shape = CircleShape
             ) {
                 Icon(
                     Icons.Default.Add,
                     contentDescription = "Add Task",
-                    tint = Color.White
+                    tint = TextColor 
                 )
             }
         }

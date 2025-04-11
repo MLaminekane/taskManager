@@ -57,7 +57,7 @@ fun CalendarScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     // Custom colors for the app theme
-    val primaryColor = Color(0xFF6200EE)
+    val primaryColor = Color(0xFF00A2E3)
     val secondaryColor = Color(0xFF03DAC6)
     val backgroundColor = Color(0xFFF5F5F5)
     val cardBackgroundColor = Color.White
@@ -140,7 +140,6 @@ fun CalendarScreen(
                                         modifier = Modifier
                                             .size(40.dp)
                                             .clip(CircleShape)
-                                            .background(primaryColor.copy(alpha = 0.1f))
                                     ) {
                                         Icon(
                                             imageVector = Icons.Rounded.DateRange,
@@ -166,19 +165,18 @@ fun CalendarScreen(
                     ) {
                         items(TimeFilter.values()) { filter ->
                             Surface(
-                                modifier = Modifier.clip(RoundedCornerShape(24.dp)),
+                                modifier = Modifier.clip(RoundedCornerShape(8.dp)),
                                 color = if (selectedTimeFilter == filter)
                                     primaryColor
                                 else
                                     Color.White,
-                                shadowElevation = if (selectedTimeFilter == filter) 4.dp else 0.dp,
                                 border = BorderStroke(
                                     width = 1.dp,
                                     color = if (selectedTimeFilter == filter)
                                         Color.Transparent
                                     else
                                         Color.LightGray
-                                )
+                                ),shape = RoundedCornerShape(8.dp)
                             ) {
                                 Row(
                                     modifier = Modifier
@@ -267,16 +265,16 @@ fun CalendarScreen(
             ) {
                 items(TaskFilter.values()) { filter ->
                     Surface(
-                        modifier = Modifier.clip(RoundedCornerShape(24.dp)),
+                        modifier = Modifier.clip(RoundedCornerShape(8.dp)),
                         color = if (selectedFilter == filter)
                             filter.color.copy(alpha = 0.15f)
                         else
                             cardBackgroundColor,
-                        shadowElevation = if (selectedFilter == filter) 2.dp else 0.dp,
+
                         border = BorderStroke(
                             width = 1.dp,
                             color = if (selectedFilter == filter) filter.color else Color.LightGray
-                        )
+                        ),shape = RoundedCornerShape(8.dp)
                     ) {
                         Row(
                             modifier = Modifier
@@ -429,7 +427,7 @@ private fun DateItem(
     Surface(
         modifier = Modifier
             .width(90.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(8.dp))
             .clickable(onClick = onClick),
         color = when {
             isSelected -> primaryColor
@@ -437,7 +435,7 @@ private fun DateItem(
             else -> Color.White
         },
         shadowElevation = if (isSelected) 4.dp else 0.dp,
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(8.dp)
     ) {
         Column(
             modifier = Modifier

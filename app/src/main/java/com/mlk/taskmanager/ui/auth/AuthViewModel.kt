@@ -34,6 +34,8 @@ class AuthViewModel @Inject constructor(
         private set
     var confirmPassword by mutableStateOf("")
         private set
+    var name by mutableStateOf("")
+        private set
 
     init {
         checkLoginStatus()
@@ -60,6 +62,10 @@ class AuthViewModel @Inject constructor(
 
     fun updateConfirmPassword(value: String) {
         confirmPassword = value
+    }
+
+    fun updateName(value: String) {
+        name = value
     }
 
     fun login() {
@@ -100,7 +106,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
             
-            if (email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
+            if (email.isBlank() || password.isBlank() || confirmPassword.isBlank() || name.isBlank()) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     errorMessage = "Veuillez remplir tous les champs"
@@ -116,7 +122,7 @@ class AuthViewModel @Inject constructor(
                 return@launch
             }
             
-            val result = userRepository.registerUser(email, password)
+            val result = userRepository.registerUser(email, password, name)
             
             result.fold(
                 onSuccess = { userId ->
@@ -150,5 +156,6 @@ class AuthViewModel @Inject constructor(
         email = ""
         password = ""
         confirmPassword = ""
+        name = ""
     }
 }

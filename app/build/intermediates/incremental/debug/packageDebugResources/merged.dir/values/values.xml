@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="add">Ajouter</string>
+    <string name="app_name">Task Manager</string>
+    <string name="calendar_sign_in">Se connecter avec Google</string>
+    <string name="calendar_sign_out">Se déconnecter</string>
+    <string name="calendar_sync">Synchronisation avec Google Calendar</string>
+    <string name="calendar_sync_description">Vos routines seront automatiquement synchronisées avec votre calendrier Google</string>
+    <string name="cancel">Annuler</string>
+    <string name="delete">Supprimer</string>
+    <string name="edit">Modifier</string>
+    <string name="google_client_id">557560762744-85j9upqja4em8mq8keid8brdh7dn0cf8.apps.googleusercontent.com</string>
+    <string name="maps_api_key">AIzaSyD6JoDURF9gS8cL4u7ukbmUdaJouFOzZFQ</string>
+    <string name="openweather_api_key">bd5e378503939ddaee76f12ad7a97608</string>
+    <string name="routine_description">Description</string>
+    <string name="routine_repeat">Répéter</string>
+    <string name="routine_time">Heure</string>
+    <string name="routine_title">Titre de la routine</string>
+    <string name="save">Enregistrer</string>
+    <string name="settings_language">Langue</string>
+    <string name="settings_location">Localisation</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_sound">Son</string>
+    <string name="settings_theme">Thème</string>
+    <string name="settings_vibration">Vibration</string>
+    <string name="task_description">Description</string>
+    <string name="task_due_date">Date d\'échéance</string>
+    <string name="task_priority">Priorité</string>
+    <string name="task_title">Titre de la tâche</string>
+    <style name="Theme.Taskmanager" parent="android:Theme.Material.Light.NoActionBar"/>
+</resources>

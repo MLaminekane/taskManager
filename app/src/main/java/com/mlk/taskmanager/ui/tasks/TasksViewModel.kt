@@ -236,7 +236,7 @@ class TasksViewModel @Inject constructor(
                 val updatedTask = task.copy(isCompleted = !task.isCompleted)
                 taskRepository.updateTask(updatedTask)
                 
-                // Si la tâche est marquée comme terminée, envoyer une notification de félicitations
+                // Si la tache est marquée comme terminée envoyer une notification de félicitations
                 if (updatedTask.isCompleted) {
                     notificationManager.scheduleSingleNotification(
                         task = updatedTask,
@@ -298,7 +298,6 @@ class TasksViewModel @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e("TasksViewModel", "Error synchronizing task with calendar: ${e.message}", e)
-            // Ne pas propager l'erreur pour ne pas perturber l'opération principale
         }
     }
     
@@ -311,14 +310,13 @@ class TasksViewModel @Inject constructor(
             
             if (isGoogleSignedIn && task.calendarEventId != null) {
                 Log.d("TasksViewModel", "Deleting calendar event for task ${task.id}")
-                // On peut simplement passer par la synchronisation qui gérera la suppression
+                // On passe par la synchronisation qui gérera la suppression
                 // car la tâche sera supprimée juste après
                 val modifiedTask = task.copy(calendarEventId = null, isSyncedWithCalendar = false)
                 calendarSyncService.syncTaskWithCalendar(modifiedTask)
             }
         } catch (e: Exception) {
             Log.e("TasksViewModel", "Error deleting calendar event: ${e.message}", e)
-            // Ne pas propager l'erreur pour ne pas perturber l'opération principale
         }
     }
     

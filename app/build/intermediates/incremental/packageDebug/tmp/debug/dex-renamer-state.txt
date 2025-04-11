@@ -1,4 +1,4 @@
-#Fri Apr 11 14:15:13 EDT 2025
+#Fri Apr 11 15:33:25 EDT 2025
 base.0=/Users/lamine/Projects/taskManager/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
 base.1=/Users/lamine/Projects/taskManager/app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
 base.10=/Users/lamine/Projects/taskManager/app/build/intermediates/dex/debug/mergeProjectDexDebug/5/classes.dex

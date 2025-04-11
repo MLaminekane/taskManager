@@ -9,6 +9,7 @@ import com.mlk.taskmanager.service.BootCompletedReceiver_GeneratedInjector;
 import com.mlk.taskmanager.service.GeofenceBroadcastReceiver_GeneratedInjector;
 import com.mlk.taskmanager.service.TimeNotificationReceiver_GeneratedInjector;
 import com.mlk.taskmanager.ui.MainActivity_GeneratedInjector;
+import com.mlk.taskmanager.ui.auth.AuthViewModel_HiltModules;
 import com.mlk.taskmanager.ui.calendar.CalendarViewModel_HiltModules;
 import com.mlk.taskmanager.ui.home.HomeViewModel_HiltModules;
 import com.mlk.taskmanager.ui.pomodoro.PomodoroViewModel_HiltModules;
@@ -176,6 +177,7 @@ public final class TaskManagerApplication_HiltComponents {
 
   @Subcomponent(
       modules = {
+          AuthViewModel_HiltModules.KeyModule.class,
           CalendarViewModel_HiltModules.KeyModule.class,
           HiltWrapper_ActivityRetainedComponentManager_LifecycleModule.class,
           HiltWrapper_SavedStateHandleModule.class,
@@ -224,6 +226,7 @@ public final class TaskManagerApplication_HiltComponents {
 
   @Subcomponent(
       modules = {
+          AuthViewModel_HiltModules.BindsModule.class,
           CalendarViewModel_HiltModules.BindsModule.class,
           HiltWrapper_HiltViewModelFactory_ViewModelModule.class,
           HomeViewModel_HiltModules.BindsModule.class,

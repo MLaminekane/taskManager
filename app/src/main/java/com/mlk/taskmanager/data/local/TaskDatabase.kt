@@ -9,13 +9,15 @@ import com.mlk.taskmanager.data.model.Task
 import com.mlk.taskmanager.data.dao.TaskDao
 import com.mlk.taskmanager.data.dao.RoutineDao
 import com.mlk.taskmanager.data.dao.ProjectDao
+import com.mlk.taskmanager.data.dao.UserDao
 import com.mlk.taskmanager.data.model.Routine
 import com.mlk.taskmanager.data.model.Project
+import com.mlk.taskmanager.data.model.User
 import com.mlk.taskmanager.data.util.Converters
 
 @Database(
-    entities = [Task::class, Routine::class, Project::class],
-    version = 4,
+    entities = [Task::class, Routine::class, Project::class, User::class],
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -23,6 +25,7 @@ abstract class TaskDatabase : RoomDatabase() {
     abstract val taskDao: TaskDao
     abstract val routineDao: RoutineDao
     abstract val projectDao: ProjectDao
+    abstract val userDao: UserDao
 
     companion object {
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -87,5 +90,20 @@ abstract class TaskDatabase : RoomDatabase() {
                 """)
             }
         }
+        
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Create the users table
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS users (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        email TEXT NOT NULL,
+                        password TEXT NOT NULL,
+                        name TEXT,
+                        profilePictureUrl TEXT
+                    )
+                """)
+            }
+        }
     }
-} 
+}

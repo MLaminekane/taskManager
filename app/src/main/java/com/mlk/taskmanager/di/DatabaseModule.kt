@@ -6,6 +6,7 @@ import com.mlk.taskmanager.data.TaskManagerDatabase
 import com.mlk.taskmanager.data.dao.RoutineDao
 import com.mlk.taskmanager.data.dao.TaskDao
 import com.mlk.taskmanager.data.dao.ProjectDao
+import com.mlk.taskmanager.data.dao.UserDao
 import com.mlk.taskmanager.data.local.TaskDatabase
 import dagger.Module
 import dagger.Provides
@@ -29,7 +30,8 @@ object DatabaseModule {
         .addMigrations(
             TaskDatabase.MIGRATION_1_2,
             TaskDatabase.MIGRATION_2_3,
-            TaskDatabase.MIGRATION_3_4
+            TaskDatabase.MIGRATION_3_4,
+            TaskDatabase.MIGRATION_4_5
         )
         .build()
     }
@@ -51,4 +53,10 @@ object DatabaseModule {
     fun provideProjectDao(database: TaskDatabase): ProjectDao {
         return database.projectDao
     }
-} 
+    
+    @Provides
+    @Singleton
+    fun provideUserDao(database: TaskDatabase): UserDao {
+        return database.userDao
+    }
+}

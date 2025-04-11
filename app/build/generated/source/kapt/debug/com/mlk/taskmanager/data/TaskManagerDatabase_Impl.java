@@ -11,10 +11,14 @@ import androidx.room.util.DBUtil;
 import androidx.room.util.TableInfo;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
+import com.mlk.taskmanager.data.dao.ProjectDao;
+import com.mlk.taskmanager.data.dao.ProjectDao_TaskManagerDatabase_Impl;
 import com.mlk.taskmanager.data.dao.RoutineDao;
 import com.mlk.taskmanager.data.dao.RoutineDao_TaskManagerDatabase_Impl;
 import com.mlk.taskmanager.data.dao.TaskDao;
 import com.mlk.taskmanager.data.dao.TaskDao_TaskManagerDatabase_Impl;
+import com.mlk.taskmanager.data.dao.UserDao;
+import com.mlk.taskmanager.data.dao.UserDao_TaskManagerDatabase_Impl;
 import java.lang.Class;
 import java.lang.Override;
 import java.lang.String;
@@ -34,22 +38,30 @@ public final class TaskManagerDatabase_Impl extends TaskManagerDatabase {
 
   private volatile RoutineDao _routineDao;
 
+  private volatile ProjectDao _projectDao;
+
+  private volatile UserDao _userDao;
+
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
-    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(1) {
+    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(2) {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS `tasks` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `dueDateTime` TEXT NOT NULL, `isCompleted` INTEGER NOT NULL, `priority` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `locationRadius` REAL, `reminderEnabled` INTEGER NOT NULL, `categoryId` INTEGER, `category` TEXT, `projectId` INTEGER)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `routines` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `time` TEXT NOT NULL, `repeatDays` TEXT NOT NULL, `isEnabled` INTEGER NOT NULL, `category` TEXT, `isLocationBased` INTEGER NOT NULL, `latitude` REAL, `longitude` REAL, `locationRadius` REAL, `calendarEventId` TEXT, `isSyncedWithCalendar` INTEGER NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `projects` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `icon` TEXT NOT NULL, `color` INTEGER NOT NULL, `taskCount` INTEGER NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `users` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `email` TEXT NOT NULL, `password` TEXT NOT NULL, `name` TEXT, `profilePictureUrl` TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2580b88749392a17d4c2d3b8ef98341e')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '44ff9cad7c657255707bed3fb3a7c6c7')");
       }
 
       @Override
       public void dropAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS `tasks`");
         db.execSQL("DROP TABLE IF EXISTS `routines`");
+        db.execSQL("DROP TABLE IF EXISTS `projects`");
+        db.execSQL("DROP TABLE IF EXISTS `users`");
         final List<? extends RoomDatabase.Callback> _callbacks = mCallbacks;
         if (_callbacks != null) {
           for (RoomDatabase.Callback _callback : _callbacks) {
@@ -139,9 +151,40 @@ public final class TaskManagerDatabase_Impl extends TaskManagerDatabase {
                   + " Expected:\n" + _infoRoutines + "\n"
                   + " Found:\n" + _existingRoutines);
         }
+        final HashMap<String, TableInfo.Column> _columnsProjects = new HashMap<String, TableInfo.Column>(6);
+        _columnsProjects.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsProjects.put("name", new TableInfo.Column("name", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsProjects.put("description", new TableInfo.Column("description", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsProjects.put("icon", new TableInfo.Column("icon", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsProjects.put("color", new TableInfo.Column("color", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsProjects.put("taskCount", new TableInfo.Column("taskCount", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysProjects = new HashSet<TableInfo.ForeignKey>(0);
+        final HashSet<TableInfo.Index> _indicesProjects = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoProjects = new TableInfo("projects", _columnsProjects, _foreignKeysProjects, _indicesProjects);
+        final TableInfo _existingProjects = TableInfo.read(db, "projects");
+        if (!_infoProjects.equals(_existingProjects)) {
+          return new RoomOpenHelper.ValidationResult(false, "projects(com.mlk.taskmanager.data.model.Project).\n"
+                  + " Expected:\n" + _infoProjects + "\n"
+                  + " Found:\n" + _existingProjects);
+        }
+        final HashMap<String, TableInfo.Column> _columnsUsers = new HashMap<String, TableInfo.Column>(5);
+        _columnsUsers.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsUsers.put("email", new TableInfo.Column("email", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsUsers.put("password", new TableInfo.Column("password", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsUsers.put("name", new TableInfo.Column("name", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsUsers.put("profilePictureUrl", new TableInfo.Column("profilePictureUrl", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysUsers = new HashSet<TableInfo.ForeignKey>(0);
+        final HashSet<TableInfo.Index> _indicesUsers = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoUsers = new TableInfo("users", _columnsUsers, _foreignKeysUsers, _indicesUsers);
+        final TableInfo _existingUsers = TableInfo.read(db, "users");
+        if (!_infoUsers.equals(_existingUsers)) {
+          return new RoomOpenHelper.ValidationResult(false, "users(com.mlk.taskmanager.data.model.User).\n"
+                  + " Expected:\n" + _infoUsers + "\n"
+                  + " Found:\n" + _existingUsers);
+        }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "2580b88749392a17d4c2d3b8ef98341e", "6e48f867887928110d9c81f6ddbe0676");
+    }, "44ff9cad7c657255707bed3fb3a7c6c7", "48879665b7370c75e94afb5ff645ae17");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;
@@ -152,7 +195,7 @@ public final class TaskManagerDatabase_Impl extends TaskManagerDatabase {
   protected InvalidationTracker createInvalidationTracker() {
     final HashMap<String, String> _shadowTablesMap = new HashMap<String, String>(0);
     final HashMap<String, Set<String>> _viewTables = new HashMap<String, Set<String>>(0);
-    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "tasks","routines");
+    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "tasks","routines","projects","users");
   }
 
   @Override
@@ -163,6 +206,8 @@ public final class TaskManagerDatabase_Impl extends TaskManagerDatabase {
       super.beginTransaction();
       _db.execSQL("DELETE FROM `tasks`");
       _db.execSQL("DELETE FROM `routines`");
+      _db.execSQL("DELETE FROM `projects`");
+      _db.execSQL("DELETE FROM `users`");
       super.setTransactionSuccessful();
     } finally {
       super.endTransaction();
@@ -179,6 +224,8 @@ public final class TaskManagerDatabase_Impl extends TaskManagerDatabase {
     final HashMap<Class<?>, List<Class<?>>> _typeConvertersMap = new HashMap<Class<?>, List<Class<?>>>();
     _typeConvertersMap.put(TaskDao.class, TaskDao_TaskManagerDatabase_Impl.getRequiredConverters());
     _typeConvertersMap.put(RoutineDao.class, RoutineDao_TaskManagerDatabase_Impl.getRequiredConverters());
+    _typeConvertersMap.put(ProjectDao.class, ProjectDao_TaskManagerDatabase_Impl.getRequiredConverters());
+    _typeConvertersMap.put(UserDao.class, UserDao_TaskManagerDatabase_Impl.getRequiredConverters());
     return _typeConvertersMap;
   }
 
@@ -221,6 +268,34 @@ public final class TaskManagerDatabase_Impl extends TaskManagerDatabase {
           _routineDao = new RoutineDao_TaskManagerDatabase_Impl(this);
         }
         return _routineDao;
+      }
+    }
+  }
+
+  @Override
+  public ProjectDao projectDao() {
+    if (_projectDao != null) {
+      return _projectDao;
+    } else {
+      synchronized(this) {
+        if(_projectDao == null) {
+          _projectDao = new ProjectDao_TaskManagerDatabase_Impl(this);
+        }
+        return _projectDao;
+      }
+    }
+  }
+
+  @Override
+  public UserDao userDao() {
+    if (_userDao != null) {
+      return _userDao;
+    } else {
+      synchronized(this) {
+        if(_userDao == null) {
+          _userDao = new UserDao_TaskManagerDatabase_Impl(this);
+        }
+        return _userDao;
       }
     }
   }

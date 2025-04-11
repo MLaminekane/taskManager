@@ -4,24 +4,30 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.mlk.taskmanager.data.dao.ProjectDao
 import com.mlk.taskmanager.data.dao.RoutineDao
 import com.mlk.taskmanager.data.dao.TaskDao
+import com.mlk.taskmanager.data.dao.UserDao
+import com.mlk.taskmanager.data.model.Project
 import com.mlk.taskmanager.data.model.Routine
 import com.mlk.taskmanager.data.model.Task
+import com.mlk.taskmanager.data.model.User
 import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @Database(
-    entities = [Task::class, Routine::class],
-    version = 1,
+    entities = [Task::class, Routine::class, Project::class, User::class],
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class TaskManagerDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
     abstract fun routineDao(): RoutineDao
+    abstract fun projectDao(): ProjectDao
+    abstract fun userDao(): UserDao
 }
 
 class Converters {
@@ -57,4 +63,4 @@ class Converters {
     fun toDayOfWeekString(days: Set<DayOfWeek>?): String? {
         return days?.joinToString(",") { it.name }
     }
-} 
+}

@@ -27,6 +27,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.mlk.taskmanager.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -83,7 +84,7 @@ fun SettingsScreen(
         ) {
             // Profile Section
             item {
-                ProfileCard()
+                ProfileCard(navController, viewModel)
             }
 
             // Notifications Section
@@ -209,16 +210,16 @@ fun SettingsScreen(
                 ) {
                     SettingsItem(
                         title = "Backup & Restore",
-                        subtitle = "Backup or restore your data",
+                        subtitle = "Save and restore your data",
                         icon = Icons.Outlined.Backup,
                         onClick = { showBackupDialog = true }
                     )
 
                     SettingsItem(
-                        title = "Clear Data",
-                        subtitle = "Delete all app data",
+                        title = "Clear All Data",
+                        subtitle = "Delete all tasks, routines, and settings",
                         icon = Icons.Outlined.DeleteForever,
-                        onClick = { /* Show clear data confirmation */ }
+                        onClick = { /* Show confirmation dialog */ }
                     )
                 }
             }
@@ -228,175 +229,205 @@ fun SettingsScreen(
                 SettingsSection(
                     title = "About",
                     icon = Icons.Filled.Info,
-                    iconTint = Color(0xFF9C27B0)
+                    iconTint = Color(0xFF607D8B)
                 ) {
                     SettingsItem(
                         title = "Version",
-                        subtitle = "2.0.4",
+                        subtitle = "1.0.0",
                         icon = Icons.Outlined.Update,
-                        onClick = { }
+                        onClick = { /* Show app info */ }
+                    )
+
+                    SettingsItem(
+                        title = "Licenses",
+                        subtitle = "Third-party licenses",
+                        icon = Icons.Outlined.Description,
+                        onClick = { /* Show licenses */ }
                     )
 
                     SettingsItem(
                         title = "Privacy Policy",
                         subtitle = "Read our privacy policy",
-                        icon = Icons.Outlined.Security,
-                        onClick = { }
+                        icon = Icons.Outlined.Shield,
+                        onClick = { /* Show privacy policy */ }
                     )
                 }
-            }
-
-            // Section Google Calendar
-            item {
-                SettingsSectionHeader(title = "Google Calendar")
-                
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.CalendarToday,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Column {
-                                    Text(
-                                        text = "Synchroniser avec Google Calendar",
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    Text(
-                                        text = "Vos routines seront automatiquement synchronisées avec Google Calendar",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-                            Switch(
-                                checked = uiState.isCalendarSyncEnabled,
-                                onCheckedChange = { enabled ->
-                                    if (enabled && !uiState.isGoogleSignedIn) {
-                                        // Si on active la synchro mais qu'on n'est pas connecté, lancer la connexion
-                                        val signInClient = viewModel.signInToGoogle()
-                                        launcher.launch(signInClient.signInIntent)
-                                    } else {
-                                        // Sinon, juste changer le paramètre
-                                        viewModel.setCalendarSyncEnabled(enabled)
-                                    }
-                                }
-                            )
-                        }
-
-                        if (uiState.isCalendarSyncEnabled) {
-                            if (uiState.isGoogleSignedIn) {
-                                // Afficher les informations du compte connecté
-                                ListPreference(
-                                    title = "Compte Google",
-                                    value = uiState.googleAccountEmail ?: "Non connecté",
-                                    icon = Icons.Default.AccountCircle,
-                                    onClick = { /* Ne rien faire, juste informatif */ }
-                                )
-                                
-                                ButtonPreference(
-                                    title = "Synchroniser maintenant",
-                                    description = "Synchroniser toutes vos routines avec Google Calendar",
-                                    icon = Icons.Default.Sync,
-                                    onClick = { viewModel.syncAllRoutines() }
-                                )
-                                
-                                ButtonPreference(
-                                    title = "Se déconnecter",
-                                    description = "Se déconnecter de Google Calendar",
-                                    icon = Icons.Default.ExitToApp,
-                                    onClick = { viewModel.signOutFromGoogle() }
-                                )
-                            } else {
-                                // Afficher un message si la synchronisation est activée mais pas connecté
-                                ButtonPreference(
-                                    title = "Se connecter à Google",
-                                    description = "Connexion requise pour synchroniser avec Google Calendar",
-                                    icon = Icons.Default.Login,
-                                    onClick = { 
-                                        val signInClient = viewModel.signInToGoogle()
-                                        launcher.launch(signInClient.signInIntent)
-                                    }
-                                )
-                            }
-                        }
-                        
-                        if (uiState.isSyncing) {
-                            LinearProgressIndicator(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp)
-                            )
-                        }
-                        
-                        if (uiState.syncError != null) {
-                            Text(
-                                text = uiState.syncError ?: "",
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(32.dp))
             }
         }
-    }
 
-    if (showThemePicker) {
-        ThemePickerDialog(
-            onDismiss = { showThemePicker = false },
-            onThemeSelected = { theme ->
-                viewModel.setDarkMode(when (theme) {
-                    "dark" -> true
-                    "light" -> false
-                    else -> false // system default
-                })
-            }
-        )
-    }
+        if (showThemePicker) {
+            ThemePickerDialog(
+                onDismiss = { showThemePicker = false },
+                onThemeSelected = { theme ->
+                    // Handle theme selection
+                    showThemePicker = false
+                }
+            )
+        }
 
-    if (showBackupDialog) {
-        BackupDialog(
-            onDismiss = { showBackupDialog = false }
-        )
-    }
+        if (showBackupDialog) {
+            BackupDialog(
+                onDismiss = { showBackupDialog = false }
+            )
+        }
 
-    if (showCategoryDialog) {
-        CategoryDialog(
-            onDismiss = { showCategoryDialog = false },
-            categories = uiState.categories,
-            onAddCategory = { viewModel.addCategory(it) },
-            onRemoveCategory = { viewModel.removeCategory(it) }
-        )
+        if (showCategoryDialog) {
+            CategoryDialog(
+                onDismiss = { showCategoryDialog = false },
+                categories = uiState.categories,
+                onAddCategory = { viewModel.addCategory(it) },
+                onRemoveCategory = { viewModel.removeCategory(it) }
+            )
+        }
     }
 }
 
 @Composable
-private fun ProfileCard() {
+fun ProfileCard(
+    navController: NavController,
+    viewModel: SettingsViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Profile Image
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (uiState.isUserLoggedIn && uiState.currentUser != null) {
+                        // Display first letter of email as avatar if no profile picture
+                        val userEmail = uiState.currentUser?.email ?: ""
+                        if (userEmail.isNotEmpty()) {
+                            Text(
+                                text = userEmail.first().uppercase(),
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = "Profile",
+                                modifier = Modifier.size(32.dp),
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Profile",
+                            modifier = Modifier.size(32.dp),
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                // User Info
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    if (uiState.isUserLoggedIn && uiState.currentUser != null) {
+                        Text(
+                            text = uiState.currentUser?.name ?: "Utilisateur",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        uiState.currentUser?.email?.let { email ->
+                            Text(
+                                text = email,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = "Non connecté",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Connectez-vous pour synchroniser vos données",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            if (uiState.isUserLoggedIn) {
+                // Logout Button
+                Button(
+                    onClick = { 
+                        viewModel.logout()
+                        navController.navigate("login") {
+                            popUpTo("home") { inclusive = true }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Logout,
+                        contentDescription = "Logout",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Se déconnecter")
+                }
+            } else {
+                // Login Button
+                Button(
+                    onClick = { navController.navigate("login") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Login,
+                        contentDescription = "Login",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Se connecter")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SettingsSection(
+    title: String,
+    icon: ImageVector,
+    iconTint: Color,
+    content: @Composable () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -405,81 +436,39 @@ private fun ProfileCard() {
             containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(16.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 16.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Person,
+                    imageVector = icon,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = iconTint,
+                    modifier = Modifier.size(24.dp)
                 )
-            }
-            
-            Spacer(modifier = Modifier.width(16.dp))
-            
-            Column {
+                
+                Spacer(modifier = Modifier.width(8.dp))
+                
                 Text(
-                    text = "User",
+                    text = title,
                     style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Text(
-                    text = "user@example.com",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
+            
+            content()
         }
     }
 }
 
 @Composable
-private fun SettingsSection(
-    title: String,
-    icon: ImageVector,
-    iconTint: Color,
-    content: @Composable () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(16.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 16.dp)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = iconTint,
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-        content()
-    }
-}
-
-@Composable
-private fun SettingsItem(
+fun SettingsItem(
     title: String,
     subtitle: String,
     icon: ImageVector,
@@ -488,17 +477,19 @@ private fun SettingsItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
+            .clickable { onClick() }
+            .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(24.dp)
         )
+        
         Spacer(modifier = Modifier.width(16.dp))
+        
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -513,11 +504,17 @@ private fun SettingsItem(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+        
+        Icon(
+            imageVector = Icons.Default.ChevronRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
 @Composable
-private fun SettingsSwitch(
+fun SettingsSwitch(
     title: String,
     subtitle: String,
     icon: ImageVector,
@@ -527,16 +524,18 @@ private fun SettingsSwitch(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(24.dp)
         )
+        
         Spacer(modifier = Modifier.width(16.dp))
+        
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -551,6 +550,7 @@ private fun SettingsSwitch(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+        
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange
@@ -559,48 +559,47 @@ private fun SettingsSwitch(
 }
 
 @Composable
-private fun ThemePickerDialog(
+fun ThemePickerDialog(
     onDismiss: () -> Unit,
     onThemeSelected: (String) -> Unit
 ) {
+    val themes = listOf("System", "Light", "Dark")
+    
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("Choose Theme")
+            Text(
+                text = "Choose Theme",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
         },
         text = {
             Column {
-                SettingsItem(
-                    title = "Light",
-                    subtitle = "Light theme for your app",
-                    icon = Icons.Default.LightMode,
-                    onClick = { 
-                        onThemeSelected("light")
-                        onDismiss()
+                themes.forEach { theme ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onThemeSelected(theme) }
+                            .padding(vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = false,
+                            onClick = { onThemeSelected(theme) }
+                        )
+                        
+                        Spacer(modifier = Modifier.width(8.dp))
+                        
+                        Text(
+                            text = theme,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                     }
-                )
-                SettingsItem(
-                    title = "Dark",
-                    subtitle = "Dark theme for your app",
-                    icon = Icons.Default.DarkMode,
-                    onClick = { 
-                        onThemeSelected("dark")
-                        onDismiss()
-                    }
-                )
-                SettingsItem(
-                    title = "System",
-                    subtitle = "Follow system theme",
-                    icon = Icons.Default.Settings,
-                    onClick = { 
-                        onThemeSelected("system")
-                        onDismiss()
-                    }
-                )
+                }
             }
         },
-        confirmButton = { },
-        dismissButton = {
+        confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text("Cancel")
             }
@@ -609,38 +608,40 @@ private fun ThemePickerDialog(
 }
 
 @Composable
-private fun BackupDialog(
+fun BackupDialog(
     onDismiss: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("Backup & Restore")
+            Text(
+                text = "Backup & Restore",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
         },
         text = {
-            Column {
-                SettingsItem(
-                    title = "Backup Data",
-                    subtitle = "Create a backup of your data",
-                    icon = Icons.Default.Backup,
-                    onClick = { 
-                        // Handle backup
-                        onDismiss()
-                    }
-                )
-                SettingsItem(
-                    title = "Restore Data",
-                    subtitle = "Restore from a backup",
-                    icon = Icons.Default.Restore,
-                    onClick = { 
-                        // Handle restore
-                        onDismiss()
-                    }
-                )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text("Create backups of your data or restore from an existing backup.")
+                
+                Button(
+                    onClick = { /* Create backup */ },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Create Backup")
+                }
+                
+                Button(
+                    onClick = { /* Restore from backup */ },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Restore from Backup")
+                }
             }
         },
-        confirmButton = { },
-        dismissButton = {
+        confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text("Cancel")
             }
@@ -649,76 +650,103 @@ private fun BackupDialog(
 }
 
 @Composable
-private fun CategoryDialog(
+fun CategoryDialog(
     onDismiss: () -> Unit,
     categories: List<String>,
     onAddCategory: (String) -> Unit,
     onRemoveCategory: (String) -> Unit
 ) {
     var newCategory by remember { mutableStateOf("") }
-
+    
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Manage Categories") },
+        title = {
+            Text(
+                text = "Manage Categories",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        },
         text = {
             Column {
                 OutlinedTextField(
                     value = newCategory,
                     onValueChange = { newCategory = it },
                     label = { Text("New Category") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                // List of existing categories
-                Column {
-                    categories.forEach { category ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    trailingIcon = {
+                        IconButton(
+                            onClick = {
+                                if (newCategory.isNotEmpty()) {
+                                    onAddCategory(newCategory)
+                                    newCategory = ""
+                                }
+                            },
+                            enabled = newCategory.isNotEmpty()
                         ) {
-                            Text(category)
-                            IconButton(onClick = { onRemoveCategory(category) }) {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete")
-                            }
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add Category"
+                            )
+                        }
+                    }
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Text(
+                    text = "Current Categories",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                categories.forEach { category ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = category,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
+                        
+                        IconButton(onClick = { onRemoveCategory(category) }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Remove Category",
+                                tint = MaterialTheme.colorScheme.error
+                            )
                         }
                     }
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = {
-                if (newCategory.isNotEmpty()) {
-                    onAddCategory(newCategory)
-                    newCategory = ""
-                }
-                onDismiss()
-            }) {
-                Text("Add")
-            }
-        },
-        dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("Done")
             }
         }
     )
 }
 
 @Composable
-private fun SettingsSectionHeader(title: String) {
+fun SettingsSectionHeader(title: String) {
     Text(
         text = title,
         style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onSurface,
-        modifier = Modifier.padding(bottom = 16.dp)
+        fontWeight = FontWeight.Medium,
+        modifier = Modifier.padding(vertical = 8.dp)
     )
 }
 
 @Composable
-private fun SwitchPreference(
+fun SwitchPreference(
     title: String,
     description: String,
     icon: ImageVector,
@@ -734,24 +762,25 @@ private fun SwitchPreference(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(24.dp)
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .size(24.dp)
+                .padding(end = 16.dp)
         )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
+        
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.bodyLarge
             )
+            
             Text(
                 text = description,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+        
         Switch(
             checked = isChecked,
             onCheckedChange = onCheckedChange
@@ -760,7 +789,7 @@ private fun SwitchPreference(
 }
 
 @Composable
-private fun ListPreference(
+fun ListPreference(
     title: String,
     value: String,
     icon: ImageVector,
@@ -776,29 +805,35 @@ private fun ListPreference(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(24.dp)
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .size(24.dp)
+                .padding(end = 16.dp)
         )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
+        
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.bodyLarge
             )
+            
             Text(
                 text = value,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+        
+        Icon(
+            imageVector = Icons.Default.KeyboardArrowRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        )
     }
 }
 
 @Composable
-private fun ButtonPreference(
+fun ButtonPreference(
     title: String,
     description: String,
     icon: ImageVector,
@@ -814,21 +849,21 @@ private fun ButtonPreference(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(24.dp)
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .size(24.dp)
+                .padding(end = 16.dp)
         )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
+        
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.bodyLarge
             )
+            
             Text(
                 text = description,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

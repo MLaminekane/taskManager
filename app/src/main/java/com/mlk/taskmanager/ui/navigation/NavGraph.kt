@@ -17,6 +17,8 @@ import com.mlk.taskmanager.ui.routines.RoutinesScreen
 import com.mlk.taskmanager.ui.project.ProjectDetailScreen
 import com.mlk.taskmanager.ui.pomodoro.PomodoroScreen
 import com.mlk.taskmanager.ui.steps.StepCounterScreen
+import com.mlk.taskmanager.ui.auth.LoginScreen
+import com.mlk.taskmanager.ui.auth.RegisterScreen
 
 sealed class Screen(val route: String) {
     object Welcome : Screen("welcome")
@@ -38,6 +40,8 @@ sealed class Screen(val route: String) {
     }
     object Pomodoro : Screen("pomodoro")
     object StepCounter : Screen("step_counter")
+    object Login : Screen("login")
+    object Register : Screen("register")
 }
 
 @Composable
@@ -56,8 +60,6 @@ fun TaskManagerNavGraph(
         composable(Screen.Home.route) {
             HomeScreen(navController)
         }
-
-      
         
         composable(Screen.Tasks.route) {
             TasksScreen(navController)
@@ -116,5 +118,21 @@ fun TaskManagerNavGraph(
         composable(Screen.StepCounter.route) {
             StepCounterScreen(navController = navController)
         }
+        
+        composable(Screen.Login.route) {
+            LoginScreen(
+                onNavigateToRegister = { navController.navigate(Screen.Register.route) },
+                onLoginSuccess = { navController.navigate(Screen.Home.route) {
+                    popUpTo(Screen.Login.route) { inclusive = true }
+                }}
+            )
+        }
+        
+        composable(Screen.Register.route) {
+            RegisterScreen(
+                onNavigateToLogin = { navController.navigate(Screen.Login.route) },
+                onRegisterSuccess = { navController.navigate(Screen.Login.route) }
+            )
+        }
     }
-} 
+}

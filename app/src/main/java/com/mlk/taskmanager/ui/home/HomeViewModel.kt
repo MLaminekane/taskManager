@@ -53,7 +53,7 @@ data class HomeUiState(
     val weatherLoading: Boolean = false,
     val weatherError: String? = null,
     val weatherModalVisible: Boolean = false,
-    val currentUser: String = "Utilisateur"
+    val currentUser: String = "Lamine"
 )
 
 enum class TaskFilter {
@@ -104,7 +104,7 @@ class HomeViewModel @Inject constructor(
                     weatherLoading = _uiState.value.weatherLoading,
                     weatherError = _uiState.value.weatherError,
                     weatherModalVisible = _uiState.value.weatherModalVisible,
-                    currentUser = "Utilisateur" // Valeur par défaut, à remplacer par le nom réel de l'utilisateur si disponible
+                    currentUser = "Lamine" // Valeur par défaut, à remplacer par le nom réel de l'utilisateur si disponible
                 )
             }.collect { newState ->
                 Log.d("HomeViewModel", "Updating UI state with ${newState.projects.size} projects")

@@ -439,7 +439,7 @@ fun ProfileCard(
                 ) {
                     if (uiState.isUserLoggedIn && uiState.currentUser != null) {
                         Text(
-                            text = uiState.currentUser?.name ?: "Utilisateur",
+                            text = uiState.currentUser?.name ?: "Lamine",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )

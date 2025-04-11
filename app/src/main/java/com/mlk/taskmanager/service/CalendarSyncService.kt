@@ -1,7 +1,9 @@
 package com.mlk.taskmanager.service
 
+import android.accounts.Account
 import android.content.Context
 import android.util.Log
+import com.google.android.gms.auth.GoogleAuthUtil
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -44,10 +46,17 @@ class CalendarSyncService @Inject constructor(
             
             val credential = GoogleAccountCredential.usingOAuth2(
                 context,
-                listOf(CalendarScopes.CALENDAR)
+                listOf(
+                    CalendarScopes.CALENDAR,
+                    CalendarScopes.CALENDAR_EVENTS
+                )
             )
 
-            credential.selectedAccountName = signInAccount.email
+            // Vérifier que l'email n'est pas null
+            val email = signInAccount.email ?: throw IllegalArgumentException("Email cannot be null")
+            // Utiliser l'objet Account au lieu de juste l'email
+            val account = Account(email, GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE)
+            credential.selectedAccount = account
             
             Log.d(tag, "Creating Calendar service with credential")
             calendarService = Calendar.Builder(transport, jsonFactory, credential)
@@ -59,19 +68,36 @@ class CalendarSyncService @Inject constructor(
             Log.d(tag, "Calendar service initialized successfully")
         } catch (e: Exception) {
             Log.e(tag, "Error initializing calendar service", e)
-            calendarService = null
-            currentAccount = null
+            
+            // Logging détaillé pour diagnostiquer l'erreur
             when (e) {
                 is ApiException -> {
+                    val statusCode = e.statusCode
+                    val statusMessage = e.statusMessage ?: "Pas de message"
+                    val errorDetails = "Code: $statusCode, Message: $statusMessage"
+                    Log.e(tag, "API Exception details: $errorDetails", e)
+                    
+                    // Pour l'erreur 10 spécifiquement
+                    if (statusCode == 10) {
+                        Log.e(tag, "Erreur 10 - Requête malformée. Vérifiez les scopes et les paramètres", e)
+                    }
+                    
                     val errorMessage = when (e.statusCode) {
                         7 -> "Network error - Vérifiez votre connexion internet"
+                        10 -> "Requête malformée - Vérifiez les scopes et les paramètres"
                         16 -> "Erreur d'authentification - Réessayez de vous connecter"
                         else -> "Erreur de connexion (${e.statusCode}): ${e.message}"
                     }
                     throw Exception(errorMessage)
                 }
-                else -> throw e
+                else -> {
+                    Log.e(tag, "Autre exception: ${e.javaClass.simpleName}: ${e.message}", e)
+                    throw e
+                }
             }
+            
+            calendarService = null
+            currentAccount = null
         }
     }
     
@@ -88,10 +114,8 @@ class CalendarSyncService @Inject constructor(
         Log.d(tag, "Configuring Google Sign-In options")
         return GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            .requestProfile()
             .requestScopes(Scope(CalendarScopes.CALENDAR))
-            .requestId()
-            .requestIdToken(context.getString(R.string.google_client_id))
+            // Pas de requestIdToken pour éviter les problèmes de configuration OAuth
             .build()
     }
     

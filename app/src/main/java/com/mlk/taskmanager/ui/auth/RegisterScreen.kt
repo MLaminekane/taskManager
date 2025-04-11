@@ -35,10 +35,10 @@ fun RegisterScreen(
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     
-    // Track whether registration was successful
+
     var registrationSuccessful by remember { mutableStateOf(false) }
 
-    // Monitor registration success
+
     LaunchedEffect(uiState.errorMessage, registrationSuccessful) {
         if (registrationSuccessful && uiState.errorMessage == null) {
             onRegisterSuccess()

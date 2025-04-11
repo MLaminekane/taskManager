@@ -11,6 +11,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.CommonStatusCodes
 import com.mlk.taskmanager.data.model.User
 import com.mlk.taskmanager.data.repository.SettingsRepository
 import com.mlk.taskmanager.data.repository.UserRepository
@@ -219,21 +220,125 @@ class SettingsViewModel @Inject constructor(
     
     // Google Sign-In related functions
     fun handleSignInResult(result: ActivityResult) {
-        // Keeping this function as a stub to fix compilation errors
-        // Original implementation was removed in the edit
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(isSyncing = true, syncError = null)
+                
+                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                val account = task.getResult(ApiException::class.java)
+                
+                // Initialiser le service Calendar avec le compte
+                calendarSyncService.initializeCalendarService(account)
+                
+                // Activer la synchronisation dans les paramètres
+                settingsRepository.setCalendarSyncEnabled(true)
+                
+                // Mettre à jour l'état
+                _uiState.value = _uiState.value.copy(
+                    isGoogleSignedIn = true,
+                    isCalendarSyncEnabled = true,
+                    googleAccountEmail = account.email,
+                    isSyncing = false
+                )
+                
+                // Synchroniser toutes les routines
+                syncAllRoutines()
+            } catch (e: ApiException) {
+                android.util.Log.e("SettingsViewModel", "ApiException during sign-in: ${e.statusCode}, message: ${e.message}", e)
+                
+                when (e.statusCode) {
+                    // Connexion en cours (12501)
+                    12501 -> {
+                        _uiState.value = _uiState.value.copy(
+                            isSyncing = false,
+                            syncError = "Une connexion est déjà en cours... Veuillez patienter."
+                        )
+                    }
+                    // Connexion annulée par l'utilisateur (12500)
+                    12500 -> {
+                        _uiState.value = _uiState.value.copy(
+                            isSyncing = false,
+                            syncError = null  // L'utilisateur a annulé la connexion
+                        )
+                    }
+                    // Autres erreurs
+                    else -> {
+                        _uiState.value = _uiState.value.copy(
+                            isSyncing = false,
+                            syncError = "Erreur de connexion: ${e.statusCode}"
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("SettingsViewModel", "Unexpected error during sign-in", e)
+                _uiState.value = _uiState.value.copy(
+                    isSyncing = false,
+                    syncError = "Erreur inattendue: ${e.message}"
+                )
+            }
+        }
     }
-    
+
     fun signInToGoogle(): GoogleSignInClient {
-        // Stub implementation to fix compilation errors
+        // Vérifier si une connexion est déjà en cours
+        if (_uiState.value.isSyncing) {
+            // Une connexion est déjà en cours, utiliser le client existant
+            return googleSignInClient ?: GoogleSignIn.getClient(context, calendarSyncService.getGoogleSignInOptions())
+        }
+        
+        // Sinon, créer un nouveau client
         googleSignInClient = GoogleSignIn.getClient(context, calendarSyncService.getGoogleSignInOptions())
         return googleSignInClient!!
     }
-    
+
     fun signOutFromGoogle() {
-        // Stub implementation to fix compilation errors
+        viewModelScope.launch {
+            try {
+                googleSignInClient?.signOut()?.addOnCompleteListener {
+                    viewModelScope.launch {
+                        // Désactiver la synchronisation dans les paramètres
+                        settingsRepository.setCalendarSyncEnabled(false)
+                        
+                        // Mettre à jour l'état
+                        _uiState.value = _uiState.value.copy(
+                            isGoogleSignedIn = false,
+                            isCalendarSyncEnabled = false,
+                            googleAccountEmail = null
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    syncError = "Erreur de déconnexion: ${e.message}"
+                )
+            }
+        }
     }
     
     fun syncAllRoutines() {
-        // Stub implementation to fix compilation errors
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(isSyncing = true, syncError = null)
+                
+                val result = calendarSyncService.syncAllRoutines()
+                
+                result.onSuccess { count ->
+                    _uiState.value = _uiState.value.copy(
+                        isSyncing = false,
+                        syncError = null
+                    )
+                }.onFailure { error ->
+                    _uiState.value = _uiState.value.copy(
+                        isSyncing = false,
+                        syncError = "Erreur de synchronisation: ${error.message}"
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isSyncing = false,
+                    syncError = "Erreur de synchronisation: ${e.message}"
+                )
+            }
+        }
     }
 }

@@ -27,10 +27,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -42,6 +42,7 @@ data class HomeUiState(
     val assignedTasks: Int = 0,
     val completedTasks: Int = 0,
     val todayTasks: List<Task> = emptyList(),
+    val upcomingTasks: List<Task> = emptyList(),
     val todayRoutines: List<Routine> = emptyList(),
     val projects: List<Project> = emptyList(),
     val selectedFilter: TaskFilter = TaskFilter.ALL,
@@ -51,7 +52,8 @@ data class HomeUiState(
     val weatherData: WeatherResponse? = null,
     val weatherLoading: Boolean = false,
     val weatherError: String? = null,
-    val weatherModalVisible: Boolean = false
+    val weatherModalVisible: Boolean = false,
+    val currentUser: String = "Utilisateur"
 )
 
 enum class TaskFilter {
@@ -84,16 +86,25 @@ class HomeViewModel @Inject constructor(
             ) { projects, tasks, routines ->
                 Log.d("HomeViewModel", "Data received - Projects: ${projects.size}, Tasks: ${tasks.size}, Routines: ${routines.size}")
                 Log.d("HomeViewModel", "Projects: $projects")
+                
+                // Filtrer les tâches à venir (non terminées et avec une date d'échéance future)
+                val now = LocalDateTime.now()
+                val upcomingTasksList = tasks.filter { 
+                    !it.isCompleted && it.dueDateTime.isAfter(now) 
+                }.sortedBy { it.dueDateTime }
+                
                 HomeUiState(
                     assignedTasks = tasks.count { !it.isCompleted },
                     completedTasks = tasks.count { it.isCompleted },
                     todayTasks = tasks,
+                    upcomingTasks = upcomingTasksList,
                     todayRoutines = routines,
                     projects = projects,
                     weatherData = _uiState.value.weatherData,
                     weatherLoading = _uiState.value.weatherLoading,
                     weatherError = _uiState.value.weatherError,
-                    weatherModalVisible = _uiState.value.weatherModalVisible
+                    weatherModalVisible = _uiState.value.weatherModalVisible,
+                    currentUser = "Utilisateur" // Valeur par défaut, à remplacer par le nom réel de l'utilisateur si disponible
                 )
             }.collect { newState ->
                 Log.d("HomeViewModel", "Updating UI state with ${newState.projects.size} projects")
@@ -122,6 +133,12 @@ class HomeViewModel @Inject constructor(
                     taskDate.isAfter(todayStart) && taskDate.isBefore(todayEnd)
                 }
                 
+                // Filtrer les tâches à venir (non terminées et avec une date d'échéance future)
+                val now = LocalDateTime.now()
+                val upcomingTasks = allTasks.filter { 
+                    !it.isCompleted && it.dueDateTime.isAfter(now) 
+                }.sortedBy { it.dueDateTime }
+                
                 // Appliquer le filtre actuel
                 val filteredTasks = when (_uiState.value.selectedFilter) {
                     TaskFilter.ALL -> todayTasks
@@ -141,6 +158,7 @@ class HomeViewModel @Inject constructor(
                     assignedTasks = activeTasks.size,
                     completedTasks = allTasks.count { it.isCompleted },
                     todayTasks = filteredTasks,
+                    upcomingTasks = upcomingTasks,
                     todayRoutines = routines,
                     projects = projects,
                     isLoading = false

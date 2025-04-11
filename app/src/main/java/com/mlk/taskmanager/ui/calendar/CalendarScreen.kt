@@ -385,7 +385,9 @@ fun CalendarScreen(
                                         task.isCompleted -> TaskStatus.DONE
                                         else -> TaskStatus.TODO
                                     },
-                                    primaryColor = primaryColor
+                                    primaryColor = primaryColor,
+                                    onEditClick = { /* Edit task */ },
+                                    onDeleteClick = { /* Delete task */ }
                                 )
                             }
                         }
@@ -504,7 +506,9 @@ private fun EnhancedTaskItem(
     category: String,
     time: String,
     status: TaskStatus,
-    primaryColor: Color
+    primaryColor: Color,
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
     val statusColors = mapOf(
         TaskStatus.TODO to Color(0xFF2196F3),
@@ -624,7 +628,7 @@ private fun EnhancedTaskItem(
                             modifier = Modifier
                                 .size(20.dp)
                                 .clip(CircleShape)
-                                .clickable { /* Edit task */ }
+                                .clickable(onClick = onEditClick)
                                 .padding(2.dp)
                         )
 
@@ -637,7 +641,7 @@ private fun EnhancedTaskItem(
                             modifier = Modifier
                                 .size(20.dp)
                                 .clip(CircleShape)
-                                .clickable { /* Delete task */ }
+                                .clickable(onClick = onDeleteClick)
                                 .padding(2.dp)
                         )
                     }

@@ -13,11 +13,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -31,19 +35,54 @@ import com.mlk.taskmanager.R
 import com.mlk.taskmanager.data.model.Project
 import com.mlk.taskmanager.data.model.Routine
 import com.mlk.taskmanager.data.model.Task
+import com.mlk.taskmanager.data.model.WeatherResponse
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.*
+import androidx.compose.animation.Animatable
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import com.mlk.taskmanager.ui.navigation.Screen
+import kotlinx.coroutines.launch
+import com.mlk.taskmanager.data.model.Priority
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.material.icons.filled.AcUnit
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.Opacity
+import androidx.compose.material.icons.filled.Water
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Work
+import androidx.compose.material.icons.filled.TaskAlt
+import androidx.compose.material.icons.filled.Loop
+import androidx.compose.material.icons.filled.KeyboardDoubleArrowUp
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.contentColorFor
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.Circle
+import com.mlk.taskmanager.ui.home.HomeUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,412 +91,379 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val currentWeatherData = uiState.weatherData
+    val isWeatherLoading = uiState.weatherLoading
+    val projects = uiState.projects
+    val routines = uiState.todayRoutines
+    val upcomingTasks = uiState.upcomingTasks
+    val name = uiState.currentUser
+    
+    val scope = rememberCoroutineScope()
+    
+    // État pour le dialogue de création de projet
+    val showCreateProjectDialog = uiState.showCreateProjectDialog
+    
+    if (showCreateProjectDialog) {
+        CreateProjectDialog(
+            onDismiss = { viewModel.hideCreateProjectDialog() },
+            onConfirm = { name, description, icon ->
+                viewModel.createProject(name, description, icon)
+                viewModel.hideCreateProjectDialog()
+            }
+        )
+    }
+    
+    // Animation pour l'entrée de page
+    val fadeInAnimation = remember { Animatable(0f) }
+    val slideUpAnimation = remember { Animatable(50f) }
+    
+    LaunchedEffect(key1 = true) {
+        fadeInAnimation.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(500)
+        )
+        slideUpAnimation.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(500, easing = FastOutSlowInEasing)
+        )
+    }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFAFAFA))
-            .padding(16.dp)
+            .background(MaterialTheme.colorScheme.surface)
     ) {
-        // Header
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 80.dp) // Espace pour la barre de navigation
+                .graphicsLayer {
+                    alpha = fadeInAnimation.value
+                    translationY = slideUpAnimation.value
+                }
         ) {
-            Column {
-                Text(
-                    text = "Good morning Lamine!",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        color = Color.Gray
+            item {
+                // Header avec fond dégradé
+                HeaderSection(uiState = uiState, navController = navController, viewModel = viewModel)
+                
+                // Quick Actions
+                QuickActionsRow(navController)
+                
+                // Résumé des tâches avec animation
+                TaskSummarySection(uiState = uiState)
+                
+                // Section des projets avec animation
+                ProjectsSection(
+                    projects = projects,
+                    onAddProject = { viewModel.showCreateProjectDialog() },
+                    onProjectClick = { project -> 
+                        navController.navigate(Screen.ProjectDetail.createRoute(project.id))
+                    }
+                )
+                
+                // Section routines avec animations
+                RoutinesSection(
+                    routines = routines,
+                    onAddRoutine = { navController.navigate(Screen.AddRoutine.route) },
+                    onRoutineClick = { routine -> 
+                        navController.navigate(Screen.RoutineDetail.createRoute(routine.id))
+                    },
+                    onSeeAllClick = { navController.navigate(Screen.Routines.route) }
+                )
+                
+                // Section tâches à venir avec animations
+                UpcomingTasksSection(
+                    tasks = upcomingTasks,
+                    onTaskClick = { task ->
+                        navController.navigate(Screen.TaskDetail.createRoute(task.id))
+                    },
+                    onAddTaskClick = { navController.navigate(Screen.AddTask.route) }
+                )
+                
+                // Espace en bas pour la navigation
+                Spacer(modifier = Modifier.height(80.dp))
+            }
+            
+            // Reste des éléments...
+        }
+    }
+}
+
+@Composable
+fun HeaderSection(
+    uiState: HomeUiState,
+    navController: NavController,
+    viewModel: HomeViewModel
+) {
+    // Obtenir l'heure locale pour ajuster le message de bienvenue
+    val hour = java.time.LocalTime.now().hour
+    val greeting = when {
+        hour < 12 -> "Bonjour"
+        hour < 18 -> "Bon après-midi"
+        else -> "Bonsoir"
+    }
+    val name = uiState.currentUser
+    
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp)
+    ) {
+        // Fond dégradé avec coins arrondis uniquement en bas
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp)
+                .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.primaryContainer
+                        )
                     )
                 )
-                Text(
-                    text = LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMMM, yyyy")),
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Weather button
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(Color.White)
-                        .clickable { viewModel.toggleWeatherModal() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (uiState.weatherLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = MaterialTheme.colorScheme.primary,
-                            strokeWidth = 2.dp
-                        )
-                    } else if (uiState.weatherData != null) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_weather),
-                                contentDescription = "Weather",
-                                modifier = Modifier.size(16.dp),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(modifier = Modifier.width(2.dp))
-                            Text(
-                                text = "${uiState.weatherData?.main?.temp?.toInt()}°",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.Bold
-                                ),
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
-                        }
-                    } else {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_weather),
-                            contentDescription = "Weather",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-
-                // Pomodoro button
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(Color.White)
-                        .clickable { navController.navigate(Screen.Pomodoro.route) },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Timer,
-                            contentDescription = "Focus",
-                            modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = "Focus",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(Color.White)
-                        .clickable { navController.navigate(Screen.StepCounter.route) },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.DirectionsWalk,
-                            contentDescription = "Steps",
-                            modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = "Steps",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-            }
-        }
-
-        AnimatedVisibility(
-            visible = uiState.weatherModalVisible,
-            enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically()
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-            ) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    if (uiState.weatherData != null) {
-                        val weatherData = uiState.weatherData!!
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = weatherData.name,
-                                    style = MaterialTheme.typography.titleLarge.copy(
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                )
-                                IconButton(onClick = { viewModel.toggleWeatherModal() }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = "Close"
-                                    )
-                                }
-                            }
-                            
-                            Spacer(modifier = Modifier.height(8.dp))
-                            
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                val weatherIcon = when {
-                                    weatherData.weather.firstOrNull()?.main?.contains("rain", ignoreCase = true) == true -> R.drawable.ic_rainy
-                                    else -> R.drawable.ic_weather
-                                }
-                                
-                                Icon(
-                                    painter = painterResource(id = weatherIcon),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(64.dp),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                
-                                Spacer(modifier = Modifier.width(16.dp))
-                                
-                                Column {
-                                    Text(
-                                        text = "${weatherData.main.temp.toInt()}°C",
-                                        style = MaterialTheme.typography.displayMedium
-                                    )
-                                    Text(
-                                        text = weatherData.weather.firstOrNull()?.description ?: "",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = Color.Gray
-                                    )
-                                }
-                            }
-                            
-                            Spacer(modifier = Modifier.height(16.dp))
-                            
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                WeatherInfoItem(
-                                    label = "Ressenti",
-                                    value = "${weatherData.main.feelsLike.toInt()}°C"
-                                )
-                                WeatherInfoItem(
-                                    label = "Humidité",
-                                    value = "${weatherData.main.humidity}%"
-                                )
-                                WeatherInfoItem(
-                                    label = "Vent",
-                                    value = "${weatherData.wind.speed.toInt()} km/h"
-                                )
-                            }
-                        }
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Summary Cards
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            SummaryCard(
-                title = "Assigned tasks",
-                count = uiState.assignedTasks,
-                modifier = Modifier.weight(1f)
-            )
-            SummaryCard(
-                title = "Completed tasks",
-                count = uiState.completedTasks,
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Projects Section
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Projects",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold
-                )
-            )
-            IconButton(
-                onClick = { viewModel.showCreateProjectDialog() },
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFF613BE7))
-                    .size(32.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Project",
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Project Cards
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(uiState.projects) { project ->
-                ProjectCard(
-                    project = project,
-                    onClick = { navController.navigate(Screen.ProjectDetail.createRoute(project.id)) }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Routines Section
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Routines",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold
-                )
-            )
-            TextButton(
-                onClick = { navController.navigate(Screen.Routines.route) }
-            ) {
-                Text(
-                    text = "See all",
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowRight,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
+        )
         
-        // Today's Routines
-        if (uiState.todayRoutines.isEmpty()) {
-            Card(
+        // Contenu
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            // Ligne supérieure avec salutation et avatar/profil
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
+                // Salutation
+                Column {
+                    Text(
+                        text = "$greeting,",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White.copy(alpha = 0.8f)
+                    )
+                    Text(
+                        text = name,
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = Color.White
+                    )
+                }
+                
+                // Avatar/Photo de profil (cliquable pour naviguer vers le profil)
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.2f))
+                        .clickable { navController.navigate(Screen.Settings.route) },
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = null,
-                        tint = Color.Gray,
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Profile",
+                        tint = Color.White,
                         modifier = Modifier.size(24.dp)
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "No routines today",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Text(
-                            text = "Create a new routine to get started",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray
-                        )
-                    }
-                    Button(
-                        onClick = { navController.navigate(Screen.AddRoutine.route) },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        ),
-                        modifier = Modifier.padding(start = 8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add, 
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
                 }
             }
-        } else {
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Date actuelle avec animation de couleur
+            Text(
+                text = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy", Locale.FRENCH)),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White.copy(alpha = 0.8f)
+            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            // Carte météo avec animation lors du clic
+            WeatherCard(
+                isLoading = uiState.weatherLoading,
+                weatherData = uiState.weatherData,
+                onClick = { /* Naviguer vers la météo détaillée si nécessaire */ }
+            )
+        }
+    }
+}
+
+@Composable
+fun WeatherCard(
+    isLoading: Boolean,
+    weatherData: WeatherResponse?,
+    onClick: () -> Unit
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(top = 16.dp)
+            .height(100.dp)
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        )
+    ) {
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                items(uiState.todayRoutines) { routine ->
-                    RoutineCardCompact(
-                        routine = routine,
-                        onClick = { 
-                            navController.navigate(Screen.RoutineDetail.createRoute(routine.id)) 
-                        }
+                CircularProgressIndicator(color = Color.White)
+            }
+        } else if (weatherData != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Température
+                Text(
+                    text = "${weatherData.main.temp.toInt()}°C",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.White
+                )
+                
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    // Nom de la localisation
+                    Text(
+                        text = weatherData.name,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = Color.White
+                    )
+                    
+                    // Description de la météo
+                    val weatherDesc = if (weatherData.weather.isNotEmpty()) {
+                        weatherData.weather[0].description
+                    } else {
+                        ""
+                    }
+                    Text(
+                        text = weatherDesc,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.7f)
+                    )
+                }
+                
+                // Icône météo
+                val weatherType = if (weatherData.weather.isNotEmpty()) {
+                    weatherData.weather[0].main
+                } else {
+                    ""
+                }
+                Icon(
+                    painter = getWeatherIcon(weatherType),
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
+        } else {
+            // État par défaut quand les données ne sont pas disponibles
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.WbSunny,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Météo non disponible",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White
                     )
                 }
             }
         }
+    }
+}
 
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-
-
-        if (uiState.showCreateProjectDialog) {
-            CreateProjectDialog(
-                onDismiss = { viewModel.hideCreateProjectDialog() },
-                onProjectCreated = { name, description, icon ->
-                    viewModel.createProject(name, description, icon)
-                }
-            )
+@Composable
+fun QuickActionsRow(navController: NavController) {
+    val actionItems = listOf(
+        ActionItem("Tâches", Icons.Filled.Assignment) { navController.navigate(Screen.Tasks.route) },
+        ActionItem("Routines", Icons.Filled.Loop) { navController.navigate(Screen.Routines.route) },
+        ActionItem("Pomodoro", Icons.Filled.Timer) { navController.navigate(Screen.Pomodoro.route) },
+        ActionItem("Pas", Icons.Filled.DirectionsWalk) { navController.navigate(Screen.StepCounter.route) }
+    )
+    
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp)
+    ) {
+        items(actionItems) { item ->
+            QuickActionItem(item)
         }
+    }
+}
+
+data class ActionItem(
+    val title: String,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector,
+    val onClick: () -> Unit
+)
+
+@Composable
+fun QuickActionItem(item: ActionItem) {
+    val scale = remember { Animatable(1f) }
+    val scope = rememberCoroutineScope()
+    
+    Column(
+        modifier = Modifier
+            .graphicsLayer {
+                scaleX = scale.value
+                scaleY = scale.value
+            }
+            .clickable {
+                scope.launch {
+                    scale.animateTo(0.8f, tween(100))
+                    scale.animateTo(1f, spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow
+                    ))
+                    item.onClick()
+                }
+            }
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f))
+            .padding(vertical = 12.dp, horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = item.icon,
+            contentDescription = item.title,
+            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+            modifier = Modifier.size(28.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = item.title,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSecondaryContainer
+        )
     }
 }
 
@@ -511,33 +517,31 @@ private fun ProjectCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
-                Icon(
-                    imageVector = when (project.icon) {
-                        "kotlin" -> Icons.Default.Code
-                        "typescript" -> Icons.Default.Web
-                        else -> Icons.Default.Folder
-                    },
-                    contentDescription = null,
-                    tint = Color(project.color),
-                    modifier = Modifier.size(32.dp)
+            Icon(
+                imageVector = when (project.icon) {
+                    "kotlin" -> Icons.Default.Code
+                    "typescript" -> Icons.Default.Web
+                    else -> Icons.Default.Folder
+                },
+                contentDescription = null,
+                tint = Color(project.color),
+                modifier = Modifier.size(32.dp)
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Text(
+                text = project.name,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold
                 )
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                Text(
-                    text = project.name,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-                
-                Text(
-                    text = project.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
-                )
-            }
+            )
+            
+            Text(
+                text = project.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray
+            )
             
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -672,7 +676,7 @@ private fun EmptyTasksMessage() {
 @Composable
 private fun CreateProjectDialog(
     onDismiss: () -> Unit,
-    onProjectCreated: (String, String, String) -> Unit
+    onConfirm: (name: String, description: String, icon: String) -> Unit
 ) {
     var projectName by remember { mutableStateOf(TextFieldValue()) }
     var projectDescription by remember { mutableStateOf(TextFieldValue()) }
@@ -789,7 +793,7 @@ private fun CreateProjectDialog(
             Button(
                 onClick = {
                     if (projectName.text.isNotBlank()) {
-                        onProjectCreated(
+                        onConfirm(
                             projectName.text,
                             projectDescription.text,
                             selectedIcon
@@ -798,10 +802,15 @@ private fun CreateProjectDialog(
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF613BE7)
-                )
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                modifier = Modifier.padding(start = 8.dp)
             ) {
-                Text("Create Project")
+                Icon(
+                    imageVector = Icons.Default.Add, 
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
             }
         },
         dismissButton = {
@@ -810,6 +819,63 @@ private fun CreateProjectDialog(
             }
         }
     )
+}
+
+@Composable
+private fun ProjectTypeSelector(
+    selectedType: String,
+    onTypeSelected: (String) -> Unit
+) {
+    val types = listOf(
+        Triple("Travail", "work", MaterialTheme.colorScheme.error),
+        Triple("Personnel", "home", MaterialTheme.colorScheme.secondary),
+        Triple("Études", "study", MaterialTheme.colorScheme.primary),
+        Triple("Projet", "project", MaterialTheme.colorScheme.tertiary)
+    )
+    
+    // Utiliser des icônes standard Material Design
+    val icons = mapOf(
+        "work" to Icons.Default.Work,
+        "home" to Icons.Default.Home,
+        "study" to Icons.Default.School,
+        "project" to Icons.Default.Description
+    )
+    
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(types) { (label, type, color) ->
+            IconButton(
+                onClick = { onTypeSelected(type) },
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(
+                        if (selectedType == type)
+                            color.copy(alpha = 0.1f)
+                        else
+                            Color.Transparent
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = if (selectedType == type)
+                            color
+                        else
+                            Color.Gray,
+                        shape = RoundedCornerShape(8.dp)
+                    )
+            ) {
+                Icon(
+                    imageVector = icons[type]!!,
+                    contentDescription = type,
+                    tint = if (selectedType == type)
+                        color
+                    else
+                        Color.Gray
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -929,4 +995,1199 @@ private fun WeatherInfoItem(label: String, value: String) {
             )
         )
     }
-} 
+}
+
+@Composable
+fun TaskSummarySection(uiState: HomeUiState) {
+    // Animation d'entrée (slide in de droite et gauche)
+    val animatedProgress = remember { Animatable(0f) }
+    
+    LaunchedEffect(key1 = true) {
+        animatedProgress.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(800, easing = FastOutSlowInEasing)
+        )
+    }
+    
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 16.dp)
+    ) {
+        Text(
+            text = "Votre progression",
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold
+            ),
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Tâches assignées
+            AnimatedSummaryCard(
+                title = "Tâches assignées",
+                count = uiState.assignedTasks,
+                icon = Icons.Filled.Assignment,
+                backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                animatedProgress = animatedProgress,
+                animationOffsetX = -100f, // Animation de gauche à droite
+                modifier = Modifier.weight(1f)
+            )
+            
+            // Tâches complétées
+            AnimatedSummaryCard(
+                title = "Tâches terminées",
+                count = uiState.completedTasks,
+                icon = Icons.Filled.Check,
+                backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                animatedProgress = animatedProgress,
+                animationOffsetX = 100f, // Animation de droite à gauche
+                modifier = Modifier.weight(1f)
+            )
+        }
+        
+        // Barre de progression globale
+        if (uiState.assignedTasks > 0) {
+            val progress = if (uiState.assignedTasks > 0) {
+                uiState.completedTasks.toFloat() / uiState.assignedTasks.toFloat()
+            } else 0f
+            
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Progression globale",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "${(progress * 100).toInt()}%",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // Barre de progression animée
+                val animatedProgress = remember(progress) {
+                    Animatable(0f)
+                }
+                
+                LaunchedEffect(progress) {
+                    animatedProgress.snapTo(0f)
+                    animatedProgress.animateTo(
+                        targetValue = progress,
+                        animationSpec = tween(800, easing = FastOutSlowInEasing)
+                    )
+                }
+                
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(animatedProgress.value)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(
+                                        MaterialTheme.colorScheme.primary,
+                                        MaterialTheme.colorScheme.tertiary
+                                    )
+                                )
+                            )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AnimatedSummaryCard(
+    title: String,
+    count: Int,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    backgroundColor: Color,
+    contentColor: Color,
+    animatedProgress: Animatable<Float, AnimationVector1D>,
+    animationOffsetX: Float,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .graphicsLayer {
+                alpha = animatedProgress.value
+                translationX = (1f - animatedProgress.value) * animationOffsetX
+            },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = backgroundColor
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(contentColor.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = contentColor,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = count.toString(),
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                color = contentColor
+            )
+            
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                color = contentColor.copy(alpha = 0.8f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+fun ProjectsSection(
+    projects: List<Project>,
+    onAddProject: () -> Unit,
+    onProjectClick: (Project) -> Unit
+) {
+    val fadeIn = remember { Animatable(0f) }
+    val slideUp = remember { Animatable(50f) }
+    
+    LaunchedEffect(key1 = true) {
+        fadeIn.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(800, delayMillis = 300)
+        )
+        slideUp.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(800, delayMillis = 300, easing = FastOutSlowInEasing)
+        )
+    }
+    
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 8.dp)
+            .graphicsLayer {
+                alpha = fadeIn.value
+                translationY = slideUp.value
+            }
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Vos projets",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            
+            FloatingActionButton(
+                onClick = onAddProject,
+                modifier = Modifier.size(42.dp),
+                shape = CircleShape,
+                elevation = FloatingActionButtonDefaults.elevation(4.dp),
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Ajouter un projet",
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
+        
+        AnimatedVisibility(
+            visible = true,
+            enter = fadeIn() + expandVertically()
+        ) {
+            if (projects.isEmpty()) {
+                // Afficher un message s'il n'y a pas de projets
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Folder,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(48.dp)
+                        )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        Text(
+                            text = "Aucun projet",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        
+                        Text(
+                            text = "Créez votre premier projet pour organiser vos tâches",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            } else {
+                // Afficher la liste des projets
+                Spacer(modifier = Modifier.height(16.dp))
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(vertical = 8.dp)
+                ) {
+                    items(projects) { project ->
+                        // Utiliser notre card redesignée pour les projets
+                        ImprovedProjectCard(
+                            project = project,
+                            onClick = { onProjectClick(project) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ImprovedProjectCard(
+    project: Project,
+    onClick: () -> Unit
+) {
+    val cardScale = remember { Animatable(1f) }
+    val cardElevation = remember { Animatable(4f) }
+    val scope = rememberCoroutineScope()
+    
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        // Fond d'origine - préservé
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(130.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+            ),
+            elevation = CardDefaults.cardElevation(0.dp)
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                // Contenu vide pour le fond
+            }
+        }
+        
+        // Carte du projet superposée
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(130.dp)
+                .padding(2.dp)
+                .graphicsLayer {
+                    scaleX = cardScale.value
+                    scaleY = cardScale.value
+                    shadowElevation = cardElevation.value
+                }
+                .clickable {
+                    scope.launch {
+                        // Animation de clic
+                        launch {
+                            cardScale.animateTo(0.95f, tween(100))
+                            cardScale.animateTo(1f, spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ))
+                        }
+                        launch {
+                            cardElevation.animateTo(8f, tween(100))
+                            cardElevation.animateTo(4f, tween(200))
+                        }
+                        onClick()
+                    }
+                },
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(project.color).copy(alpha = 0.2f) 
+            ),
+            elevation = CardDefaults.cardElevation(0.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                // Icône du projet
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(
+                            MaterialTheme.colorScheme.primaryContainer
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = when (project.icon) {
+                            "work" -> Icons.Default.Work
+                            "home" -> Icons.Default.Home
+                            "study" -> Icons.Default.School
+                            else -> Icons.Default.Description
+                        },
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                // Titre du projet
+                Text(
+                    text = project.name,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                
+                // Description du projet
+                Text(
+                    text = project.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+                
+                Spacer(modifier = Modifier.weight(1f))
+                
+                // Barre de progression
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "0/${project.taskCount} tâches",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        
+                        // Pourcentage de progression
+                        val progressPercentage = if (project.taskCount > 0) {
+                            (0f / project.taskCount.toFloat() * 100).toInt()
+                        } else {
+                            0
+                        }
+                        
+                        Text(
+                            text = "$progressPercentage%",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(4.dp))
+                    
+                    // Barre de progression animée
+                    val progress = if (project.taskCount > 0) {
+                        0f / project.taskCount.toFloat()
+                    } else {
+                        0f
+                    }
+                    
+                    val animatedProgress = remember(progress) {
+                        Animatable(0f)
+                    }
+                    
+                    LaunchedEffect(progress) {
+                        animatedProgress.animateTo(
+                            targetValue = progress,
+                            animationSpec = tween(800, easing = FastOutSlowInEasing)
+                        )
+                    }
+                    
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(animatedProgress.value)
+                                .fillMaxHeight()
+                                .clip(RoundedCornerShape(3.dp))
+                                .background(MaterialTheme.colorScheme.primary)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun RoutinesSection(
+    routines: List<Routine>,
+    onAddRoutine: () -> Unit,
+    onRoutineClick: (Routine) -> Unit,
+    onSeeAllClick: () -> Unit
+) {
+    val fadeIn = remember { Animatable(0f) }
+    val slideUp = remember { Animatable(50f) }
+    
+    LaunchedEffect(key1 = true) {
+        fadeIn.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(800, delayMillis = 400)
+        )
+        slideUp.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(800, delayMillis = 400, easing = FastOutSlowInEasing)
+        )
+    }
+    
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, top = 24.dp)
+            .graphicsLayer {
+                alpha = fadeIn.value
+                translationY = slideUp.value
+            }
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Routines du jour",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(
+                    onClick = onSeeAllClick
+                ) {
+                    Text(
+                        text = "Voir tout",
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                
+                FloatingActionButton(
+                    onClick = onAddRoutine,
+                    modifier = Modifier.size(42.dp),
+                    shape = CircleShape,
+                    elevation = FloatingActionButtonDefaults.elevation(4.dp),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Ajouter une routine",
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
+        }
+        
+        AnimatedVisibility(
+            visible = true,
+            enter = fadeIn() + expandVertically()
+        ) {
+            if (routines.isEmpty()) {
+                // Afficher un message s'il n'y a pas de routines
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Loop,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(48.dp)
+                        )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        Text(
+                            text = "Aucune routine aujourd'hui",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        
+                        Text(
+                            text = "Créez des routines pour automatiser vos tâches récurrentes",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Center
+                        )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        Button(
+                            onClick = onAddRoutine,
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Créer une routine")
+                        }
+                    }
+                }
+            } else {
+                // Afficher la liste des routines
+                Spacer(modifier = Modifier.height(16.dp))
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(vertical = 8.dp)
+                ) {
+                    items(routines) { routine ->
+                        // Utiliser notre card redesignée pour les routines
+                        ImprovedRoutineCard(
+                            routine = routine,
+                            onClick = { onRoutineClick(routine) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ImprovedRoutineCard(
+    routine: Routine,
+    onClick: () -> Unit
+) {
+    val cardScale = remember { Animatable(1f) }
+    val cardElevation = remember { Animatable(4f) }
+    val scope = rememberCoroutineScope()
+    
+    // Couleur basée sur le statut de la routine
+    val backgroundColor = if (routine.isEnabled) {
+        if (routine.isSyncedWithCalendar) {
+            // Routine activée et synchronisée avec Google Calendar
+            MaterialTheme.colorScheme.tertiaryContainer
+        } else {
+            // Routine activée mais pas synchronisée
+            MaterialTheme.colorScheme.secondaryContainer
+        }
+    } else {
+        // Routine désactivée
+        MaterialTheme.colorScheme.surfaceVariant
+    }
+    
+    val contentColor = if (routine.isEnabled) {
+        if (routine.isSyncedWithCalendar) {
+            MaterialTheme.colorScheme.onTertiaryContainer
+        } else {
+            MaterialTheme.colorScheme.onSecondaryContainer
+        }
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+    }
+    
+    Card(
+        modifier = Modifier
+            .width(180.dp)
+            .height(180.dp)
+            .graphicsLayer {
+                scaleX = cardScale.value
+                scaleY = cardScale.value
+                shadowElevation = cardElevation.value
+            }
+            .clickable {
+                scope.launch {
+                    // Animation de clic
+                    launch {
+                        cardScale.animateTo(0.95f, tween(100))
+                        cardScale.animateTo(1f, spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessLow
+                        ))
+                    }
+                    launch {
+                        cardElevation.animateTo(8f, tween(100))
+                        cardElevation.animateTo(4f, tween(200))
+                    }
+                    onClick()
+                }
+            },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = backgroundColor
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            // Statut de synchronisation
+            if (routine.isSyncedWithCalendar) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f))
+                        .padding(horizontal = 6.dp, vertical = 3.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Sync,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Text(
+                            text = "Synchronisé",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
+                }
+            }
+            
+            // Heure de la routine
+            Text(
+                text = routine.time.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")),
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                color = contentColor
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            // Titre de la routine
+            Text(
+                text = routine.title,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                color = contentColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            
+            // Description de la routine
+            Text(
+                text = routine.description,
+                style = MaterialTheme.typography.bodySmall,
+                color = contentColor.copy(alpha = 0.8f),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            
+            Spacer(modifier = Modifier.weight(1f))
+            
+            // Jours de répétition
+            if (routine.repeatDays.isNotEmpty()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    val daysOfWeek = DayOfWeek.values()
+                    for (day in daysOfWeek) {
+                        val isSelected = routine.repeatDays.contains(day)
+                        val dayLabel = day.getDisplayName(TextStyle.NARROW, Locale.getDefault())
+                        
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    if (isSelected) contentColor
+                                    else contentColor.copy(alpha = 0.1f)
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = dayLabel,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (isSelected) backgroundColor else contentColor,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun UpcomingTasksSection(
+    tasks: List<Task>,
+    onTaskClick: (Task) -> Unit,
+    onAddTaskClick: () -> Unit
+) {
+    val fadeIn = remember { Animatable(0f) }
+    val slideUp = remember { Animatable(50f) }
+    
+    LaunchedEffect(key1 = true) {
+        fadeIn.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(800, delayMillis = 500)
+        )
+        slideUp.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(800, delayMillis = 500, easing = FastOutSlowInEasing)
+        )
+    }
+    
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, top = 24.dp)
+            .graphicsLayer {
+                alpha = fadeIn.value
+                translationY = slideUp.value
+            }
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Tâches à venir",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            
+            FloatingActionButton(
+                onClick = onAddTaskClick,
+                modifier = Modifier.size(42.dp),
+                shape = CircleShape,
+                elevation = FloatingActionButtonDefaults.elevation(4.dp),
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Ajouter une tâche",
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        // Afficher les tâches
+        AnimatedVisibility(
+            visible = true,
+            enter = fadeIn() + expandVertically()
+        ) {
+            if (tasks.isEmpty()) {
+                // Afficher un message s'il n'y a pas de tâches
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.TaskAlt,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(48.dp)
+                        )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        Text(
+                            text = "Aucune tâche à venir",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        
+                        Text(
+                            text = "Créez des tâches pour organiser votre travail",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Center
+                        )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        Button(
+                            onClick = onAddTaskClick,
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Créer une tâche")
+                        }
+                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Limiter à 3 tâches pour ne pas surcharger l'écran d'accueil
+                    tasks.take(3).forEach { task ->
+                        AnimatedTaskCard(
+                            task = task,
+                            onClick = { onTaskClick(task) }
+                        )
+                    }
+                    
+                    // Bouton "Voir plus" si plus de 3 tâches
+                    if (tasks.size > 3) {
+                        TextButton(
+                            onClick = { /* Navigation vers la liste complète */ },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                        ) {
+                            Text(
+                                text = "Voir ${tasks.size - 3} tâches supplémentaires",
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowRight,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AnimatedTaskCard(
+    task: Task,
+    onClick: () -> Unit
+) {
+    val cardScale = remember { Animatable(1f) }
+    val cardElevation = remember { Animatable(4f) }
+    val scope = rememberCoroutineScope()
+    
+    // Couleur basée sur la priorité de la tâche
+    val (backgroundColor, contentColor) = when (task.priority) {
+        Priority.HIGH -> Pair(
+            MaterialTheme.colorScheme.errorContainer.copy(alpha = if (task.isCompleted) 0.5f else 0.7f),
+            MaterialTheme.colorScheme.onErrorContainer.copy(alpha = if (task.isCompleted) 0.7f else 1f)
+        )
+        Priority.MEDIUM -> Pair(
+            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = if (task.isCompleted) 0.5f else 0.7f),
+            MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = if (task.isCompleted) 0.7f else 1f)
+        )
+        else -> Pair(
+            MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = if (task.isCompleted) 0.5f else 0.7f),
+            MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = if (task.isCompleted) 0.7f else 1f)
+        )
+    }
+    
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .graphicsLayer {
+                scaleX = cardScale.value
+                scaleY = cardScale.value
+                shadowElevation = cardElevation.value
+            }
+            .clickable {
+                scope.launch {
+                    // Animation de clic
+                    launch {
+                        cardScale.animateTo(0.98f, tween(100))
+                        cardScale.animateTo(1f, spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessLow
+                        ))
+                    }
+                    launch {
+                        cardElevation.animateTo(8f, tween(100))
+                        cardElevation.animateTo(4f, tween(200))
+                    }
+                    onClick()
+                }
+            },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (task.isCompleted) 
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f) 
+            else 
+                backgroundColor
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Checkbox ou icône de statut
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (task.isCompleted) 
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                        else 
+                            contentColor.copy(alpha = 0.1f)
+                    )
+                    .padding(4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (task.isCompleted) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Completed",
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.width(16.dp))
+            
+            // Contenu de la tâche
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = task.title,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        textDecoration = if (task.isCompleted) TextDecoration.LineThrough else null
+                    ),
+                    color = if (task.isCompleted) 
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    else 
+                        contentColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                
+                if (task.description.isNotEmpty()) {
+                    Text(
+                        text = task.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (task.isCompleted) 
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                        else 
+                            contentColor.copy(alpha = 0.7f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+                
+                // Date d'échéance
+                Row(
+                    modifier = Modifier.padding(top = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Schedule,
+                        contentDescription = null,
+                        tint = if (task.isCompleted) 
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                        else 
+                            contentColor.copy(alpha = 0.7f),
+                        modifier = Modifier.size(14.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.width(4.dp))
+                    
+                    val dateFormatter = DateTimeFormatter.ofPattern("d MMM, HH:mm")
+                    Text(
+                        text = task.dueDateTime.format(dateFormatter),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (task.isCompleted) 
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                        else 
+                            contentColor.copy(alpha = 0.7f)
+                    )
+                    
+                    // Statut de synchronisation
+                    if (task.isSyncedWithCalendar) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(
+                            imageVector = Icons.Default.Sync,
+                            contentDescription = "Synchronized with Google Calendar",
+                            tint = if (task.isCompleted) 
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                            else 
+                                MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
+                }
+            }
+            
+            // Badge de priorité
+            val priorityIcon = when (task.priority) {
+                Priority.HIGH -> Icons.Default.KeyboardDoubleArrowUp
+                Priority.MEDIUM -> Icons.Default.KeyboardArrowUp
+                else -> Icons.Default.KeyboardArrowDown
+            }
+            
+            val priorityColor = when (task.priority) {
+                Priority.HIGH -> MaterialTheme.colorScheme.error
+                Priority.MEDIUM -> MaterialTheme.colorScheme.secondary
+                else -> MaterialTheme.colorScheme.tertiary
+            }
+            
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(priorityColor.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = priorityIcon,
+                    contentDescription = "Priority",
+                    tint = priorityColor.copy(alpha = if (task.isCompleted) 0.5f else 1f),
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Retourne l'icône météo correspondant à la condition météo
+ */
+@Composable
+fun getWeatherIcon(condition: String): Painter {
+    // Retourner l'icône appropriée en fonction de la condition météo
+    return when (condition.lowercase()) {
+        "clear" -> rememberVectorPainter(Icons.Default.WbSunny)
+        "clouds" -> rememberVectorPainter(Icons.Default.Cloud)
+        "rain" -> rememberVectorPainter(Icons.Default.Opacity)
+        "snow" -> rememberVectorPainter(Icons.Default.AcUnit)
+        "thunderstorm" -> rememberVectorPainter(Icons.Default.FlashOn)
+        "mist", "fog", "haze" -> rememberVectorPainter(Icons.Default.Water)
+        else -> rememberVectorPainter(Icons.Default.WbSunny)
+    }
+}

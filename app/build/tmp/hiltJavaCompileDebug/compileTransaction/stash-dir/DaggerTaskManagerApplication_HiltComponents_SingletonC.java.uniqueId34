@@ -551,7 +551,7 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
           return (T) new StepCounterViewModel(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
           case 9: // com.mlk.taskmanager.ui.tasks.TasksViewModel 
-          return (T) new TasksViewModel(singletonCImpl.provideTaskRepositoryProvider.get(), singletonCImpl.bindProjectRepositoryProvider.get(), singletonCImpl.locationReminderServiceProvider.get(), singletonCImpl.provideNotificationManagerProvider2.get());
+          return (T) new TasksViewModel(singletonCImpl.provideTaskRepositoryProvider.get(), singletonCImpl.bindProjectRepositoryProvider.get(), singletonCImpl.locationReminderServiceProvider.get(), singletonCImpl.provideNotificationManagerProvider2.get(), singletonCImpl.calendarSyncServiceProvider.get(), singletonCImpl.provideSettingsRepositoryProvider.get());
 
           default: throw new AssertionError(id);
         }
@@ -814,7 +814,7 @@ public final class DaggerTaskManagerApplication_HiltComponents_SingletonC {
           return (T) ApiModule_ProvideOkHttpClientFactory.provideOkHttpClient();
 
           case 15: // com.mlk.taskmanager.service.CalendarSyncService 
-          return (T) new CalendarSyncService(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.routineRepositoryImplProvider.get());
+          return (T) new CalendarSyncService(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.routineRepositoryImplProvider.get(), singletonCImpl.provideTaskRepositoryProvider.get());
 
           case 16: // com.mlk.taskmanager.data.repository.SettingsRepository 
           return (T) AppModule_ProvideSettingsRepositoryFactory.provideSettingsRepository(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));

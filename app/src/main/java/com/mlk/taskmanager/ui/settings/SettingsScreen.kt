@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -38,6 +39,8 @@ fun SettingsScreen(
     var showThemePicker by remember { mutableStateOf(false) }
     var showBackupDialog by remember { mutableStateOf(false) }
     var showCategoryDialog by remember { mutableStateOf(false) }
+    var showLicensesDialog by remember { mutableStateOf(false) }
+    var showPrivacyPolicyDialog by remember { mutableStateOf(false) }
 
     val uiState by viewModel.uiState.collectAsState()
     
@@ -315,14 +318,14 @@ fun SettingsScreen(
                         title = "Licenses",
                         subtitle = "Third-party licenses",
                         icon = Icons.Outlined.Description,
-                        onClick = { /* Show licenses */ }
+                        onClick = { showLicensesDialog = true }
                     )
 
                     SettingsItem(
                         title = "Privacy Policy",
                         subtitle = "Read our privacy policy",
                         icon = Icons.Outlined.Shield,
-                        onClick = { /* Show privacy policy */ }
+                        onClick = { showPrivacyPolicyDialog = true }
                     )
                 }
             }
@@ -350,6 +353,18 @@ fun SettingsScreen(
                 categories = uiState.categories,
                 onAddCategory = { viewModel.addCategory(it) },
                 onRemoveCategory = { viewModel.removeCategory(it) }
+            )
+        }
+
+        if (showLicensesDialog) {
+            LicensesDialog(
+                onDismiss = { showLicensesDialog = false }
+            )
+        }
+
+        if (showPrivacyPolicyDialog) {
+            PrivacyPolicyDialog(
+                onDismiss = { showPrivacyPolicyDialog = false }
             )
         }
     }
@@ -735,74 +750,157 @@ fun CategoryDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Manage Categories",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                text = "Gérer les catégories",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold
+                )
             )
         },
         text = {
-            Column {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Champ de saisie pour ajouter une nouvelle catégorie
                 OutlinedTextField(
                     value = newCategory,
                     onValueChange = { newCategory = it },
-                    label = { Text("New Category") },
-                    singleLine = true,
+                    label = { Text("Nouvelle catégorie") },
                     modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
                     trailingIcon = {
                         IconButton(
                             onClick = {
-                                if (newCategory.isNotEmpty()) {
+                                if (newCategory.isNotBlank()) {
                                     onAddCategory(newCategory)
                                     newCategory = ""
                                 }
                             },
-                            enabled = newCategory.isNotEmpty()
+                            enabled = newCategory.isNotBlank()
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
-                                contentDescription = "Add Category"
+                                contentDescription = "Ajouter",
+                                tint = if (newCategory.isNotBlank()) 
+                                    MaterialTheme.colorScheme.primary 
+                                else 
+                                    Color.Gray.copy(alpha = 0.5f)
                             )
                         }
                     }
                 )
                 
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                Text(
-                    text = "Current Categories",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                
                 Spacer(modifier = Modifier.height(8.dp))
                 
-                categories.forEach { category ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = category,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f)
-                        )
-                        
-                        IconButton(onClick = { onRemoveCategory(category) }) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Remove Category",
-                                tint = MaterialTheme.colorScheme.error
+                // Liste des catégories existantes
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                ) {
+                    itemsIndexed(categories) { _, category ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = category,
+                                style = MaterialTheme.typography.bodyLarge
                             )
+                            
+                            IconButton(
+                                onClick = { onRemoveCategory(category) }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Supprimer",
+                                    tint = Color.Red
+                                )
+                            }
                         }
                     }
                 }
             }
         },
         confirmButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("Fermer")
+            }
+        }
+    )
+}
+
+@Composable
+fun LicensesDialog(
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Licenses",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(text = "This app uses the following third-party libraries:")
+                
+                Text(text = "• AndroidX")
+                Text(text = "• Compose")
+                Text(text = "• Hilt")
+                Text(text = "• Accompanist")
+            }
+        },
+        confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Done")
+                Text(text = "OK")
+            }
+        }
+    )
+}
+
+@Composable
+fun PrivacyPolicyDialog(
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Privacy Policy",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(text = "This app collects the following data:")
+                
+                Text(text = "• Task and routine data")
+                Text(text = "• User preferences")
+                Text(text = "• Device information")
+                
+                Text(text = "This data is used to:")
+                
+                Text(text = "• Provide app functionality")
+                Text(text = "• Improve app performance")
+                Text(text = "• Personalize app experience")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = "OK")
             }
         }
     )

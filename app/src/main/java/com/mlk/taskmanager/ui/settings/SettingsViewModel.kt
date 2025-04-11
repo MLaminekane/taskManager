@@ -137,30 +137,35 @@ class SettingsViewModel @Inject constructor(
     fun setNotificationsEnabled(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.setNotificationsEnabled(enabled)
+            _uiState.value = _uiState.value.copy(areNotificationsEnabled = enabled)
         }
     }
 
     fun setSoundEnabled(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.setSoundEnabled(enabled)
+            _uiState.value = _uiState.value.copy(isSoundEnabled = enabled)
         }
     }
 
     fun setVibrationEnabled(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.setVibrationEnabled(enabled)
+            _uiState.value = _uiState.value.copy(isVibrationEnabled = enabled)
         }
     }
 
     fun setLocationEnabled(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.setLocationEnabled(enabled)
+            _uiState.value = _uiState.value.copy(isLocationEnabled = enabled)
         }
     }
 
     fun setDefaultLocationRadius(radius: Float) {
         viewModelScope.launch {
             settingsRepository.setDefaultLocationRadius(radius)
+            _uiState.value = _uiState.value.copy(defaultLocationRadius = radius)
         }
     }
     
@@ -177,13 +182,17 @@ class SettingsViewModel @Inject constructor(
 
     fun addCategory(category: String) {
         viewModelScope.launch {
-            settingsRepository.setCategories(uiState.value.categories + category)
+            val updatedCategories = uiState.value.categories + category
+            settingsRepository.setCategories(updatedCategories)
+            _uiState.value = _uiState.value.copy(categories = updatedCategories)
         }
     }
 
     fun removeCategory(category: String) {
         viewModelScope.launch {
-            settingsRepository.setCategories(uiState.value.categories - category)
+            val updatedCategories = uiState.value.categories - category
+            settingsRepository.setCategories(updatedCategories)
+            _uiState.value = _uiState.value.copy(categories = updatedCategories)
         }
     }
 
@@ -407,5 +416,18 @@ class SettingsViewModel @Inject constructor(
                 )
             }
         }
+    }
+    
+    // Méthodes pour afficher les licences et la politique de confidentialité
+    fun showLicenses(context: Context) {
+        // Cette méthode peut être utilisée pour ouvrir une URL contenant les licences
+        // ou pour afficher une boîte de dialogue (comme implémenté dans l'écran)
+        // Pour l'instant, nous utilisons simplement la boîte de dialogue dans l'écran
+    }
+    
+    fun showPrivacyPolicy(context: Context) {
+        // Cette méthode peut être utilisée pour ouvrir une URL contenant la politique de confidentialité
+        // ou pour afficher une boîte de dialogue (comme implémenté dans l'écran)
+        // Pour l'instant, nous utilisons simplement la boîte de dialogue dans l'écran
     }
 }

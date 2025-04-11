@@ -2,6 +2,7 @@ package com.mlk.taskmanager.service;
 
 import android.content.Context;
 import com.mlk.taskmanager.data.repository.RoutineRepository;
+import com.mlk.taskmanager.data.repository.TaskRepository;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.QualifierMetadata;
@@ -27,24 +28,29 @@ public final class CalendarSyncService_Factory implements Factory<CalendarSyncSe
 
   private final Provider<RoutineRepository> routineRepositoryProvider;
 
+  private final Provider<TaskRepository> taskRepositoryProvider;
+
   public CalendarSyncService_Factory(Provider<Context> contextProvider,
-      Provider<RoutineRepository> routineRepositoryProvider) {
+      Provider<RoutineRepository> routineRepositoryProvider,
+      Provider<TaskRepository> taskRepositoryProvider) {
     this.contextProvider = contextProvider;
     this.routineRepositoryProvider = routineRepositoryProvider;
+    this.taskRepositoryProvider = taskRepositoryProvider;
   }
 
   @Override
   public CalendarSyncService get() {
-    return newInstance(contextProvider.get(), routineRepositoryProvider.get());
+    return newInstance(contextProvider.get(), routineRepositoryProvider.get(), taskRepositoryProvider.get());
   }
 
   public static CalendarSyncService_Factory create(Provider<Context> contextProvider,
-      Provider<RoutineRepository> routineRepositoryProvider) {
-    return new CalendarSyncService_Factory(contextProvider, routineRepositoryProvider);
+      Provider<RoutineRepository> routineRepositoryProvider,
+      Provider<TaskRepository> taskRepositoryProvider) {
+    return new CalendarSyncService_Factory(contextProvider, routineRepositoryProvider, taskRepositoryProvider);
   }
 
   public static CalendarSyncService newInstance(Context context,
-      RoutineRepository routineRepository) {
-    return new CalendarSyncService(context, routineRepository);
+      RoutineRepository routineRepository, TaskRepository taskRepository) {
+    return new CalendarSyncService(context, routineRepository, taskRepository);
   }
 }

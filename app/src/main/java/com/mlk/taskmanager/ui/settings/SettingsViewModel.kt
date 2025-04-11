@@ -38,6 +38,7 @@ data class SettingsUiState(
     val googleAccountEmail: String? = null,
     val isSyncing: Boolean = false,
     val syncError: String? = null,
+    val lastSyncMessage: String? = null,
     val isUserLoggedIn: Boolean = false,
     val currentUser: User? = null
 )
@@ -315,28 +316,94 @@ class SettingsViewModel @Inject constructor(
         }
     }
     
+    // Synchroniser toutes les routines
     fun syncAllRoutines() {
         viewModelScope.launch {
             try {
                 _uiState.value = _uiState.value.copy(isSyncing = true, syncError = null)
                 
                 val result = calendarSyncService.syncAllRoutines()
-                
-                result.onSuccess { count ->
+                if (result.isSuccess) {
+                    val count = result.getOrDefault(0)
                     _uiState.value = _uiState.value.copy(
                         isSyncing = false,
-                        syncError = null
+                        lastSyncMessage = "Synchronisation réussie: $count routines"
                     )
-                }.onFailure { error ->
+                } else {
                     _uiState.value = _uiState.value.copy(
                         isSyncing = false,
-                        syncError = "Erreur de synchronisation: ${error.message}"
+                        syncError = result.exceptionOrNull()?.message ?: "Erreur de synchronisation"
                     )
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isSyncing = false,
-                    syncError = "Erreur de synchronisation: ${e.message}"
+                    syncError = e.message ?: "Erreur inattendue"
+                )
+            }
+        }
+    }
+    
+    // Synchroniser toutes les tâches
+    fun syncAllTasks() {
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(isSyncing = true, syncError = null)
+                
+                val result = calendarSyncService.syncAllTasks()
+                if (result.isSuccess) {
+                    val count = result.getOrDefault(0)
+                    _uiState.value = _uiState.value.copy(
+                        isSyncing = false,
+                        lastSyncMessage = "Synchronisation réussie: $count tâches"
+                    )
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        isSyncing = false,
+                        syncError = result.exceptionOrNull()?.message ?: "Erreur de synchronisation des tâches"
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isSyncing = false,
+                    syncError = e.message ?: "Erreur inattendue"
+                )
+            }
+        }
+    }
+    
+    // Synchroniser tout (routines et tâches)
+    fun syncAll() {
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(isSyncing = true, syncError = null)
+                
+                val routinesResult = calendarSyncService.syncAllRoutines()
+                val tasksResult = calendarSyncService.syncAllTasks()
+                
+                val routinesCount = if (routinesResult.isSuccess) routinesResult.getOrDefault(0) else 0
+                val tasksCount = if (tasksResult.isSuccess) tasksResult.getOrDefault(0) else 0
+                
+                if (routinesResult.isSuccess && tasksResult.isSuccess) {
+                    _uiState.value = _uiState.value.copy(
+                        isSyncing = false,
+                        lastSyncMessage = "Synchronisation réussie: $routinesCount routines, $tasksCount tâches"
+                    )
+                } else {
+                    val errorMessage = when {
+                        !routinesResult.isSuccess && !tasksResult.isSuccess -> "Erreur de synchronisation des routines et des tâches"
+                        !routinesResult.isSuccess -> "Erreur de synchronisation des routines"
+                        else -> "Erreur de synchronisation des tâches"
+                    }
+                    _uiState.value = _uiState.value.copy(
+                        isSyncing = false,
+                        syncError = errorMessage
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isSyncing = false,
+                    syncError = e.message ?: "Erreur inattendue"
                 )
             }
         }

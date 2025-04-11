@@ -48,12 +48,12 @@ public final class TaskDatabase_Impl extends TaskDatabase {
     final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(5) {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS `tasks` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `dueDateTime` TEXT NOT NULL, `isCompleted` INTEGER NOT NULL, `priority` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `locationRadius` REAL, `reminderEnabled` INTEGER NOT NULL, `categoryId` INTEGER, `category` TEXT, `projectId` INTEGER)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `tasks` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `dueDateTime` TEXT NOT NULL, `isCompleted` INTEGER NOT NULL, `priority` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `locationRadius` REAL, `reminderEnabled` INTEGER NOT NULL, `categoryId` INTEGER, `category` TEXT, `projectId` INTEGER, `calendarEventId` TEXT, `isSyncedWithCalendar` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `routines` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `time` TEXT NOT NULL, `repeatDays` TEXT NOT NULL, `isEnabled` INTEGER NOT NULL, `category` TEXT, `isLocationBased` INTEGER NOT NULL, `latitude` REAL, `longitude` REAL, `locationRadius` REAL, `calendarEventId` TEXT, `isSyncedWithCalendar` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `projects` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `icon` TEXT NOT NULL, `color` INTEGER NOT NULL, `taskCount` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `users` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `email` TEXT NOT NULL, `password` TEXT NOT NULL, `name` TEXT, `profilePictureUrl` TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '44ff9cad7c657255707bed3fb3a7c6c7')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '04581dcdfd1e661a644b8e42dfb8b44c')");
       }
 
       @Override
@@ -105,7 +105,7 @@ public final class TaskDatabase_Impl extends TaskDatabase {
       @NonNull
       public RoomOpenHelper.ValidationResult onValidateSchema(
           @NonNull final SupportSQLiteDatabase db) {
-        final HashMap<String, TableInfo.Column> _columnsTasks = new HashMap<String, TableInfo.Column>(13);
+        final HashMap<String, TableInfo.Column> _columnsTasks = new HashMap<String, TableInfo.Column>(15);
         _columnsTasks.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsTasks.put("title", new TableInfo.Column("title", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsTasks.put("description", new TableInfo.Column("description", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
@@ -119,6 +119,8 @@ public final class TaskDatabase_Impl extends TaskDatabase {
         _columnsTasks.put("categoryId", new TableInfo.Column("categoryId", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsTasks.put("category", new TableInfo.Column("category", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsTasks.put("projectId", new TableInfo.Column("projectId", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsTasks.put("calendarEventId", new TableInfo.Column("calendarEventId", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsTasks.put("isSyncedWithCalendar", new TableInfo.Column("isSyncedWithCalendar", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         final HashSet<TableInfo.ForeignKey> _foreignKeysTasks = new HashSet<TableInfo.ForeignKey>(0);
         final HashSet<TableInfo.Index> _indicesTasks = new HashSet<TableInfo.Index>(0);
         final TableInfo _infoTasks = new TableInfo("tasks", _columnsTasks, _foreignKeysTasks, _indicesTasks);
@@ -184,7 +186,7 @@ public final class TaskDatabase_Impl extends TaskDatabase {
         }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "44ff9cad7c657255707bed3fb3a7c6c7", "48879665b7370c75e94afb5ff645ae17");
+    }, "04581dcdfd1e661a644b8e42dfb8b44c", "8ec96aef757814378ff7e6c5d04357c0");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;

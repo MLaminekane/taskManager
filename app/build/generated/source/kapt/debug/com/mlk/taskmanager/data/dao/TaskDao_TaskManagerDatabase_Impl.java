@@ -57,7 +57,7 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR REPLACE INTO `tasks` (`id`,`title`,`description`,`dueDateTime`,`isCompleted`,`priority`,`latitude`,`longitude`,`locationRadius`,`reminderEnabled`,`categoryId`,`category`,`projectId`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?,?,?,?,?)";
+        return "INSERT OR REPLACE INTO `tasks` (`id`,`title`,`description`,`dueDateTime`,`isCompleted`,`priority`,`latitude`,`longitude`,`locationRadius`,`reminderEnabled`,`categoryId`,`category`,`projectId`,`calendarEventId`,`isSyncedWithCalendar`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
       }
 
       @Override
@@ -115,6 +115,13 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
         } else {
           statement.bindLong(13, entity.getProjectId());
         }
+        if (entity.getCalendarEventId() == null) {
+          statement.bindNull(14);
+        } else {
+          statement.bindString(14, entity.getCalendarEventId());
+        }
+        final int _tmp_3 = entity.isSyncedWithCalendar() ? 1 : 0;
+        statement.bindLong(15, _tmp_3);
       }
     };
     this.__deletionAdapterOfTask = new EntityDeletionOrUpdateAdapter<Task>(__db) {
@@ -134,7 +141,7 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "UPDATE OR ABORT `tasks` SET `id` = ?,`title` = ?,`description` = ?,`dueDateTime` = ?,`isCompleted` = ?,`priority` = ?,`latitude` = ?,`longitude` = ?,`locationRadius` = ?,`reminderEnabled` = ?,`categoryId` = ?,`category` = ?,`projectId` = ? WHERE `id` = ?";
+        return "UPDATE OR ABORT `tasks` SET `id` = ?,`title` = ?,`description` = ?,`dueDateTime` = ?,`isCompleted` = ?,`priority` = ?,`latitude` = ?,`longitude` = ?,`locationRadius` = ?,`reminderEnabled` = ?,`categoryId` = ?,`category` = ?,`projectId` = ?,`calendarEventId` = ?,`isSyncedWithCalendar` = ? WHERE `id` = ?";
       }
 
       @Override
@@ -192,7 +199,14 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
         } else {
           statement.bindLong(13, entity.getProjectId());
         }
-        statement.bindLong(14, entity.getId());
+        if (entity.getCalendarEventId() == null) {
+          statement.bindNull(14);
+        } else {
+          statement.bindString(14, entity.getCalendarEventId());
+        }
+        final int _tmp_3 = entity.isSyncedWithCalendar() ? 1 : 0;
+        statement.bindLong(15, _tmp_3);
+        statement.bindLong(16, entity.getId());
       }
     };
     this.__preparedStmtOfDeleteCompletedTasks = new SharedSQLiteStatement(__db) {
@@ -305,6 +319,8 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
           final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
           final int _cursorIndexOfProjectId = CursorUtil.getColumnIndexOrThrow(_cursor, "projectId");
+          final int _cursorIndexOfCalendarEventId = CursorUtil.getColumnIndexOrThrow(_cursor, "calendarEventId");
+          final int _cursorIndexOfIsSyncedWithCalendar = CursorUtil.getColumnIndexOrThrow(_cursor, "isSyncedWithCalendar");
           final List<Task> _result = new ArrayList<Task>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Task _item;
@@ -376,7 +392,17 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
             } else {
               _tmpProjectId = _cursor.getLong(_cursorIndexOfProjectId);
             }
-            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId);
+            final String _tmpCalendarEventId;
+            if (_cursor.isNull(_cursorIndexOfCalendarEventId)) {
+              _tmpCalendarEventId = null;
+            } else {
+              _tmpCalendarEventId = _cursor.getString(_cursorIndexOfCalendarEventId);
+            }
+            final boolean _tmpIsSyncedWithCalendar;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsSyncedWithCalendar);
+            _tmpIsSyncedWithCalendar = _tmp_3 != 0;
+            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId,_tmpCalendarEventId,_tmpIsSyncedWithCalendar);
             _result.add(_item);
           }
           return _result;
@@ -415,6 +441,8 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
           final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
           final int _cursorIndexOfProjectId = CursorUtil.getColumnIndexOrThrow(_cursor, "projectId");
+          final int _cursorIndexOfCalendarEventId = CursorUtil.getColumnIndexOrThrow(_cursor, "calendarEventId");
+          final int _cursorIndexOfIsSyncedWithCalendar = CursorUtil.getColumnIndexOrThrow(_cursor, "isSyncedWithCalendar");
           final List<Task> _result = new ArrayList<Task>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Task _item;
@@ -486,7 +514,17 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
             } else {
               _tmpProjectId = _cursor.getLong(_cursorIndexOfProjectId);
             }
-            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId);
+            final String _tmpCalendarEventId;
+            if (_cursor.isNull(_cursorIndexOfCalendarEventId)) {
+              _tmpCalendarEventId = null;
+            } else {
+              _tmpCalendarEventId = _cursor.getString(_cursorIndexOfCalendarEventId);
+            }
+            final boolean _tmpIsSyncedWithCalendar;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsSyncedWithCalendar);
+            _tmpIsSyncedWithCalendar = _tmp_3 != 0;
+            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId,_tmpCalendarEventId,_tmpIsSyncedWithCalendar);
             _result.add(_item);
           }
           return _result;
@@ -526,6 +564,8 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
           final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
           final int _cursorIndexOfProjectId = CursorUtil.getColumnIndexOrThrow(_cursor, "projectId");
+          final int _cursorIndexOfCalendarEventId = CursorUtil.getColumnIndexOrThrow(_cursor, "calendarEventId");
+          final int _cursorIndexOfIsSyncedWithCalendar = CursorUtil.getColumnIndexOrThrow(_cursor, "isSyncedWithCalendar");
           final List<Task> _result = new ArrayList<Task>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Task _item;
@@ -597,7 +637,17 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
             } else {
               _tmpProjectId = _cursor.getLong(_cursorIndexOfProjectId);
             }
-            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId);
+            final String _tmpCalendarEventId;
+            if (_cursor.isNull(_cursorIndexOfCalendarEventId)) {
+              _tmpCalendarEventId = null;
+            } else {
+              _tmpCalendarEventId = _cursor.getString(_cursorIndexOfCalendarEventId);
+            }
+            final boolean _tmpIsSyncedWithCalendar;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsSyncedWithCalendar);
+            _tmpIsSyncedWithCalendar = _tmp_3 != 0;
+            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId,_tmpCalendarEventId,_tmpIsSyncedWithCalendar);
             _result.add(_item);
           }
           return _result;
@@ -635,6 +685,8 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
           final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
           final int _cursorIndexOfProjectId = CursorUtil.getColumnIndexOrThrow(_cursor, "projectId");
+          final int _cursorIndexOfCalendarEventId = CursorUtil.getColumnIndexOrThrow(_cursor, "calendarEventId");
+          final int _cursorIndexOfIsSyncedWithCalendar = CursorUtil.getColumnIndexOrThrow(_cursor, "isSyncedWithCalendar");
           final Task _result;
           if (_cursor.moveToFirst()) {
             final long _tmpId;
@@ -705,7 +757,17 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
             } else {
               _tmpProjectId = _cursor.getLong(_cursorIndexOfProjectId);
             }
-            _result = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId);
+            final String _tmpCalendarEventId;
+            if (_cursor.isNull(_cursorIndexOfCalendarEventId)) {
+              _tmpCalendarEventId = null;
+            } else {
+              _tmpCalendarEventId = _cursor.getString(_cursorIndexOfCalendarEventId);
+            }
+            final boolean _tmpIsSyncedWithCalendar;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsSyncedWithCalendar);
+            _tmpIsSyncedWithCalendar = _tmp_3 != 0;
+            _result = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId,_tmpCalendarEventId,_tmpIsSyncedWithCalendar);
           } else {
             _result = null;
           }
@@ -747,6 +809,8 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
           final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
           final int _cursorIndexOfProjectId = CursorUtil.getColumnIndexOrThrow(_cursor, "projectId");
+          final int _cursorIndexOfCalendarEventId = CursorUtil.getColumnIndexOrThrow(_cursor, "calendarEventId");
+          final int _cursorIndexOfIsSyncedWithCalendar = CursorUtil.getColumnIndexOrThrow(_cursor, "isSyncedWithCalendar");
           final List<Task> _result = new ArrayList<Task>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Task _item;
@@ -818,7 +882,17 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
             } else {
               _tmpProjectId = _cursor.getLong(_cursorIndexOfProjectId);
             }
-            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId);
+            final String _tmpCalendarEventId;
+            if (_cursor.isNull(_cursorIndexOfCalendarEventId)) {
+              _tmpCalendarEventId = null;
+            } else {
+              _tmpCalendarEventId = _cursor.getString(_cursorIndexOfCalendarEventId);
+            }
+            final boolean _tmpIsSyncedWithCalendar;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsSyncedWithCalendar);
+            _tmpIsSyncedWithCalendar = _tmp_3 != 0;
+            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId,_tmpCalendarEventId,_tmpIsSyncedWithCalendar);
             _result.add(_item);
           }
           return _result;
@@ -875,6 +949,8 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
           final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
           final int _cursorIndexOfProjectId = CursorUtil.getColumnIndexOrThrow(_cursor, "projectId");
+          final int _cursorIndexOfCalendarEventId = CursorUtil.getColumnIndexOrThrow(_cursor, "calendarEventId");
+          final int _cursorIndexOfIsSyncedWithCalendar = CursorUtil.getColumnIndexOrThrow(_cursor, "isSyncedWithCalendar");
           final List<Task> _result = new ArrayList<Task>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Task _item;
@@ -946,7 +1022,17 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
             } else {
               _tmpProjectId = _cursor.getLong(_cursorIndexOfProjectId);
             }
-            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId);
+            final String _tmpCalendarEventId;
+            if (_cursor.isNull(_cursorIndexOfCalendarEventId)) {
+              _tmpCalendarEventId = null;
+            } else {
+              _tmpCalendarEventId = _cursor.getString(_cursorIndexOfCalendarEventId);
+            }
+            final boolean _tmpIsSyncedWithCalendar;
+            final int _tmp_5;
+            _tmp_5 = _cursor.getInt(_cursorIndexOfIsSyncedWithCalendar);
+            _tmpIsSyncedWithCalendar = _tmp_5 != 0;
+            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId,_tmpCalendarEventId,_tmpIsSyncedWithCalendar);
             _result.add(_item);
           }
           return _result;
@@ -1005,6 +1091,8 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
           final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
           final int _cursorIndexOfProjectId = CursorUtil.getColumnIndexOrThrow(_cursor, "projectId");
+          final int _cursorIndexOfCalendarEventId = CursorUtil.getColumnIndexOrThrow(_cursor, "calendarEventId");
+          final int _cursorIndexOfIsSyncedWithCalendar = CursorUtil.getColumnIndexOrThrow(_cursor, "isSyncedWithCalendar");
           final List<Task> _result = new ArrayList<Task>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Task _item;
@@ -1076,7 +1164,17 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
             } else {
               _tmpProjectId = _cursor.getLong(_cursorIndexOfProjectId);
             }
-            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId);
+            final String _tmpCalendarEventId;
+            if (_cursor.isNull(_cursorIndexOfCalendarEventId)) {
+              _tmpCalendarEventId = null;
+            } else {
+              _tmpCalendarEventId = _cursor.getString(_cursorIndexOfCalendarEventId);
+            }
+            final boolean _tmpIsSyncedWithCalendar;
+            final int _tmp_5;
+            _tmp_5 = _cursor.getInt(_cursorIndexOfIsSyncedWithCalendar);
+            _tmpIsSyncedWithCalendar = _tmp_5 != 0;
+            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId,_tmpCalendarEventId,_tmpIsSyncedWithCalendar);
             _result.add(_item);
           }
           return _result;
@@ -1112,6 +1210,8 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
           final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
           final int _cursorIndexOfProjectId = CursorUtil.getColumnIndexOrThrow(_cursor, "projectId");
+          final int _cursorIndexOfCalendarEventId = CursorUtil.getColumnIndexOrThrow(_cursor, "calendarEventId");
+          final int _cursorIndexOfIsSyncedWithCalendar = CursorUtil.getColumnIndexOrThrow(_cursor, "isSyncedWithCalendar");
           final List<Task> _result = new ArrayList<Task>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Task _item;
@@ -1183,7 +1283,17 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
             } else {
               _tmpProjectId = _cursor.getLong(_cursorIndexOfProjectId);
             }
-            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId);
+            final String _tmpCalendarEventId;
+            if (_cursor.isNull(_cursorIndexOfCalendarEventId)) {
+              _tmpCalendarEventId = null;
+            } else {
+              _tmpCalendarEventId = _cursor.getString(_cursorIndexOfCalendarEventId);
+            }
+            final boolean _tmpIsSyncedWithCalendar;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsSyncedWithCalendar);
+            _tmpIsSyncedWithCalendar = _tmp_3 != 0;
+            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId,_tmpCalendarEventId,_tmpIsSyncedWithCalendar);
             _result.add(_item);
           }
           return _result;
@@ -1220,6 +1330,8 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
           final int _cursorIndexOfCategoryId = CursorUtil.getColumnIndexOrThrow(_cursor, "categoryId");
           final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
           final int _cursorIndexOfProjectId = CursorUtil.getColumnIndexOrThrow(_cursor, "projectId");
+          final int _cursorIndexOfCalendarEventId = CursorUtil.getColumnIndexOrThrow(_cursor, "calendarEventId");
+          final int _cursorIndexOfIsSyncedWithCalendar = CursorUtil.getColumnIndexOrThrow(_cursor, "isSyncedWithCalendar");
           final List<Task> _result = new ArrayList<Task>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Task _item;
@@ -1291,7 +1403,17 @@ public final class TaskDao_TaskManagerDatabase_Impl implements TaskDao {
             } else {
               _tmpProjectId = _cursor.getLong(_cursorIndexOfProjectId);
             }
-            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId);
+            final String _tmpCalendarEventId;
+            if (_cursor.isNull(_cursorIndexOfCalendarEventId)) {
+              _tmpCalendarEventId = null;
+            } else {
+              _tmpCalendarEventId = _cursor.getString(_cursorIndexOfCalendarEventId);
+            }
+            final boolean _tmpIsSyncedWithCalendar;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsSyncedWithCalendar);
+            _tmpIsSyncedWithCalendar = _tmp_3 != 0;
+            _item = new Task(_tmpId,_tmpTitle,_tmpDescription,_tmpDueDateTime,_tmpIsCompleted,_tmpPriority,_tmpLatitude,_tmpLongitude,_tmpLocationRadius,_tmpReminderEnabled,_tmpCategoryId,_tmpCategory,_tmpProjectId,_tmpCalendarEventId,_tmpIsSyncedWithCalendar);
             _result.add(_item);
           }
           return _result;

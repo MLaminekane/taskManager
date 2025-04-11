@@ -18,7 +18,9 @@ import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.CalendarScopes
 import com.mlk.taskmanager.R
 import com.mlk.taskmanager.data.model.Routine
+import com.mlk.taskmanager.data.model.Task
 import com.mlk.taskmanager.data.repository.RoutineRepository
+import com.mlk.taskmanager.data.repository.TaskRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -31,7 +33,8 @@ import javax.inject.Singleton
 @Singleton
 class CalendarSyncService @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val routineRepository: RoutineRepository
+    private val routineRepository: RoutineRepository,
+    private val taskRepository: TaskRepository
 ) {
     private val tag = "CalendarSyncService"
     private var calendarService: Calendar? = null
@@ -288,4 +291,148 @@ class CalendarSyncService @Inject constructor(
             return@withContext Result.failure(e)
         }
     }
-} 
+    
+    // Synchroniser une tâche avec Google Calendar
+    suspend fun syncTaskWithCalendar(task: Task): Result<Task> = withContext(Dispatchers.IO) {
+        try {
+            if (calendarService == null || currentAccount == null) {
+                Log.e(tag, "Calendar service not initialized")
+                return@withContext Result.failure(IllegalStateException("Calendar service not initialized"))
+            }
+            
+            // Si la tâche a déjà un ID d'événement, supprimer cet événement d'abord
+            task.calendarEventId?.let { eventId ->
+                try {
+                    calendarService?.events()?.delete("primary", eventId)?.execute()
+                    Log.d(tag, "Deleted existing calendar event for task: $eventId")
+                } catch (e: IOException) {
+                    Log.e(tag, "Error deleting existing calendar event for task", e)
+                }
+            }
+            
+            // Créer un nouvel événement
+            val event = com.google.api.services.calendar.model.Event()
+                .setSummary(task.title)
+                .setDescription(task.description)
+            
+            // Si la tâche est terminée, la marquer comme telle dans le calendrier
+            if (task.isCompleted) {
+                event.setColorId("9") // Gris pour les tâches terminées
+            } else {
+                // Utiliser la couleur en fonction de la priorité
+                when (task.priority) {
+                    com.mlk.taskmanager.data.model.Priority.HIGH -> event.setColorId("11") // Rouge
+                    com.mlk.taskmanager.data.model.Priority.MEDIUM -> event.setColorId("6") // Orange
+                    com.mlk.taskmanager.data.model.Priority.LOW -> event.setColorId("7") // Jaune
+                }
+            }
+            
+            // Configurer la date et l'heure de la tâche
+            val startDateTime = DateTime(
+                task.dueDateTime
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli()
+            )
+            
+            // Ajouter une heure pour la durée par défaut
+            val endDateTime = DateTime(
+                task.dueDateTime
+                    .plusHours(1)
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli()
+            )
+            
+            // Configuration de début et fin de l'événement
+            val start = com.google.api.services.calendar.model.EventDateTime()
+                .setDateTime(startDateTime)
+                .setTimeZone(ZoneId.systemDefault().id)
+            
+            val end = com.google.api.services.calendar.model.EventDateTime()
+                .setDateTime(endDateTime)
+                .setTimeZone(ZoneId.systemDefault().id)
+            
+            event.setStart(start)
+            event.setEnd(end)
+            
+            // Ajouter la catégorie comme tag
+            task.category?.let { category ->
+                event.setExtendedProperties(
+                    com.google.api.services.calendar.model.Event.ExtendedProperties()
+                        .setPrivate(mapOf("category" to category))
+                )
+            }
+            
+            // Créer l'événement dans Google Calendar
+            val createdEvent = calendarService?.events()?.insert("primary", event)?.execute()
+            
+            if (createdEvent != null && createdEvent.id != null) {
+                Log.d(tag, "Calendar event created for task: ${createdEvent.id}")
+                
+                // Mettre à jour la tâche avec l'ID de l'événement
+                val updatedTask = task.copy(
+                    calendarEventId = createdEvent.id,
+                    isSyncedWithCalendar = true
+                )
+                
+                // Enregistrer la tâche mise à jour
+                taskRepository.updateTask(updatedTask)
+                
+                return@withContext Result.success(updatedTask)
+            } else {
+                Log.e(tag, "Failed to create calendar event for task")
+                return@withContext Result.failure(IOException("Failed to create calendar event"))
+            }
+        } catch (e: Exception) {
+            Log.e(tag, "Error syncing task with calendar", e)
+            return@withContext Result.failure(e)
+        }
+    }
+    
+    // Mettre à jour un événement existant pour une tâche
+    suspend fun updateCalendarEventForTask(task: Task): Result<Task> = withContext(Dispatchers.IO) {
+        // Si la tâche n'a pas d'ID d'événement ou n'est pas synchronisée, créer un nouvel événement
+        if (task.calendarEventId == null || !task.isSyncedWithCalendar) {
+            return@withContext syncTaskWithCalendar(task)
+        }
+        
+        try {
+            // Pour simplifier, nous utilisons la même approche que pour les routines:
+            // Supprimer et recréer l'événement
+            syncTaskWithCalendar(task)
+        } catch (e: Exception) {
+            Log.e(tag, "Error updating calendar event for task", e)
+            return@withContext Result.failure(e)
+        }
+    }
+    
+    // Synchroniser toutes les tâches avec Google Calendar
+    suspend fun syncAllTasks(): Result<Int> = withContext(Dispatchers.IO) {
+        try {
+            if (calendarService == null || currentAccount == null) {
+                Log.e(tag, "Calendar service not initialized")
+                return@withContext Result.failure(IllegalStateException("Calendar service not initialized"))
+            }
+            
+            val tasks = taskRepository.getAllTasksSync()
+            var successCount = 0
+            
+            for (task in tasks) {
+                try {
+                    val result = syncTaskWithCalendar(task)
+                    if (result.isSuccess) {
+                        successCount++
+                    }
+                } catch (e: Exception) {
+                    Log.e(tag, "Error syncing task: ${task.id}", e)
+                }
+            }
+            
+            return@withContext Result.success(successCount)
+        } catch (e: Exception) {
+            Log.e(tag, "Error syncing all tasks", e)
+            return@withContext Result.failure(e)
+        }
+    }
+}

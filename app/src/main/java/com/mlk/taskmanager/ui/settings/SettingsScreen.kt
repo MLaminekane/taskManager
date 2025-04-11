@@ -206,10 +206,24 @@ fun SettingsScreen(
                             )
                             
                             ButtonPreference(
-                                title = "Synchroniser maintenant",
+                                title = "Synchroniser les routines",
                                 description = "Synchroniser toutes vos routines avec Google Calendar",
                                 icon = Icons.Default.Sync,
                                 onClick = { viewModel.syncAllRoutines() }
+                            )
+                            
+                            ButtonPreference(
+                                title = "Synchroniser les tâches",
+                                description = "Synchroniser toutes vos tâches avec Google Calendar",
+                                icon = Icons.Default.Task,
+                                onClick = { viewModel.syncAllTasks() }
+                            )
+                            
+                            ButtonPreference(
+                                title = "Tout synchroniser",
+                                description = "Synchroniser toutes vos routines et tâches avec Google Calendar",
+                                icon = Icons.Default.SyncAlt,
+                                onClick = { viewModel.syncAll() }
                             )
                             
                             ButtonPreference(
@@ -244,6 +258,15 @@ fun SettingsScreen(
                         Text(
                             text = uiState.syncError ?: "",
                             color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
+                    
+                    if (uiState.lastSyncMessage != null) {
+                        Text(
+                            text = uiState.lastSyncMessage ?: "",
+                            color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.padding(vertical = 8.dp)
                         )

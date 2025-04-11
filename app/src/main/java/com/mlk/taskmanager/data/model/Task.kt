@@ -19,9 +19,11 @@ data class Task(
     val reminderEnabled: Boolean = true,
     val categoryId: Long? = null,
     val category: String? = null,
-    val projectId: Long? = null
+    val projectId: Long? = null,
+    val calendarEventId: String? = null, // ID de l'événement dans Google Calendar
+    val isSyncedWithCalendar: Boolean = false // Indicateur si la tâche est synchronisée
 )
 
 enum class Priority {
     LOW, MEDIUM, HIGH
-} 
+}

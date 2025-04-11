@@ -7,6 +7,8 @@ import com.mlk.taskmanager.data.model.Priority
 import com.mlk.taskmanager.data.model.Task
 import com.mlk.taskmanager.data.repository.TaskRepository
 import com.mlk.taskmanager.data.repository.ProjectRepository
+import com.mlk.taskmanager.data.repository.SettingsRepository
+import com.mlk.taskmanager.service.CalendarSyncService
 import com.mlk.taskmanager.service.LocationReminderService
 import com.mlk.taskmanager.service.NotificationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +42,9 @@ class TasksViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val projectRepository: ProjectRepository,
     private val locationReminderService: LocationReminderService,
-    private val notificationManager: NotificationManager
+    private val notificationManager: NotificationManager,
+    private val calendarSyncService: CalendarSyncService,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(TasksUiState(isLoading = true))
@@ -215,6 +219,9 @@ class TasksViewModel @Inject constructor(
                     projectRepository.incrementTaskCount(it) 
                 }
                 
+                // Synchroniser avec Google Calendar si activé
+                tryCalendarSync(task.copy(id = taskId))
+                
                 loadTasks()
             } catch (e: Exception) {
                 Log.e("TasksViewModel", "Error adding task: ${e.message}", e)
@@ -248,6 +255,9 @@ class TasksViewModel @Inject constructor(
                     }
                 }
                 
+                // Synchroniser avec Google Calendar si activé
+                tryCalendarSync(updatedTask)
+                
                 loadTasks()
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.message) }
@@ -258,6 +268,11 @@ class TasksViewModel @Inject constructor(
     fun deleteTask(task: Task) {
         viewModelScope.launch {
             try {
+                // Si la tâche est synchronisée avec Google Calendar, supprimer l'événement
+                if (task.calendarEventId != null && task.isSyncedWithCalendar) {
+                    tryDeleteCalendarEvent(task)
+                }
+                
                 taskRepository.deleteTask(task)
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.message) }
@@ -265,11 +280,51 @@ class TasksViewModel @Inject constructor(
         }
     }
     
+    /**
+     * Essaie de synchroniser une tâche avec Google Calendar si la synchronisation est activée
+     * et si l'utilisateur est connecté à Google.
+     */
+    private suspend fun tryCalendarSync(task: Task) {
+        try {
+            // Vérifier si la synchronisation est activée
+            val isCalendarSyncEnabled = settingsRepository.isCalendarSyncEnabled().first()
+            val isGoogleSignedIn = calendarSyncService.isSignedIn()
+            
+            if (isCalendarSyncEnabled && isGoogleSignedIn) {
+                Log.d("TasksViewModel", "Synchronizing task ${task.id} with Google Calendar")
+                calendarSyncService.syncTaskWithCalendar(task)
+            } else {
+                Log.d("TasksViewModel", "Calendar sync skipped - enabled: $isCalendarSyncEnabled, signed in: $isGoogleSignedIn")
+            }
+        } catch (e: Exception) {
+            Log.e("TasksViewModel", "Error synchronizing task with calendar: ${e.message}", e)
+            // Ne pas propager l'erreur pour ne pas perturber l'opération principale
+        }
+    }
+    
+    /**
+     * Essaie de supprimer un événement dans Google Calendar pour une tâche supprimée
+     */
+    private suspend fun tryDeleteCalendarEvent(task: Task) {
+        try {
+            val isGoogleSignedIn = calendarSyncService.isSignedIn()
+            
+            if (isGoogleSignedIn && task.calendarEventId != null) {
+                Log.d("TasksViewModel", "Deleting calendar event for task ${task.id}")
+                // On peut simplement passer par la synchronisation qui gérera la suppression
+                // car la tâche sera supprimée juste après
+                val modifiedTask = task.copy(calendarEventId = null, isSyncedWithCalendar = false)
+                calendarSyncService.syncTaskWithCalendar(modifiedTask)
+            }
+        } catch (e: Exception) {
+            Log.e("TasksViewModel", "Error deleting calendar event: ${e.message}", e)
+            // Ne pas propager l'erreur pour ne pas perturber l'opération principale
+        }
+    }
+    
     fun clearError() {
         _uiState.update { it.copy(error = null) }
     }
-
-
     
     // Méthode pour rafraîchir l'interface après un court délai
     fun delayedRefresh() {

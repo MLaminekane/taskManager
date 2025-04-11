@@ -26,6 +26,11 @@ import androidx.navigation.NavController
 import com.mlk.taskmanager.data.model.Priority
 import com.mlk.taskmanager.data.model.Task
 import com.mlk.taskmanager.ui.navigation.Screen
+import com.mlk.taskmanager.ui.theme.Background
+import com.mlk.taskmanager.ui.theme.TextColor
+import com.mlk.taskmanager.ui.theme.PrimaryColor
+import com.mlk.taskmanager.ui.theme.SecondaryColor
+import com.mlk.taskmanager.ui.theme.AccentColor
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 import androidx.compose.foundation.BorderStroke
@@ -60,7 +65,7 @@ fun TasksScreen(
         topBar = {
             Column(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(Background)
                     .padding(top = 12.dp)
             ) {
                 // Afficher la barre de recherche si la recherche est active
@@ -86,7 +91,8 @@ fun TasksScreen(
                             text = "My Tasks",
                             style = MaterialTheme.typography.headlineMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                letterSpacing = (-0.5).sp
+                                letterSpacing = (-0.5).sp,
+                                color = TextColor
                             )
                         )
                         
@@ -96,12 +102,12 @@ fun TasksScreen(
                                 modifier = Modifier
                                     .size(48.dp)
                                     .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                                    .background(Background.copy(alpha = 0.5f))
                             ) {
                                 Icon(
                                     Icons.Default.Search, 
                                     contentDescription = "Search",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    tint = TextColor
                                 )
                             }
                             
@@ -112,12 +118,12 @@ fun TasksScreen(
                                 modifier = Modifier
                                     .size(48.dp)
                                     .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                                    .background(Background.copy(alpha = 0.5f))
                             ) {
                                 Icon(
                                     Icons.Default.FilterList, 
                                     contentDescription = "Filter",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    tint = TextColor
                                 )
                             }
                         }
@@ -148,9 +154,9 @@ fun TasksScreen(
                                         .animateContentSize(),
                                     colors = CardDefaults.cardColors(
                                         containerColor = if (isSelected)
-                                            MaterialTheme.colorScheme.primary
+                                            PrimaryColor
                                         else
-                                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+                                            Background.copy(alpha = 0.7f)
                                     ),
                                     shape = RoundedCornerShape(20.dp),
                                     elevation = CardDefaults.cardElevation(
@@ -166,12 +172,12 @@ fun TasksScreen(
                                         Text(
                                             text = filter,
                                             style = MaterialTheme.typography.labelLarge.copy(
-                                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                                color = if (isSelected)
+                                                    Color.White
+                                                else
+                                                    TextColor
                                             ),
-                                            color = if (isSelected)
-                                                MaterialTheme.colorScheme.onPrimary
-                                            else
-                                                MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
                                 }
@@ -184,8 +190,8 @@ fun TasksScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate(Screen.AddTask.route) },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = PrimaryColor,
+                contentColor = Color.White,
                 modifier = Modifier
                     .padding(16.dp)
                     .size(56.dp),
@@ -204,12 +210,12 @@ fun TasksScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
+                .background(Background.copy(alpha = 0.95f))
         ) {
             if (uiState.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
-                    color = MaterialTheme.colorScheme.primary,
+                    color = PrimaryColor,
                     strokeWidth = 3.dp
                 )
             } else if (uiState.filteredTasks.isEmpty()) {
@@ -286,14 +292,14 @@ private fun TaskItem(
     modifier: Modifier = Modifier
 ) {
     val cardColor = if (task.isCompleted) 
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        Background.copy(alpha = 0.5f)
     else 
-        MaterialTheme.colorScheme.surface
+        Background
     
     val priorityColor = when (task.priority) {
-        Priority.HIGH -> Color(0xFFFF4C60)
-        Priority.MEDIUM -> Color(0xFF4B7BE5)
-        Priority.LOW -> Color(0xFF4CAF50)
+        Priority.HIGH -> AccentColor
+        Priority.MEDIUM -> SecondaryColor
+        Priority.LOW -> PrimaryColor
     }
     
     Card(
@@ -336,7 +342,7 @@ private fun TaskItem(
                     text = task.title,
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.SemiBold,
-                        color = if (task.isCompleted) Color.Gray else Color.Unspecified,
+                        color = if (task.isCompleted) Color.Gray else TextColor,
                         textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None
                     ),
                     maxLines = 1,
@@ -352,7 +358,7 @@ private fun TaskItem(
                         color = if (task.isCompleted) 
                             Color.Gray 
                         else 
-                            MaterialTheme.colorScheme.onSurfaceVariant,
+                            TextColor,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -373,14 +379,14 @@ private fun TaskItem(
                                 if (task.isCompleted) 
                                     Color.Gray.copy(alpha = 0.1f)
                                 else 
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                                    PrimaryColor.copy(alpha = 0.1f)
                             )
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Schedule,
                             contentDescription = null,
-                            tint = if (task.isCompleted) Color.Gray else MaterialTheme.colorScheme.primary,
+                            tint = if (task.isCompleted) Color.Gray else PrimaryColor,
                             modifier = Modifier.size(14.dp)
                         )
                         
@@ -391,7 +397,7 @@ private fun TaskItem(
                                 DateTimeFormatter.ofPattern("MMM dd, HH:mm")
                             ),
                             style = MaterialTheme.typography.bodySmall,
-                            color = if (task.isCompleted) Color.Gray else MaterialTheme.colorScheme.primary
+                            color = if (task.isCompleted) Color.Gray else PrimaryColor
                         )
                     }
                     
@@ -405,14 +411,14 @@ private fun TaskItem(
                                     if (task.isCompleted) 
                                         Color.Gray.copy(alpha = 0.1f)
                                     else 
-                                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+                                        SecondaryColor.copy(alpha = 0.1f)
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.LocationOn,
                                 contentDescription = null,
-                                tint = if (task.isCompleted) Color.Gray else MaterialTheme.colorScheme.secondary,
+                                tint = if (task.isCompleted) Color.Gray else SecondaryColor,
                                 modifier = Modifier.size(14.dp)
                             )
                         }
@@ -428,14 +434,14 @@ private fun TaskItem(
                                     if (task.isCompleted) 
                                         Color.Gray.copy(alpha = 0.1f)
                                     else 
-                                        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f)
+                                        AccentColor.copy(alpha = 0.1f)
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.Folder,
                                 contentDescription = null,
-                                tint = if (task.isCompleted) Color.Gray else MaterialTheme.colorScheme.tertiary,
+                                tint = if (task.isCompleted) Color.Gray else AccentColor,
                                 modifier = Modifier.size(14.dp)
                             )
                         }
@@ -447,8 +453,9 @@ private fun TaskItem(
                 checked = task.isCompleted,
                 onCheckedChange = { onCheckedChange() },
                 colors = CheckboxDefaults.colors(
-                    checkedColor = if (task.isCompleted) Color.Gray else MaterialTheme.colorScheme.primary,
-                    uncheckedColor = MaterialTheme.colorScheme.outline
+                    checkedColor = if (task.isCompleted) Color.Gray else PrimaryColor,
+                    uncheckedColor = TextColor,
+                    checkmarkColor = Background
                 ),
                 modifier = Modifier
                     .size(24.dp)
@@ -471,14 +478,14 @@ private fun EmptyTasksMessage(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+                .background(PrimaryColor.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Outlined.Assignment,
                 contentDescription = null,
                 modifier = Modifier.size(48.dp),
-                tint = MaterialTheme.colorScheme.primary
+                tint = PrimaryColor
             )
         }
         
@@ -487,7 +494,8 @@ private fun EmptyTasksMessage(modifier: Modifier = Modifier) {
         Text(
             text = "No tasks yet",
             style = MaterialTheme.typography.headlineSmall.copy(
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = TextColor
             )
         )
         
@@ -496,7 +504,7 @@ private fun EmptyTasksMessage(modifier: Modifier = Modifier) {
         Text(
             text = "Create your first task by tapping the + button",
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = TextColor,
             textAlign = TextAlign.Center
         )
     }
@@ -516,14 +524,14 @@ private fun ErrorSnackbar(
             TextButton(
                 onClick = onDismiss,
                 colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.colorScheme.inversePrimary
+                    contentColor = AccentColor
                 )
             ) {
                 Text("DISMISS")
             }
         },
-        containerColor = MaterialTheme.colorScheme.errorContainer,
-        contentColor = MaterialTheme.colorScheme.onErrorContainer
+        containerColor = AccentColor.copy(alpha = 0.1f),
+        contentColor = AccentColor
     ) {
         Text(message)
     }
@@ -545,7 +553,7 @@ fun SearchBar(
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
+                tint = PrimaryColor
             )
         },
         trailingIcon = {
@@ -560,8 +568,8 @@ fun SearchBar(
         colors = OutlinedTextFieldDefaults.colors(
             unfocusedBorderColor = Color.Transparent,
             focusedBorderColor = Color.Transparent,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
+            unfocusedContainerColor = Background,
+            focusedContainerColor = Background
         ),
         shape = RoundedCornerShape(16.dp)
     )
@@ -591,7 +599,8 @@ fun FilterDialog(
                 Text(
                     text = "Priority",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = TextColor
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -608,16 +617,16 @@ fun FilterDialog(
                             modifier = Modifier.weight(1f),
                             colors = CardDefaults.outlinedCardColors(
                                 containerColor = if (selectedPriorities.contains(priority)) 
-                                    MaterialTheme.colorScheme.primaryContainer 
+                                    PrimaryColor.copy(alpha = 0.1f) 
                                 else 
-                                    MaterialTheme.colorScheme.surface
+                                    Background
                             ),
                             border = BorderStroke(
                                 width = 1.dp,
                                 color = if (selectedPriorities.contains(priority))
-                                    MaterialTheme.colorScheme.primary
+                                    PrimaryColor
                                 else
-                                    MaterialTheme.colorScheme.outline
+                                    Background
                             ),
                             onClick = { onTogglePriority(priority) }
                         ) {
@@ -640,7 +649,8 @@ fun FilterDialog(
                 ) {
                     Text(
                         text = "Show completed tasks",
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        color = TextColor
                     )
                     Switch(
                         checked = showCompletedTasks,
@@ -652,7 +662,8 @@ fun FilterDialog(
                 Text(
                     text = "Sort by",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = TextColor
                 )
                 
                 Column(

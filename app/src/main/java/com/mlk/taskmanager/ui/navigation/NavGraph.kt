@@ -29,6 +29,7 @@ sealed class Screen(val route: String) {
     object AddTask : Screen("add_task")
     object AddRoutine : Screen("add_routine")
     object Routines : Screen("routines")
+    object Projects : Screen("projects")
     object TaskDetail : Screen("task_detail/{taskId}") {
         fun createRoute(taskId: Long) = "task_detail/$taskId"
     }

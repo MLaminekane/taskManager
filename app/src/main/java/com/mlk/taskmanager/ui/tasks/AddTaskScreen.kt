@@ -52,6 +52,11 @@ import java.time.format.DateTimeFormatter
 import androidx.compose.foundation.BorderStroke
 import com.mlk.taskmanager.ui.home.HomeViewModel
 import com.mlk.taskmanager.util.PlacesUtil
+import com.mlk.taskmanager.ui.theme.Background
+import com.mlk.taskmanager.ui.theme.TextColor
+import com.mlk.taskmanager.ui.theme.PrimaryColor
+import com.mlk.taskmanager.ui.theme.SecondaryColor
+import com.mlk.taskmanager.ui.theme.AccentColor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
@@ -80,15 +85,20 @@ fun TaskTitleField(
                 fontWeight = FontWeight.Bold
             ),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = Color.LightGray,
-                focusedBorderColor = Color(0xFF613BE7)
+                unfocusedBorderColor = TextColor.copy(alpha = 0.3f),
+                focusedBorderColor = PrimaryColor,
+                cursorColor = PrimaryColor,
+                focusedTextColor = TextColor,
+                unfocusedTextColor = TextColor,
+                focusedLabelColor = PrimaryColor,
+                unfocusedLabelColor = TextColor.copy(alpha = 0.7f)
             ),
             shape = RoundedCornerShape(16.dp)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
             text = "$progress/$total",
-            color = Color(0xFF613BE7),
+            color = PrimaryColor,
             style = MaterialTheme.typography.titleMedium
         )
     }
@@ -103,7 +113,8 @@ fun TaskDescriptionField(
         Text(
             text = "Task description",
             style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                color = TextColor
             )
         )
         OutlinedTextField(
@@ -115,7 +126,10 @@ fun TaskDescriptionField(
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedBorderColor = Color.LightGray,
-                focusedBorderColor = Color(0xFF613BE7)
+                focusedBorderColor = PrimaryColor,
+                focusedTextColor = TextColor,
+                unfocusedTextColor = TextColor,
+                cursorColor = PrimaryColor
             )
         )
     }
@@ -132,7 +146,8 @@ fun DateTimeSelector(
         Text(
             text = "Date and time",
             style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                color = TextColor
             )
         )
         Row(
@@ -144,6 +159,7 @@ fun DateTimeSelector(
                 value = selectedDate.format(DateTimeFormatter.ofPattern("dd MMM yyyy")),
                 onValueChange = { },
                 modifier = Modifier.weight(1f),
+
                 shape = RoundedCornerShape(16.dp),
                 readOnly = true,
                 trailingIcon = {
@@ -151,18 +167,20 @@ fun DateTimeSelector(
                         Icon(
                             Icons.Default.CalendarToday,
                             contentDescription = "Select date",
-                            tint = Color.Gray
+                            tint = SecondaryColor
                         )
                     }
                 },
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color.LightGray,
-                    focusedBorderColor = Color(0xFF613BE7)
+                    unfocusedBorderColor = TextColor.copy(alpha = 0.3f),
+                    focusedBorderColor = PrimaryColor,
+                    unfocusedTextColor = TextColor,
+                    focusedTextColor = TextColor
                 )
             )
-            
+
             Spacer(modifier = Modifier.width(16.dp))
-            
+
             // Time Field
             OutlinedTextField(
                 value = selectedTime.format(DateTimeFormatter.ofPattern("HH:mm")),
@@ -175,14 +193,16 @@ fun DateTimeSelector(
                         Icon(
                             Icons.Default.Schedule,
                             contentDescription = "Select time",
-                            tint = Color.Gray
+                            tint = SecondaryColor
                         )
                     }
                 },
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color.LightGray,
-                    focusedBorderColor = Color(0xFF613BE7)
-                )
+             colors = OutlinedTextFieldDefaults.colors(
+                 unfocusedBorderColor = TextColor.copy(alpha = 0.3f),
+                 focusedBorderColor = PrimaryColor,
+                 focusedTextColor = TextColor,
+                 unfocusedTextColor = TextColor
+             )
             )
         }
     }
@@ -195,7 +215,11 @@ fun PrioritySelector(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = Background),
+        border = BorderStroke(
+            width = 2.dp,
+            color = TextColor.copy(alpha = 0.3f)
+        ),
     ) {
         Column(
             modifier = Modifier
@@ -205,12 +229,13 @@ fun PrioritySelector(
             Text(
                 text = "Priority",
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
+                color = Color.White
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
+
             ) {
                 Priority.values().forEach { priorityOption ->
                     FilterChip(
@@ -219,14 +244,26 @@ fun PrioritySelector(
                         label = { Text(priorityOption.name) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = when(priorityOption) {
-                                Priority.HIGH -> Color.Red.copy(alpha = 0.1f)
-                                Priority.MEDIUM -> Color(0xFF613BE7).copy(alpha = 0.1f)
-                                Priority.LOW -> Color.Green.copy(alpha = 0.1f)
+                                Priority.HIGH -> AccentColor.copy(alpha = 0.1f)
+                                Priority.MEDIUM -> SecondaryColor.copy(alpha = 0.1f)
+                                Priority.LOW -> PrimaryColor.copy(alpha = 0.1f)
                             },
                             selectedLabelColor = when(priorityOption) {
-                                Priority.HIGH -> Color.Red
-                                Priority.MEDIUM -> Color(0xFF613BE7)
-                                Priority.LOW -> Color.Green
+                                Priority.HIGH -> AccentColor
+                                Priority.MEDIUM -> SecondaryColor
+                                Priority.LOW -> PrimaryColor
+                            }
+                        ),
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = if (selectedPriority == priorityOption) {
+                                when(priorityOption) {
+                                    Priority.HIGH -> AccentColor
+                                    Priority.MEDIUM -> SecondaryColor
+                                    Priority.LOW -> PrimaryColor
+                                }
+                            } else {
+                                Color.Transparent
                             }
                         ),
                         modifier = Modifier.weight(1f)
@@ -245,18 +282,22 @@ fun CategorySelector(
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = "Category",
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            color = TextColor
         )
         OutlinedCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onCategoryClick),
+            colors = CardDefaults.outlinedCardColors(
+                containerColor = Color(0xFF121212)
+            ),
             border = BorderStroke(
                 width = 1.dp,
-                color = if (selectedCategory != null) 
-                    MaterialTheme.colorScheme.primary 
-                else 
-                    MaterialTheme.colorScheme.outline
+                color = if (selectedCategory != null)
+                    PrimaryColor
+                else
+                    TextColor.copy(alpha = 0.3f)
             )
         ) {
             Row(
@@ -265,17 +306,19 @@ fun CategorySelector(
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
+
             ) {
                 Text(
                     text = selectedCategory ?: "Select Category",
-                    color = if (selectedCategory != null) 
-                        MaterialTheme.colorScheme.onSurface 
-                    else 
-                        MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (selectedCategory != null)
+                        PrimaryColor
+                    else
+                        TextColor
                 )
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = "Select Category"
+                    contentDescription = "Select Category",
+                    tint = TextColor.copy(alpha = 0.7f)
                 )
             }
         }
@@ -290,24 +333,22 @@ fun ProjectSelector(
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = "Project",
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.White
         )
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onProjectClick),
             colors = CardDefaults.cardColors(
-                containerColor = if (selectedProject != null) 
-                    Color(0xFFF8F7FC) 
-                else 
-                    Color.White
+                containerColor = Color.Black
             ),
             border = BorderStroke(
                 width = 1.dp,
-                color = if (selectedProject != null) 
-                    Color(0xFF613BE7) 
-                else 
-                    Color.LightGray
+                color = if (selectedProject != null)
+                    PrimaryColor
+                else
+                    TextColor.copy(alpha = 0.3f)
             ),
             shape = RoundedCornerShape(12.dp)
         ) {
@@ -322,7 +363,6 @@ fun ProjectSelector(
                         modifier = Modifier
                             .size(32.dp)
                             .clip(CircleShape)
-                            .background(Color(selectedProject.color))
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
@@ -330,33 +370,35 @@ fun ProjectSelector(
                             text = selectedProject.name,
                             style = MaterialTheme.typography.bodyLarge.copy(
                                 fontWeight = FontWeight.SemiBold
-                            )
+                            ),
+                            color = Color.White
                         )
                         Text(
                             text = selectedProject.description,
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray
+                            color = Color.White.copy(alpha = 0.7f)
                         )
                     }
                 }
-            } else {
+            }  else {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(16.dp)
+                        .background(Color.Black, shape = RoundedCornerShape(8.dp)),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
-                ) {
+                )  {
                     Text(
-                        text = "Assign to a project",
+                        text = "Select project",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray
+                        color = Color.White
                     )
-                    
+
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = "Select Project",
-                        tint = Color.Gray
+                        tint = TextColor
                     )
                 }
             }
@@ -379,7 +421,7 @@ fun CreateTaskButton(onClick: () -> Unit) {
                 .height(56.dp),
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF613BE7)
+                containerColor = PrimaryColor
             )
         ) {
             Text(
@@ -405,27 +447,32 @@ fun LocationSearchField(
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp)),
         placeholder = { Text("Rechercher une adresse...") },
-        leadingIcon = { 
+        leadingIcon = {
             Icon(
-                imageVector = Icons.Default.Search, 
+                imageVector = Icons.Default.Search,
                 contentDescription = "Search",
-                tint = Color(0xFF613BE7)
+                tint = PrimaryColor
             )
         },
         trailingIcon = {
             if (query.isNotEmpty()) {
                 IconButton(onClick = { onQueryChange("") }) {
                     Icon(
-                        imageVector = Icons.Default.Clear, 
-                        contentDescription = "Clear"
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = "Clear",
+                        tint = TextColor.copy(alpha = 0.7f)
                     )
                 }
             }
         },
         colors = OutlinedTextFieldDefaults.colors(
-            unfocusedBorderColor = Color.LightGray,
-            focusedBorderColor = Color(0xFF613BE7),
-            cursorColor = Color(0xFF613BE7)
+            unfocusedBorderColor = TextColor.copy(alpha = 0.3f),
+            focusedBorderColor = PrimaryColor,
+            cursorColor = PrimaryColor,
+            focusedTextColor = TextColor,
+            unfocusedTextColor = TextColor,
+            focusedPlaceholderColor = TextColor.copy(alpha = 0.5f),
+            unfocusedPlaceholderColor = TextColor.copy(alpha = 0.5f)
         ),
         singleLine = true
     )
@@ -440,7 +487,7 @@ fun LocationSearchResults(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(max = 200.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = Background),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         LazyColumn {
@@ -456,7 +503,7 @@ fun LocationSearchResults(
                         Icon(
                             imageVector = Icons.Default.LocationOn,
                             contentDescription = null,
-                            tint = Color.Gray,
+                            tint = SecondaryColor,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(12.dp))
@@ -465,20 +512,21 @@ fun LocationSearchResults(
                                 text = result.mainText,
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     fontWeight = FontWeight.Medium
-                                )
+                                ),
+                                color = TextColor
                             )
                             Text(
                                 text = result.secondaryText,
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color.Gray
+                                color = TextColor.copy(alpha = 0.7f)
                             )
                         }
                     }
-                    
+
                     if (results.last() != result) {
                         HorizontalDivider(
                             modifier = Modifier.padding(horizontal = 16.dp),
-                            color = Color.LightGray.copy(alpha = 0.5f)
+                            color = TextColor.copy(alpha = 0.2f)
                         )
                     }
                 }
@@ -499,7 +547,7 @@ fun LocationSearchSection(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF121212)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -524,7 +572,8 @@ fun LocationSearchSection(
                     Text(
                         text = "Location Reminder",
                         style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            color = TextColor
                         )
                     )
                 }
@@ -532,21 +581,21 @@ fun LocationSearchSection(
                     checked = useLocation,
                     onCheckedChange = onToggleLocation,
                     colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color(0xFF613BE7),
-                        checkedTrackColor = Color(0xFF613BE7).copy(alpha = 0.5f)
+                        checkedThumbColor = PrimaryColor,
+                        checkedTrackColor = PrimaryColor.copy(alpha = 0.1f)
                     )
                 )
             }
 
             if (useLocation) {
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 // Champ de recherche
                 LocationSearchField(
                     query = searchQuery,
                     onQueryChange = onSearchQueryChange
                 )
-                
+
                 // Affichage des résultats de recherche
                 if (searchResults.isNotEmpty()) {
                     LocationSearchResults(
@@ -554,7 +603,7 @@ fun LocationSearchSection(
                         onResultClick = onResultClick
                     )
                 }
-                
+
                 // Indicateur de chargement
                 if (isSearching) {
                     Box(
@@ -565,7 +614,7 @@ fun LocationSearchSection(
                     ) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
-                            color = Color(0xFF613BE7),
+                            color = PrimaryColor,
                             strokeWidth = 2.dp
                         )
                     }
@@ -585,11 +634,11 @@ fun MapView(
             .fillMaxWidth()
             .height(250.dp)
             .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp))
+            .border(1.dp, TextColor.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
     ) {
         val cameraPositionState = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(
-                selectedLocation ?: PlacesUtil.DEFAULT_LOCATION, 
+                selectedLocation ?: PlacesUtil.DEFAULT_LOCATION,
                 15f
             )
         }
@@ -677,7 +726,7 @@ fun AddTaskScreen(
     val fusedLocationClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
     }
-    
+
     // Initialisation de l'API Places
     LaunchedEffect(Unit) {
         try {
@@ -710,7 +759,7 @@ fun AddTaskScreen(
     fun handlePlaceSearch(query: String) {
         searchQuery = query
         searchJob?.cancel()
-                                 
+
         if (query.length >= 3) {
             isSearching = true
             searchJob = scope.launch {
@@ -721,10 +770,10 @@ fun AddTaskScreen(
                     } catch (e: Exception) {
                         Log.e("AddTaskScreen", "Échec de réinitialisation Places: ${e.message}")
                     }
-                    
+
                     Log.d("AddTaskScreen", "Recherche lancée pour: $query")
                     val results = PlacesUtil.searchPlaces(query, context)
-                    
+
                     if (results.isNotEmpty()) {
                         Log.d("AddTaskScreen", "Résultats trouvés: ${results.size}")
                         searchResults = results
@@ -807,16 +856,16 @@ fun AddTaskScreen(
                                 )
                             )
                         }
-                        
+
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = Color.Black
+                    containerColor = Background,
+                    titleContentColor = TextColor
                 )
             )
         },
-        containerColor = Color.White
+        containerColor = Background
     ) { padding ->
         Column(
             modifier = Modifier
@@ -824,7 +873,8 @@ fun AddTaskScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+
         ) {
             // Titre et progression
             TaskTitleField(
@@ -869,7 +919,7 @@ fun AddTaskScreen(
             // Localisation (déjà optimisé)
             if (useLocation) {
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 LocationSearchSection(
                     useLocation = useLocation,
                     searchQuery = searchQuery,
@@ -879,9 +929,9 @@ fun AddTaskScreen(
                     onResultClick = { result -> handlePlaceSelection(result) },
                     onToggleLocation = { enabled -> handleLocationToggle(enabled) }
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 // Carte
                 MapView(
                     selectedLocation = selectedLocation,
@@ -890,7 +940,7 @@ fun AddTaskScreen(
                         searchQuery = "Position sélectionnée (${latLng.latitude.format(2)}, ${latLng.longitude.format(2)})"
                     }
                 )
-                
+
                 // Rayon de localisation
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -904,8 +954,8 @@ fun AddTaskScreen(
                     steps = 19,
                     modifier = Modifier.fillMaxWidth(),
                     colors = SliderDefaults.colors(
-                        thumbColor = Color(0xFF613BE7),
-                        activeTrackColor = Color(0xFF613BE7)
+                        thumbColor = PrimaryColor,
+                        activeTrackColor = PrimaryColor.copy(alpha = 0.2f)
                     )
                 )
             } else {
@@ -915,7 +965,11 @@ fun AddTaskScreen(
                         .fillMaxWidth()
                         .clickable { handleLocationToggle(true) },
                     colors = CardDefaults.outlinedCardColors(
-                        containerColor = Color(0xFFF8F7FC)
+                        containerColor = Color(0xFF121212)
+                    ),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        color = TextColor.copy(alpha = 0.3f)
                     )
                 ) {
                     Row(
@@ -927,7 +981,7 @@ fun AddTaskScreen(
                         Icon(
                             imageVector = Icons.Default.LocationOn,
                             contentDescription = null,
-                            tint = Color(0xFF613BE7)
+                            tint = PrimaryColor
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
@@ -935,12 +989,13 @@ fun AddTaskScreen(
                                 text = "Add Location Reminder",
                                 style = MaterialTheme.typography.bodyLarge.copy(
                                     fontWeight = FontWeight.SemiBold
-                                )
+                                ),
+                                color = TextColor
                             )
                             Text(
                                 text = "Get notified when you are near this location",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color.Gray
+                                color = TextColor.copy(alpha = 0.7f)
                             )
                         }
                     }
@@ -975,6 +1030,9 @@ fun AddTaskScreen(
     if (showGroupDialog) {
         AlertDialog(
             onDismissRequest = { showGroupDialog = false },
+            containerColor = Color(0xFF121212),
+            titleContentColor = TextColor,
+            textContentColor = TextColor,
             title = { Text("Select Task Group") },
             text = {
                 Column {
@@ -997,14 +1055,14 @@ fun AddTaskScreen(
                                 }
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(group)
+                            Text(group, color = TextColor)
                         }
                     }
                 }
             },
             confirmButton = {
                 TextButton(onClick = { showGroupDialog = false }) {
-                    Text("Cancel")
+                    Text("Cancel", color = PrimaryColor)
                 }
             }
         )
@@ -1012,10 +1070,13 @@ fun AddTaskScreen(
 
     if (showAddUserDialog) {
         AlertDialog(
-            onDismissRequest = { 
+            onDismissRequest = {
                 showAddUserDialog = false
                 newUserName = ""
             },
+            containerColor = Color(0xFF121212),
+            titleContentColor = TextColor,
+            textContentColor = TextColor,
             title = { Text("Add User") },
             text = {
                 Column(
@@ -1047,15 +1108,15 @@ fun AddTaskScreen(
                         }
                     }
                 ) {
-                    Text("Add", color = Color(0xFF613BE7))
+                    Text("Add", color = PrimaryColor)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { 
+                TextButton(onClick = {
                     showAddUserDialog = false
                     newUserName = ""
                 }) {
-                    Text("Cancel")
+                    Text("Cancel", color = PrimaryColor)
                 }
             }
         )
@@ -1064,6 +1125,9 @@ fun AddTaskScreen(
     if (showProjectDialog) {
         AlertDialog(
             onDismissRequest = { showProjectDialog = false },
+            containerColor = Color(0xFF121212),
+            titleContentColor = TextColor,
+            textContentColor = TextColor,
             title = { Text("Select Project") },
             text = {
                 LazyColumn {
@@ -1082,7 +1146,7 @@ fun AddTaskScreen(
                                 modifier = Modifier
                                     .size(32.dp)
                                     .clip(CircleShape)
-                                    .background(Color(project.color))
+                                    .background(TextColor.copy(alpha = 0.1f))
                                     .padding(6.dp)
                             )
                             Spacer(modifier = Modifier.width(12.dp))
@@ -1096,7 +1160,7 @@ fun AddTaskScreen(
                                 Text(
                                     text = project.description,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.Gray
+                                    color = TextColor.copy(alpha = 0.7f)
                                 )
                             }
                         }
@@ -1104,10 +1168,10 @@ fun AddTaskScreen(
                 }
             },
             confirmButton = {
-                Button(
+                TextButton(
                     onClick = { showProjectDialog = false }
                 ) {
-                    Text("Close")
+                    Text("Close", color = PrimaryColor)
                 }
             }
         )
@@ -1135,6 +1199,9 @@ fun AddTaskScreen(
     if (showCategoryDialog) {
         AlertDialog(
             onDismissRequest = { showCategoryDialog = false },
+            containerColor = Color(0xFF121212),
+            titleContentColor = TextColor,
+            textContentColor = TextColor,
             title = { Text("Select Category") },
             text = {
                 LazyColumn {
@@ -1150,12 +1217,12 @@ fun AddTaskScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(category)
+                            Text(category, color = TextColor)
                             if (category == selectedCategory) {
                                 Icon(
                                     imageVector = Icons.Default.Check,
                                     contentDescription = "Selected",
-                                    tint = MaterialTheme.colorScheme.primary
+                                    tint = PrimaryColor
                                 )
                             }
                         }
@@ -1164,7 +1231,7 @@ fun AddTaskScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showCategoryDialog = false }) {
-                    Text("Cancel")
+                    Text("Cancel", color = PrimaryColor)
                 }
             }
         )

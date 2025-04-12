@@ -4,6 +4,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import com.mlk.taskmanager.ui.theme.Background
+import com.mlk.taskmanager.ui.theme.TextColor
+import com.mlk.taskmanager.ui.theme.PrimaryColor
+import com.mlk.taskmanager.ui.theme.SecondaryColor
+import com.mlk.taskmanager.ui.theme.AccentColor
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -56,15 +61,17 @@ fun CalendarScreen(
     val calendarState = rememberUseCaseState()
     val uiState by viewModel.uiState.collectAsState()
 
-    // Custom colors for the app theme
-    val primaryColor = Color(0xFF00A2E3)
-    val secondaryColor = Color(0xFF03DAC6)
-    val backgroundColor = Color(0xFFF5F5F5)
-    val cardBackgroundColor = Color.White
+    // Use the app's theme colors
+    val primaryColor = PrimaryColor // Orange
+    val secondaryColor = SecondaryColor // Beige
+    val backgroundColor = Background // Black
+    val cardBackgroundColor = Color(0xFF121212) // Dark Gray for cards
+    val textColor = TextColor // White
+    val accentColor = AccentColor // Red
     val accentGradient = Brush.horizontalGradient(
         colors = listOf(
-            Color(0xFF6200EE),
-            Color(0xFF9C47FF)
+            primaryColor,
+            accentColor
         )
     )
 
@@ -100,7 +107,7 @@ fun CalendarScreen(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shadowElevation = 4.dp,
-                color = cardBackgroundColor
+                color = backgroundColor
             ) {
                 Column {
                     TopAppBar(
@@ -117,16 +124,16 @@ fun CalendarScreen(
                                             TimeFilter.WEEK -> "Weekly Planner"
                                             TimeFilter.MONTH -> "Monthly Overview"
                                         },
-                                        style = MaterialTheme.typography.titleLarge.copy(
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 22.sp,
-                                            letterSpacing = (-0.5).sp
-                                        )
+                                        style = MaterialTheme.typography.titleLarge,
+                                        color = textColor,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 22.sp,
+                                        letterSpacing = (-0.5).sp
                                     )
                                     Text(
                                         text = selectedDate.format(java.time.format.DateTimeFormatter.ofPattern("MMMM yyyy")),
                                         style = MaterialTheme.typography.bodyMedium.copy(
-                                            color = Color.Gray,
+                                            color = secondaryColor,
                                             fontSize = 14.sp
                                         )
                                     )
@@ -151,8 +158,8 @@ fun CalendarScreen(
                             }
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = cardBackgroundColor,
-                            titleContentColor = Color.Black
+                            containerColor = backgroundColor,
+                            titleContentColor = textColor
                         )
                     )
 
@@ -169,13 +176,13 @@ fun CalendarScreen(
                                 color = if (selectedTimeFilter == filter)
                                     primaryColor
                                 else
-                                    Color.White,
+                                    cardBackgroundColor,
                                 border = BorderStroke(
                                     width = 1.dp,
                                     color = if (selectedTimeFilter == filter)
                                         Color.Transparent
                                     else
-                                        Color.LightGray
+                                        Color.DarkGray
                                 ),shape = RoundedCornerShape(8.dp)
                             ) {
                                 Row(
@@ -193,18 +200,18 @@ fun CalendarScreen(
                                         },
                                         contentDescription = null,
                                         tint = if (selectedTimeFilter == filter)
-                                            Color.White
+                                            textColor
                                         else
-                                            Color.Gray,
+                                            secondaryColor,
                                         modifier = Modifier.size(18.dp)
                                     )
                                     Text(
                                         text = filter.label,
                                         style = MaterialTheme.typography.bodyMedium.copy(
                                             color = if (selectedTimeFilter == filter)
-                                                Color.White
+                                                textColor
                                             else
-                                                Color.Gray,
+                                                secondaryColor,
                                             fontWeight = FontWeight.Medium
                                         )
                                     )
@@ -265,15 +272,11 @@ fun CalendarScreen(
             ) {
                 items(TaskFilter.values()) { filter ->
                     Surface(
-                        modifier = Modifier.clip(RoundedCornerShape(8.dp)),
-                        color = if (selectedFilter == filter)
-                            filter.color.copy(alpha = 0.15f)
-                        else
-                            cardBackgroundColor,
-
+                        modifier = Modifier.padding(8.dp),
+                        color = if (selectedFilter == filter) filter.color.copy(alpha = 0.15f) else cardBackgroundColor,
                         border = BorderStroke(
                             width = 1.dp,
-                            color = if (selectedFilter == filter) filter.color else Color.LightGray
+                            color = if (selectedFilter == filter) filter.color else Color.DarkGray
                         ),shape = RoundedCornerShape(8.dp)
                     ) {
                         Row(
@@ -286,13 +289,13 @@ fun CalendarScreen(
                             Icon(
                                 imageVector = filter.icon,
                                 contentDescription = null,
-                                tint = if (selectedFilter == filter) filter.color else Color.Gray,
+                                tint = if (selectedFilter == filter) filter.color else secondaryColor,
                                 modifier = Modifier.size(18.dp)
                             )
                             Text(
                                 text = filter.label,
                                 style = MaterialTheme.typography.bodyMedium.copy(
-                                    color = if (selectedFilter == filter) filter.color else Color.Gray,
+                                    color = if (selectedFilter == filter) filter.color else secondaryColor,
                                     fontWeight = FontWeight.Medium
                                 )
                             )
@@ -350,14 +353,14 @@ fun CalendarScreen(
                                         Icon(
                                             imageVector = Icons.Rounded.CheckCircle,
                                             contentDescription = null,
-                                            tint = Color.LightGray,
+                                            tint = secondaryColor,
                                             modifier = Modifier.size(48.dp)
                                         )
                                         Spacer(modifier = Modifier.height(16.dp))
                                         Text(
                                             text = "No tasks found",
                                             style = MaterialTheme.typography.bodyLarge.copy(
-                                                color = Color.Gray,
+                                                color = secondaryColor,
                                                 fontWeight = FontWeight.Medium
                                             )
                                         )
@@ -365,7 +368,7 @@ fun CalendarScreen(
                                         Text(
                                             text = "Enjoy your free time!",
                                             style = MaterialTheme.typography.bodyMedium.copy(
-                                                color = Color.LightGray
+                                                color = secondaryColor.copy(alpha = 0.7f)
                                             )
                                         )
                                     }
@@ -407,10 +410,10 @@ private enum class TaskFilter(
     val color: Color,
     val icon: androidx.compose.ui.graphics.vector.ImageVector
 ) {
-    ALL("All tasks", Color(0xFF6200EE), Icons.Rounded.FormatListBulleted),
-    TODO("To do", Color(0xFF2196F3), Icons.Rounded.CheckBoxOutlineBlank),
-    IN_PROGRESS("In Progress", Color(0xFFFF4C60), Icons.Rounded.Pending),
-    COMPLETED("Completed", Color(0xFF4CAF50), Icons.Rounded.CheckBox)
+    ALL("All tasks", TextColor, Icons.Rounded.FormatListBulleted),
+    TODO("To do", PrimaryColor, Icons.Rounded.CheckBoxOutlineBlank),
+    IN_PROGRESS("In Progress", AccentColor, Icons.Rounded.Pending),
+    COMPLETED("Completed", SecondaryColor, Icons.Rounded.CheckBox)
 }
 
 @Composable
@@ -421,6 +424,9 @@ private fun DateItem(
     primaryColor: Color,
     onClick: () -> Unit
 ) {
+    val cardBackgroundColor = Color(0xFF121212) // Dark Gray for cards
+    val textColor = TextColor // White
+    val secondaryColor = SecondaryColor // Beige
     val today = LocalDate.now()
     val isToday = date.equals(today)
 
@@ -431,8 +437,8 @@ private fun DateItem(
             .clickable(onClick = onClick),
         color = when {
             isSelected -> primaryColor
-            isToday -> primaryColor.copy(alpha = 0.1f)
-            else -> Color.White
+            isToday -> primaryColor.copy(alpha = 0.3f)
+            else -> cardBackgroundColor
         },
         shadowElevation = if (isSelected) 4.dp else 0.dp,
         shape = RoundedCornerShape(8.dp)
@@ -449,7 +455,7 @@ private fun DateItem(
                     TimeFilter.MONTH -> date.year.toString()
                 },
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = if (isSelected) Color.White.copy(alpha = 0.8f) else Color.Gray
+                    color = if (isSelected) textColor.copy(alpha = 0.8f) else secondaryColor
                 )
             )
 
@@ -461,9 +467,9 @@ private fun DateItem(
                     .clip(CircleShape)
                     .background(
                         if (isToday && !isSelected)
-                            primaryColor.copy(alpha = 0.2f)
+                            primaryColor.copy(alpha = 0.3f)
                         else if (isSelected)
-                            Color.White.copy(alpha = 0.2f)
+                            textColor.copy(alpha = 0.2f)
                         else
                             Color.Transparent
                     ),
@@ -477,7 +483,7 @@ private fun DateItem(
                     },
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
-                        color = if (isSelected) Color.White else if (isToday) primaryColor else Color.Black
+                        color = if (isSelected) textColor else if (isToday) primaryColor else textColor
                     )
                 )
             }
@@ -491,7 +497,7 @@ private fun DateItem(
                     TimeFilter.MONTH -> date.year.toString()
                 },
                 style = MaterialTheme.typography.bodySmall.copy(
-                    color = if (isSelected) Color.White.copy(alpha = 0.8f) else Color.Gray
+                    color = if (isSelected) textColor.copy(alpha = 0.8f) else secondaryColor
                 )
             )
         }
@@ -508,10 +514,13 @@ private fun EnhancedTaskItem(
     onEditClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {}
 ) {
+    val cardBackgroundColor = Color(0xFF121212) // Dark Gray for cards
+    val backgroundColor = Background // Black
+    val secondaryColor = SecondaryColor // Beige
     val statusColors = mapOf(
-        TaskStatus.TODO to Color(0xFF2196F3),
-        TaskStatus.IN_PROGRESS to Color(0xFFFF4C60),
-        TaskStatus.DONE to Color(0xFF4CAF50)
+        TaskStatus.TODO to PrimaryColor, // Orange primary color
+        TaskStatus.IN_PROGRESS to AccentColor, // Red accent color
+        TaskStatus.DONE to SecondaryColor // Beige secondary color
     )
 
     val statusColor = statusColors[status] ?: primaryColor
@@ -520,7 +529,7 @@ private fun EnhancedTaskItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { /* Task detail */ },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -530,7 +539,7 @@ private fun EnhancedTaskItem(
                 modifier = Modifier
                     .width(8.dp)
                     .fillMaxHeight()
-                    .background(statusColor)
+                    .background(backgroundColor)
             )
 
             Column(
@@ -548,7 +557,7 @@ private fun EnhancedTaskItem(
                             modifier = Modifier
                                 .size(32.dp)
                                 .clip(CircleShape)
-                                .background(statusColor.copy(alpha = 0.1f)),
+                                .background(statusColor.copy(alpha = 0.2f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -569,7 +578,7 @@ private fun EnhancedTaskItem(
                             Text(
                                 text = category,
                                 style = MaterialTheme.typography.labelMedium.copy(
-                                    color = Color.Gray,
+                                    color = secondaryColor,
                                     fontWeight = FontWeight.Medium
                                 )
                             )
@@ -592,7 +601,7 @@ private fun EnhancedTaskItem(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Divider(color = Color.LightGray.copy(alpha = 0.5f))
+                Divider(color = Color.DarkGray.copy(alpha = 0.5f))
 
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -622,7 +631,7 @@ private fun EnhancedTaskItem(
                         Icon(
                             imageVector = Icons.Rounded.Edit,
                             contentDescription = "Edit",
-                            tint = Color.Gray,
+                            tint = secondaryColor,
                             modifier = Modifier
                                 .size(20.dp)
                                 .clip(CircleShape)
@@ -635,7 +644,7 @@ private fun EnhancedTaskItem(
                         Icon(
                             imageVector = Icons.Rounded.Delete,
                             contentDescription = "Delete",
-                            tint = Color.Gray,
+                            tint = secondaryColor,
                             modifier = Modifier
                                 .size(20.dp)
                                 .clip(CircleShape)

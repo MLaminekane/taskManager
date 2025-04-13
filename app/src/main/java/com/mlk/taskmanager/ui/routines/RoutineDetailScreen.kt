@@ -3,6 +3,11 @@ package com.mlk.taskmanager.ui.routines
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import com.mlk.taskmanager.ui.theme.Background
+import com.mlk.taskmanager.ui.theme.TextColor
+import com.mlk.taskmanager.ui.theme.PrimaryColor
+import com.mlk.taskmanager.ui.theme.SecondaryColor
+import com.mlk.taskmanager.ui.theme.AccentColor
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -67,7 +72,7 @@ fun RoutineDetailScreen(
                         navController.popBackStack()
                     }
                 ) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                    Text("Delete", color = AccentColor)
                 }
             },
             dismissButton = {
@@ -83,34 +88,56 @@ fun RoutineDetailScreen(
             TopAppBar(
                 title = { 
                     Text(
-                        "Routine Details",
+                        text = "Routine Details",
                         style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = TextColor
                         )
                     ) 
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextColor)
                     }
                 },
                 actions = {
                     IconButton(onClick = { showDeleteDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete Routine"
+                            contentDescription = "Delete Routine",
+                            tint = AccentColor
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Background,
+                    titleContentColor = TextColor
+                )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    // TODO: Navigate to edit routine screen
+                    routine?.let {
+                        viewModel.toggleRoutineEnabled(it)
+                    }
                 },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+                modifier = Modifier.padding(16.dp),
+                containerColor = PrimaryColor,
+                contentColor = TextColor
+            ) {
+                Icon(
+                    imageVector = if (routine?.isEnabled == true) Icons.Default.PauseCircle else Icons.Default.PlayCircle,
+                    contentDescription = if (routine?.isEnabled == true) "Disable Routine" else "Enable Routine"
+                )
+            }
+            FloatingActionButton(
+                onClick = { 
+                    navController.navigate(Screen.AddRoutine.route + "?routineId=${routine?.id ?: -1}")
+                },
+                modifier = Modifier.padding(16.dp),
+                containerColor = PrimaryColor,
+                contentColor = TextColor
             ) {
                 Icon(Icons.Default.Edit, contentDescription = "Edit Routine")
             }
@@ -119,6 +146,7 @@ fun RoutineDetailScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Background)
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
@@ -131,10 +159,17 @@ fun RoutineDetailScreen(
                 ) {
                     Text(
                         text = "Routine not found",
-                        style = MaterialTheme.typography.headlineMedium
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = TextColor
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = { navController.navigate(Screen.Routines.route) }) {
+                    Button(
+                        onClick = { navController.navigate(Screen.Routines.route) },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = PrimaryColor,
+                            contentColor = TextColor
+                        )
+                    ) {
                         Text("Go back to routines")
                     }
                 }
@@ -142,142 +177,66 @@ fun RoutineDetailScreen(
                 // Routine detail content
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
+                        .padding(16.dp)
                         .verticalScroll(scrollState)
                 ) {
-                    // Title
-                    Text(
-                        text = routine.title,
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    // Status badge
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(
-                                    if (routine.isEnabled) Color(0xFFE6F4EA) else Color(0xFFFCE8E6)
-                                )
-                                .padding(horizontal = 12.dp, vertical = 6.dp)
-                        ) {
-                            Text(
-                                text = if (routine.isEnabled) "Active" else "Inactive",
-                                color = if (routine.isEnabled) Color(0xFF137333) else Color(0xFFC5221F),
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.Medium
-                                )
-                            )
-                        }
-                        
-                        Spacer(modifier = Modifier.width(12.dp))
-                        
-                        // Toggle switch
-                        Switch(
-                            checked = routine.isEnabled,
-                            onCheckedChange = { viewModel.toggleRoutineEnabled(routine) },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.primary,
-                                checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                            )
-                        )
-                    }
-                    
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
-                    // Info Card
+                    // Header avec le titre de la routine et son état
                     Card(
                         modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF1F1F1F)),
                         shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                        ),
-                        elevation = CardDefaults.cardElevation(0.dp)
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            // Time
-                            DetailItem(
-                                icon = Icons.Outlined.Schedule,
-                                label = "Time",
-                                value = routine.time.format(DateTimeFormatter.ofPattern("h:mm a"))
+                        // Title
+                        Text(
+                            text = routine.title,
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = TextColor
                             )
-                            
-                            // Category (if present)
-                            if (categoryName != null) {
-                                DetailItem(
-                                    icon = Icons.Outlined.Category,
-                                    label = "Category",
-                                    value = categoryName
-                                )
-                            }
-                        }
-                    }
-                    
-                    // Repeat days section
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
-                    SectionTitle(icon = Icons.Outlined.Repeat, title = "Repeats on")
-                    
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        val dayLabels = listOf("M", "T", "W", "T", "F", "S", "S")
-                        val days = listOf(
-                            java.time.DayOfWeek.MONDAY,
-                            java.time.DayOfWeek.TUESDAY,
-                            java.time.DayOfWeek.WEDNESDAY,
-                            java.time.DayOfWeek.THURSDAY,
-                            java.time.DayOfWeek.FRIDAY,
-                            java.time.DayOfWeek.SATURDAY,
-                            java.time.DayOfWeek.SUNDAY
                         )
                         
-                        days.forEachIndexed { index, day ->
-                            val isSelected = routine.repeatDays.contains(day)
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        // Status badge
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(
+                                        if (routine.isEnabled) PrimaryColor.copy(alpha = 0.2f) else AccentColor.copy(alpha = 0.2f)
+                                    )
+                                    .padding(horizontal = 12.dp, vertical = 6.dp)
                             ) {
                                 Text(
-                                    text = dayLabels[index],
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.Gray
-                                )
-                                
-                                Spacer(modifier = Modifier.height(8.dp))
-                                
-                                Box(
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                        .clip(CircleShape)
-                                        .background(
-                                            if (isSelected) MaterialTheme.colorScheme.primary
-                                            else Color.LightGray.copy(alpha = 0.3f)
-                                        ),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = day.getDisplayName(TextStyle.NARROW, Locale.getDefault()),
-                                        color = if (isSelected) Color.White else Color.Gray,
-                                        style = MaterialTheme.typography.bodyLarge.copy(
-                                            fontWeight = FontWeight.Medium
-                                        )
+                                    text = if (routine.isEnabled) "Active" else "Inactive",
+                                    color = if (routine.isEnabled) PrimaryColor else AccentColor,
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Bold
                                     )
-                                }
+                                )
                             }
+                            
+                            Spacer(modifier = Modifier.width(12.dp))
+                            
+                            // Toggle switch
+                            Switch(
+                                checked = routine.isEnabled,
+                                onCheckedChange = { viewModel.toggleRoutineEnabled(routine) },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = PrimaryColor,
+                                    checkedTrackColor = PrimaryColor.copy(alpha = 0.5f),
+                                    uncheckedThumbColor = TextColor,
+                                    uncheckedTrackColor = TextColor.copy(alpha = 0.2f)
+                                )
+                            )
                         }
                     }
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
                     
                     // Description section
                     if (routine.description.isNotBlank()) {
@@ -288,18 +247,125 @@ fun RoutineDetailScreen(
                         Spacer(modifier = Modifier.height(12.dp))
                         
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surface
-                            ),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF262626)),
+                            shape = RoundedCornerShape(12.dp)
                         ) {
                             Text(
-                                text = routine.description,
-                                style = MaterialTheme.typography.bodyLarge,
+                                text = routine.description.ifBlank { "No description provided" },
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = TextColor,
                                 modifier = Modifier.padding(16.dp)
                             )
+                        }
+                    }
+                    
+                    // Info Card
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFF1F1F1F)
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        SectionTitle(
+                            icon = Icons.Outlined.Schedule,
+                            title = "Time"
+                        )
+                        
+                        // Card pour l'heure avec couleur plus visible
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF262626)),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            DetailItem(
+                                icon = Icons.Outlined.Timer,
+                                label = "Daily at",
+                                value = routine.time.format(DateTimeFormatter.ofPattern("h:mm a"))
+                            )
+                        }
+                        
+                        // Category (if present)
+                        if (categoryName != null) {
+                            DetailItem(
+                                icon = Icons.Outlined.Category,
+                                label = "Category",
+                                value = categoryName
+                            )
+                        }
+                    }
+                    
+                    // Repeat days section
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    SectionTitle(icon = Icons.Outlined.Repeat, title = "Repeats on")
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF1D1D1D)),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            val dayLabels = listOf("M", "T", "W", "T", "F", "S", "S")
+                            val days = listOf(
+                                java.time.DayOfWeek.MONDAY,
+                                java.time.DayOfWeek.TUESDAY,
+                                java.time.DayOfWeek.WEDNESDAY,
+                                java.time.DayOfWeek.THURSDAY,
+                                java.time.DayOfWeek.FRIDAY,
+                                java.time.DayOfWeek.SATURDAY,
+                                java.time.DayOfWeek.SUNDAY
+                            )
+                            
+                            days.forEachIndexed { index, day ->
+                                val isSelected = routine.repeatDays.contains(day)
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = dayLabels[index],
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = TextColor.copy(alpha = 0.7f),
+                                        modifier = Modifier.padding(bottom = 4.dp)
+                                    )
+                                    
+                                    Box(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .clip(CircleShape)
+                                            .background(
+                                                if (isSelected) PrimaryColor 
+                                                else Color(0xFF2A2A2A)
+                                            )
+                                            .padding(2.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = dayLabels[index],
+                                            style = MaterialTheme.typography.bodyMedium.copy(
+                                                fontWeight = FontWeight.Bold
+                                            ),
+                                            color = if (isSelected) TextColor else SecondaryColor.copy(alpha = 0.5f)
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                     
@@ -312,9 +378,11 @@ fun RoutineDetailScreen(
                         Spacer(modifier = Modifier.height(12.dp))
                         
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(16.dp),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF121212)),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                         ) {
                             Box(
                                 modifier = Modifier
@@ -386,17 +454,18 @@ fun RoutineDetailScreen(
                             Icon(
                                 imageVector = Icons.Outlined.CalendarToday,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = PrimaryColor
                             )
                             Column {
                                 Text(
                                     text = if (routine.isSyncedWithCalendar) "Synced with Calendar" else "Not Synced",
-                                    style = MaterialTheme.typography.bodyLarge
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = TextColor
                                 )
                                 Text(
                                     text = if (routine.isSyncedWithCalendar) "Tap to unsync" else "Tap to sync",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = TextColor
                                 )
                             }
                         }
@@ -404,13 +473,13 @@ fun RoutineDetailScreen(
                         if (isSyncing) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(24.dp),
-                                color = MaterialTheme.colorScheme.primary
+                                color = PrimaryColor
                             )
                         } else {
                             Icon(
                                 imageVector = if (routine.isSyncedWithCalendar) Icons.Default.Check else Icons.Default.Sync,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = PrimaryColor
                             )
                         }
                     }
@@ -418,7 +487,7 @@ fun RoutineDetailScreen(
                     syncError?.let { error ->
                         Text(
                             text = error,
-                            color = MaterialTheme.colorScheme.error,
+                            color = AccentColor,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
@@ -443,7 +512,7 @@ private fun SectionTitle(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = PrimaryColor,
             modifier = Modifier.size(20.dp)
         )
         
@@ -452,7 +521,8 @@ private fun SectionTitle(
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = TextColor
             )
         )
     }
@@ -481,15 +551,16 @@ private fun DetailItem(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = SecondaryColor
             )
             
             Text(
                 text = value,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    color = TextColor
                 )
             )
         }
     }
-} 
+}

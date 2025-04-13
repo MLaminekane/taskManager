@@ -566,7 +566,7 @@ fun LocationSearchSection(
                     Icon(
                         imageVector = Icons.Default.LocationOn,
                         contentDescription = null,
-                        tint = Color(0xFF613BE7)
+                        tint = PrimaryColor
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -1092,8 +1092,8 @@ fun AddTaskScreen(
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFF613BE7),
-                            focusedLabelColor = Color(0xFF613BE7)
+                            focusedBorderColor = PrimaryColor,
+                            focusedLabelColor = PrimaryColor
                         )
                     )
                 }

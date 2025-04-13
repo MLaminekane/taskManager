@@ -1,8 +1,14 @@
 package com.mlk.taskmanager.ui.routines
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import com.mlk.taskmanager.ui.theme.Background
+import com.mlk.taskmanager.ui.theme.TextColor
+import com.mlk.taskmanager.ui.theme.PrimaryColor
+import com.mlk.taskmanager.ui.theme.SecondaryColor
+import com.mlk.taskmanager.ui.theme.AccentColor
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -59,13 +65,15 @@ fun AddRoutineScreen(
     if (showCategoryDialog) {
         AlertDialog(
             onDismissRequest = { showCategoryDialog = false },
-            title = { Text("Select Category") },
+            title = { Text("Select Category", color = TextColor) },
             text = {
                 Column {
+                    Spacer(modifier = Modifier.height(8.dp))
                     if (categories.isEmpty()) {
                         Text(
                             "No categories available. Add categories in Settings.",
-                            modifier = Modifier.padding(vertical = 12.dp)
+                            modifier = Modifier.padding(vertical = 12.dp),
+                            color = TextColor
                         )
                     } else {
                         categories.forEach { category ->
@@ -87,7 +95,7 @@ fun AddRoutineScreen(
                                     }
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(category)
+                                Text(category, color = TextColor)
                             }
                         }
                     }
@@ -95,148 +103,144 @@ fun AddRoutineScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showCategoryDialog = false }) {
-                    Text("Cancel")
+                    Text("Close", color = PrimaryColor)
                 }
-            }
+            },
+            containerColor = Color(0xFF121212)
         )
     }
     
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            IconButton(onClick = { navController.navigateUp() }) {
-                                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                            }
-                            Text(
-                                text = "Create new routine",
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontWeight = FontWeight.Medium
-                                )
-                            )
-                        }
+                title = { 
+                    Text(
+                        "Add Routine",
+                        color = TextColor
+                    ) 
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextColor)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = Color.Black
+                    containerColor = Background,
+                    titleContentColor = TextColor
                 )
             )
         },
-        containerColor = Color.White,
-        bottomBar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White)
-                    .padding(16.dp)
+        containerColor = Background,
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    if (title.isNotBlank() && selectedDays.isNotEmpty()) {
+                        viewModel.addRoutine(
+                            title = title,
+                            description = description,
+                            time = time,
+                            repeatDays = selectedDays.toList(),
+                            category = selectedCategory
+                        )
+                        navController.popBackStack()
+                    }
+                },
+                modifier = Modifier.padding(16.dp),
+                containerColor = PrimaryColor,
+                contentColor = TextColor
             ) {
-                Button(
-                    onClick = {
-                        if (title.isNotBlank() && selectedDays.isNotEmpty()) {
-                            viewModel.addRoutine(
-                                title = title,
-                                description = description,
-                                time = time,
-                                repeatDays = selectedDays.toList(),
-                                category = selectedCategory
-                            )
-                            navController.navigateUp()
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = title.isNotBlank() && selectedDays.isNotEmpty(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF613BE7),
-                        disabledContainerColor = Color(0xFF613BE7).copy(alpha = 0.5f)
-                    )
-                ) {
-                    Text(
-                        text = "Create Routine",
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    )
-                }
+                Icon(Icons.Default.Check, contentDescription = "Save Routine")
             }
         }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Background)
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+            
             // Title
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
+                label = { Text("Title", color = SecondaryColor) },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Enter routine title") },
-                textStyle = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold
-                ),
+                singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color.LightGray,
-                    focusedBorderColor = Color(0xFF613BE7)
-                ),
-                shape = RoundedCornerShape(16.dp)
+                    focusedTextColor = TextColor,
+                    unfocusedTextColor = TextColor,
+                    focusedBorderColor = PrimaryColor,
+                    unfocusedBorderColor = SecondaryColor.copy(alpha = 0.5f),
+                    cursorColor = PrimaryColor
+                )
             )
             
             // Description
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
+                label = { Text("Description", color = SecondaryColor) },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Enter routine description (optional)") },
                 minLines = 3,
-                maxLines = 5,
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color.LightGray,
-                    focusedBorderColor = Color(0xFF613BE7)
-                ),
-                shape = RoundedCornerShape(16.dp)
+                    focusedTextColor = TextColor,
+                    unfocusedTextColor = TextColor,
+                    focusedBorderColor = PrimaryColor,
+                    unfocusedBorderColor = SecondaryColor.copy(alpha = 0.5f),
+                    cursorColor = PrimaryColor
+                )
             )
             
             // Time
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray)
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+                border = BorderStroke(1.dp, PrimaryColor.copy(alpha = 0.3f))
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { timePickerState.show() }
+                        // Ajouter un fond plus clair au survol pour indiquer qu'il s'agit d'un élément cliquable
+                        .background(Color(0xFF1A1A1A))
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.Schedule,
                         contentDescription = null,
-                        tint = Color(0xFF613BE7)
+                        tint = PrimaryColor
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
                             text = "Time",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray
+                            color = SecondaryColor
                         )
-                        Text(
-                            text = time.format(DateTimeFormatter.ofPattern("h:mm a")),
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontWeight = FontWeight.SemiBold
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = time.format(DateTimeFormatter.ofPattern("h:mm")),
+                                style = MaterialTheme.typography.headlineSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = PrimaryColor
+                                )
                             )
-                        )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = time.format(DateTimeFormatter.ofPattern("a")),
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    color = TextColor
+                                )
+                            )
+                        }
                     }
                 }
             }
@@ -245,8 +249,8 @@ fun AddRoutineScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray)
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF121212)),
+                border = null
             ) {
                 Column(
                     modifier = Modifier
@@ -256,7 +260,7 @@ fun AddRoutineScreen(
                     Text(
                         text = "Repeat Days",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray
+                        color = SecondaryColor
                     )
                     
                     Spacer(modifier = Modifier.height(8.dp))
@@ -272,9 +276,7 @@ fun AddRoutineScreen(
                                     .size(36.dp)
                                     .clip(CircleShape)
                                     .background(
-                                        if (isSelected) Color(0xFF613BE7) else Color.LightGray.copy(
-                                            alpha = 0.3f
-                                        )
+                                        if (isSelected) PrimaryColor else Color(0xFF333333)
                                     )
                                     .clickable {
                                         selectedDays = if (isSelected) {
@@ -287,7 +289,7 @@ fun AddRoutineScreen(
                             ) {
                                 Text(
                                     text = day.getDisplayName(TextStyle.NARROW, Locale.getDefault()),
-                                    color = if (isSelected) Color.White else Color.Black
+                                    color = if (isSelected) TextColor else SecondaryColor
                                 )
                             }
                         }
@@ -299,8 +301,8 @@ fun AddRoutineScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray)
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF121212)),
+                border = null
             ) {
                 Row(
                     modifier = Modifier
@@ -312,26 +314,27 @@ fun AddRoutineScreen(
                     Icon(
                         imageVector = Icons.Default.Category,
                         contentDescription = null,
-                        tint = Color(0xFF613BE7)
+                        tint = PrimaryColor
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "Category",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray
+                            color = SecondaryColor
                         )
                         Text(
                             text = selectedCategory ?: "Select a category",
                             style = MaterialTheme.typography.bodyLarge.copy(
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold,
+                                color = TextColor
                             )
                         )
                     }
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowRight,
                         contentDescription = null,
-                        tint = Color.Gray
+                        tint = SecondaryColor
                     )
                 }
             }

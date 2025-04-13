@@ -4,6 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import com.mlk.taskmanager.ui.theme.Background
+import com.mlk.taskmanager.ui.theme.TextColor
+import com.mlk.taskmanager.ui.theme.PrimaryColor
+import com.mlk.taskmanager.ui.theme.SecondaryColor
+import com.mlk.taskmanager.ui.theme.AccentColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -41,6 +46,9 @@ fun PomodoroScreen(
     if (uiState.showPermissionDialog) {
         AlertDialog(
             onDismissRequest = { viewModel.permissionDialogShown() },
+            containerColor = Color(0xFF121212),
+            titleContentColor = TextColor,
+            textContentColor = TextColor,
             title = { Text("Permission requise") },
             text = { 
                 Text("Pour activer le mode Ne pas déranger, l'application a besoin d'une permission spéciale. Voulez-vous l'accorder maintenant?") 
@@ -54,14 +62,14 @@ fun PomodoroScreen(
                         }
                     }
                 ) {
-                    Text("Oui")
+                    Text("Oui", color = PrimaryColor)
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { viewModel.permissionDialogShown() }
                 ) {
-                    Text("Non")
+                    Text("Non", color = PrimaryColor)
                 }
             }
         )
@@ -74,21 +82,27 @@ fun PomodoroScreen(
                     Text(
                         "Mode Focus",
                         style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
                         )
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Retour")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Retour", tint = Color.White)
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Background,
+                    titleContentColor = TextColor
+                )
             )
         }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Background)
                 .padding(padding)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -136,8 +150,8 @@ fun PomodoroScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = uiState.error!!,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.Red
                 )
             }
         }
@@ -159,13 +173,11 @@ private fun PomodoroTimer(
 ) {
     Box(
         modifier = Modifier
-            .size(200.dp)
+            .size(250.dp)
+            .padding(bottom = 24.dp)
             .clip(CircleShape)
             .background(
-                if (isBreak) 
-                    MaterialTheme.colorScheme.secondaryContainer 
-                else 
-                    MaterialTheme.colorScheme.primaryContainer
+                color = if (isBreak) AccentColor.copy(alpha = 0.2f) else PrimaryColor.copy(alpha = 0.2f)
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -178,19 +190,13 @@ private fun PomodoroTimer(
                 text = "$minutes:${String.format("%02d", seconds)}",
                 fontSize = 48.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isBreak) 
-                    MaterialTheme.colorScheme.onSecondaryContainer 
-                else 
-                    MaterialTheme.colorScheme.onPrimaryContainer
+                color = if (isBreak) AccentColor else PrimaryColor
             )
             
             // Indication du mode (Focus ou Pause)
             Text(
                 text = if (isBreak) "Pause" else "Focus",
-                color = if (isBreak) 
-                    MaterialTheme.colorScheme.onSecondaryContainer 
-                else 
-                    MaterialTheme.colorScheme.onPrimaryContainer
+                color = if (isBreak) Color(0xFFFFA07A) else Color(0xFFFFC107)
             )
         }
     }
@@ -221,12 +227,12 @@ private fun PomodoroControls(
             modifier = Modifier
                 .size(56.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .background(Color(0xFF121212))
         ) {
             Icon(
                 Icons.Default.Refresh,
                 contentDescription = "Réinitialiser",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = Color.White
             )
         }
 
@@ -236,12 +242,12 @@ private fun PomodoroControls(
             modifier = Modifier
                 .size(72.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary)
+                .background(if (isRunning) AccentColor else PrimaryColor)
         ) {
             Icon(
                 if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
                 contentDescription = if (isRunning) "Pause" else "Démarrer",
-                tint = MaterialTheme.colorScheme.onPrimary,
+                tint = Color.White,
                 modifier = Modifier.size(36.dp)
             )
         }
@@ -252,12 +258,12 @@ private fun PomodoroControls(
             modifier = Modifier
                 .size(56.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .background(Color(0xFF121212))
         ) {
             Icon(
                 Icons.Default.SkipNext,
                 contentDescription = "Passer",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = Color.White
             )
         }
     }
@@ -280,7 +286,8 @@ private fun PomodoroSettings(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF121212))
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -294,17 +301,24 @@ private fun PomodoroSettings(
                 Column {
                     Text(
                         "Mode Ne pas déranger",
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White
                     )
                     Text(
                         "Active le mode Ne pas déranger du système",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = SecondaryColor.copy(alpha = 0.7f)
                     )
                 }
                 Switch(
                     checked = dndEnabled,
-                    onCheckedChange = { onDndToggle() }
+                    onCheckedChange = { onDndToggle() },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = PrimaryColor,
+                        checkedTrackColor = PrimaryColor.copy(alpha = 0.5f),
+                        uncheckedThumbColor = TextColor,
+                        uncheckedTrackColor = TextColor.copy(alpha = 0.2f)
+                    )
                 )
             }
 
@@ -332,7 +346,7 @@ private fun PomodoroStatistics(
             .height(150.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = Color(0xFF121212)
         )
     ) {
         Column(
@@ -341,7 +355,8 @@ private fun PomodoroStatistics(
             Text(
                 "Statistiques",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color.White
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -384,13 +399,16 @@ private fun StatisticItem(
     ) {
         Text(
             text = value,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.displayLarge.copy(
+                fontWeight = FontWeight.Light,
+                fontSize = 64.sp
+            ),
+            color = PrimaryColor
         )
         Text(
             text = title,
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = Color(0xFF959595)
         )
     }
 }

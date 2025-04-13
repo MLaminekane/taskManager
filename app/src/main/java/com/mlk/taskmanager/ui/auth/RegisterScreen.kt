@@ -292,7 +292,7 @@ fun RegisterScreen(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = PrimaryColor,
                     contentColor = TextColor,
-                    disabledContainerColor = PrimaryColor.copy(alpha = 0.3f),
+                    disabledContainerColor = PrimaryColor.copy(alpha = 0.5f),
                     disabledContentColor = TextColor.copy(alpha = 0.5f)
                 )
             ) {

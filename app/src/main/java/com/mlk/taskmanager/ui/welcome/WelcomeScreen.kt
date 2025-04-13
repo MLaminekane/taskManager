@@ -13,6 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import com.mlk.taskmanager.ui.theme.Background
+import com.mlk.taskmanager.ui.theme.TextColor
+import com.mlk.taskmanager.ui.theme.PrimaryColor
+import com.mlk.taskmanager.ui.theme.SecondaryColor
+import com.mlk.taskmanager.ui.theme.AccentColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -38,7 +43,7 @@ fun WelcomeScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Background)
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -121,7 +126,7 @@ fun WelcomeScreen(
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
-                    color = Color.Black
+                    color = TextColor
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -130,7 +135,7 @@ fun WelcomeScreen(
                     text = "Tp1 Informatique mobile developpe with Kotlin and Jetpack compose",
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
-                    color = Color(0xFF666666)
+                    color = TextColor.copy(alpha = 0.7f)
                 )
 
                 Spacer(modifier = Modifier.height(48.dp))
@@ -143,14 +148,15 @@ fun WelcomeScreen(
                         .fillMaxWidth()
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF613BE7)
+                        containerColor = PrimaryColor,
+                        contentColor = TextColor
                     ),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(
                         text = "TaskManager",
                         style = MaterialTheme.typography.titleMedium,
-                        color = Color.White
+                        color = TextColor
                     )
                 }
             }

@@ -190,13 +190,11 @@ fun TasksScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate(Screen.AddTask.route) },
-                containerColor = PrimaryColor,
-                contentColor = Color.White,
                 modifier = Modifier
                     .padding(16.dp)
                     .size(56.dp),
-                shape = CircleShape,
-                elevation = FloatingActionButtonDefaults.elevation(8.dp)
+                containerColor = PrimaryColor,
+                contentColor = TextColor
             ) {
                 Icon(
                     Icons.Default.Add,
@@ -600,7 +598,7 @@ fun FilterDialog(
                     text = "Priority",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = TextColor
+                    color = Background
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -619,7 +617,7 @@ fun FilterDialog(
                                 containerColor = if (selectedPriorities.contains(priority)) 
                                     PrimaryColor.copy(alpha = 0.1f) 
                                 else 
-                                    Background
+                                    SecondaryColor
                             ),
                             border = BorderStroke(
                                 width = 1.dp,
@@ -650,7 +648,7 @@ fun FilterDialog(
                     Text(
                         text = "Show completed tasks",
                         modifier = Modifier.weight(1f),
-                        color = TextColor
+                        color = Background
                     )
                     Switch(
                         checked = showCompletedTasks,
@@ -663,7 +661,7 @@ fun FilterDialog(
                     text = "Sort by",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = TextColor
+                    color = Background
                 )
                 
                 Column(
@@ -700,7 +698,11 @@ fun FilterDialog(
         },
         confirmButton = {
             Button(
-                onClick = onDismiss
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PrimaryColor,
+                    contentColor = TextColor
+                )
             ) {
                 Text("Apply")
             }

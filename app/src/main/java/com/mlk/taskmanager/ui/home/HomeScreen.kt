@@ -24,6 +24,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import com.mlk.taskmanager.ui.theme.Background
+import com.mlk.taskmanager.ui.theme.TextColor
+import com.mlk.taskmanager.ui.theme.PrimaryColor
+import com.mlk.taskmanager.ui.theme.SecondaryColor
+import com.mlk.taskmanager.ui.theme.AccentColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -81,8 +86,7 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Sync
-import androidx.compose.material.icons.filled.Circle
-import com.mlk.taskmanager.ui.home.HomeUiState
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -131,7 +135,7 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(Background)
     ) {
         LazyColumn(
             modifier = Modifier
@@ -216,10 +220,10 @@ fun HeaderSection(
                 .height(180.dp)
                 .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
                 .background(
-                    brush = Brush.verticalGradient(
+                    Brush.verticalGradient(
                         colors = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.primaryContainer
+                            Color(0xFF222222),
+                            Background
                         )
                     )
                 )
@@ -242,7 +246,7 @@ fun HeaderSection(
                     Text(
                         text = "$greeting,",
                         style = MaterialTheme.typography.titleMedium,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = TextColor.copy(alpha = 0.8f)
                     )
                     Text(
                         text = name,
@@ -258,14 +262,14 @@ fun HeaderSection(
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.2f))
+                        .background(PrimaryColor.copy(alpha = 0.2f))
                         .clickable { navController.navigate(Screen.Settings.route) },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Person,
                         contentDescription = "Profile",
-                        tint = Color.White,
+                        tint = TextColor,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -307,15 +311,15 @@ fun WeatherCard(
             .height(100.dp)
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary
-        )
+            containerColor = Color(0xFF1D1D1D)
+        ),
     ) {
         if (isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = Color.White)
+                CircularProgressIndicator(color = PrimaryColor)
             }
         } else if (weatherData != null) {
             Row(
@@ -354,7 +358,7 @@ fun WeatherCard(
                     Text(
                         text = weatherDesc,
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.7f)
+                        color = TextColor.copy(alpha = 0.7f)
                     )
                 }
                 
@@ -383,7 +387,7 @@ fun WeatherCard(
                     Icon(
                         imageVector = Icons.Default.WbSunny,
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = TextColor,
                         modifier = Modifier.size(32.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -448,21 +452,21 @@ fun QuickActionItem(item: ActionItem) {
                 }
             }
             .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f))
+            .background(Color(0xFF1A1A1A))
             .padding(vertical = 12.dp, horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
             imageVector = item.icon,
             contentDescription = item.title,
-            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+            tint = PrimaryColor,
             modifier = Modifier.size(28.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = item.title,
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSecondaryContainer
+            color = TextColor
         )
     }
 }
@@ -475,7 +479,7 @@ private fun SummaryCard(
 ) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1D1D1D))
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -483,7 +487,7 @@ private fun SummaryCard(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = Color.Gray
+                    color = TextColor.copy(alpha = 0.7f)
                 )
             )
             Text(
@@ -508,7 +512,7 @@ private fun ProjectCard(
             .height(160.dp)
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = Color(project.color).copy(alpha = 0.1f)
+            containerColor = Color(0xFF1D1D1D)
         )
     ) {
         Column(
@@ -524,7 +528,7 @@ private fun ProjectCard(
                     else -> Icons.Default.Folder
                 },
                 contentDescription = null,
-                tint = Color(project.color),
+                tint = PrimaryColor,
                 modifier = Modifier.size(32.dp)
             )
             
@@ -549,14 +553,14 @@ private fun ProjectCard(
                 Icon(
                     imageVector = Icons.Default.Assignment,
                     contentDescription = null,
-                    tint = Color(project.color),
+                    tint = PrimaryColor,
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "${project.taskCount} tasks",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(project.color)
+                    color = TextColor
                 )
             }
         }
@@ -572,7 +576,7 @@ private fun TaskCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1D1D1D))
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -589,7 +593,7 @@ private fun TaskCard(
             Text(
                 text = task.description,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = Color.Gray
+                    color = TextColor.copy(alpha = 0.7f)
                 ),
                 maxLines = 2
             )
@@ -605,7 +609,7 @@ private fun TaskCard(
                     Icon(
                         imageVector = Icons.Default.Schedule,
                         contentDescription = null,
-                        tint = Color.Gray,
+                        tint = SecondaryColor,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -614,7 +618,7 @@ private fun TaskCard(
                             DateTimeFormatter.ofPattern("MMM dd, HH:mm")
                         ),
                         style = MaterialTheme.typography.bodySmall.copy(
-                            color = Color.Gray
+                            color = TextColor.copy(alpha = 0.7f)
                         )
                     )
                 }
@@ -622,16 +626,16 @@ private fun TaskCard(
                 Surface(
                     modifier = Modifier.clip(RoundedCornerShape(16.dp)),
                     color = if (task.isCompleted) 
-                        Color(0xFF4CAF50).copy(alpha = 0.1f)
+                        PrimaryColor.copy(alpha = 0.1f)
                     else 
-                        Color(0xFF613BE7).copy(alpha = 0.1f)
+                        Color(0xFF333333)
                 ) {
                     Text(
                         text = if (task.isCompleted) "Completed" else "In Progress",
                         color = if (task.isCompleted) 
-                            Color(0xFF4CAF50)
+                            PrimaryColor
                         else 
-                            Color(0xFF613BE7),
+                            SecondaryColor,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontWeight = FontWeight.Medium
@@ -654,7 +658,7 @@ private fun EmptyTasksMessage() {
         Icon(
             imageVector = Icons.Default.Assignment,
             contentDescription = null,
-            tint = Color(0xFF613BE7),
+            tint = PrimaryColor,
             modifier = Modifier.size(48.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -740,14 +744,14 @@ private fun CreateProjectDialog(
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(
                                     if (selectedIcon == type)
-                                        Color(0xFF613BE7).copy(alpha = 0.1f)
+                                        Color(0xFF333333)
                                     else
                                         Color.Transparent
                                 )
                                 .border(
                                     width = 1.dp,
                                     color = if (selectedIcon == type)
-                                        Color(0xFF613BE7)
+                                        PrimaryColor
                                     else
                                         Color.Gray,
                                     shape = RoundedCornerShape(8.dp)
@@ -775,7 +779,7 @@ private fun CreateProjectDialog(
                                 .background(Color.Transparent)
                                 .border(
                                     width = 1.dp,
-                                    color = Color.Gray,
+                                    color = TextColor.copy(alpha = 0.7f),
                                     shape = RoundedCornerShape(8.dp)
                                 )
                         ) {
@@ -802,14 +806,15 @@ private fun CreateProjectDialog(
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = PrimaryColor
                 ),
                 modifier = Modifier.padding(start = 8.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Add, 
                     contentDescription = null,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.dp),
+                    tint = PrimaryColor
                 )
             }
         },
@@ -869,7 +874,7 @@ private fun ProjectTypeSelector(
                     imageVector = icons[type]!!,
                     contentDescription = type,
                     tint = if (selectedType == type)
-                        color
+                        PrimaryColor
                     else
                         Color.Gray
                 )
@@ -888,7 +893,7 @@ private fun RoutineCardCompact(
             .width(160.dp)
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = if (routine.isEnabled) Color.White else Color(0xFFF5F5F5)
+            containerColor = Color(0xFF1D1D1D)
         )
     ) {
         Column(
@@ -900,7 +905,7 @@ private fun RoutineCardCompact(
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold
                 ),
-                color = if (routine.isEnabled) MaterialTheme.colorScheme.primary else Color.Gray
+                color = if (routine.isEnabled) PrimaryColor else Color.Gray
             )
             
             Spacer(modifier = Modifier.height(4.dp))
@@ -927,7 +932,7 @@ private fun RoutineCardCompact(
                             .size(18.dp)
                             .clip(CircleShape)
                             .background(
-                                if (isSelected && routine.isEnabled) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                                if (isSelected && routine.isEnabled) PrimaryColor.copy(alpha = 0.2f)
                                 else Color.LightGray.copy(alpha = 0.3f)
                             ),
                         contentAlignment = Alignment.Center
@@ -937,7 +942,7 @@ private fun RoutineCardCompact(
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                             ),
-                            color = if (isSelected && routine.isEnabled) MaterialTheme.colorScheme.primary else Color.Gray
+                            color = if (isSelected && routine.isEnabled) PrimaryColor else Color.Gray
                         )
                     }
                 }
@@ -965,13 +970,13 @@ private fun RoutineCardCompact(
                     modifier = Modifier
                         .size(8.dp)
                         .clip(CircleShape)
-                        .background(if (routine.isEnabled) Color(0xFF4CAF50) else Color.Gray)
+                        .background(if (routine.isEnabled) PrimaryColor else Color(0xFF333333))
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = if (routine.isEnabled) "Active" else "Inactive",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
+                    color = TextColor.copy(alpha = 0.7f)
                 )
             }
         }
@@ -1076,7 +1081,7 @@ fun TaskSummarySection(uiState: HomeUiState) {
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.Bold
                         ),
-                        color = MaterialTheme.colorScheme.primary
+                        color = PrimaryColor
                     )
                 }
                 
@@ -1110,7 +1115,7 @@ fun TaskSummarySection(uiState: HomeUiState) {
                             .background(
                                 brush = Brush.horizontalGradient(
                                     colors = listOf(
-                                        MaterialTheme.colorScheme.primary,
+                                        PrimaryColor,
                                         MaterialTheme.colorScheme.tertiary
                                     )
                                 )
@@ -1235,8 +1240,8 @@ fun ProjectsSection(
                 modifier = Modifier.size(42.dp),
                 shape = CircleShape,
                 elevation = FloatingActionButtonDefaults.elevation(4.dp),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+                containerColor = PrimaryColor,
+                contentColor = TextColor
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -1258,7 +1263,7 @@ fun ProjectsSection(
                         .padding(vertical = 16.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        containerColor = Color(0xFF1D1D1D)
                     )
                 ) {
                     Column(
@@ -1270,7 +1275,7 @@ fun ProjectsSection(
                         Icon(
                             imageVector = Icons.Default.Folder,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = PrimaryColor,
                             modifier = Modifier.size(48.dp)
                         )
                         
@@ -1279,13 +1284,13 @@ fun ProjectsSection(
                         Text(
                             text = "Aucun projet",
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = TextColor
                         )
-                        
+
                         Text(
                             text = "Créez votre premier projet pour organiser vos tâches",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            color = TextColor,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -1397,7 +1402,7 @@ fun ImprovedProjectCard(
                             else -> Icons.Default.Description
                         },
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        tint = PrimaryColor,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -1450,7 +1455,7 @@ fun ImprovedProjectCard(
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = FontWeight.Bold
                             ),
-                            color = MaterialTheme.colorScheme.primary
+                            color = PrimaryColor
                         )
                     }
                     
@@ -1486,7 +1491,7 @@ fun ImprovedProjectCard(
                                 .fillMaxWidth(animatedProgress.value)
                                 .fillMaxHeight()
                                 .clip(RoundedCornerShape(3.dp))
-                                .background(MaterialTheme.colorScheme.primary)
+                                .background(PrimaryColor)
                         )
                     }
                 }
@@ -1545,29 +1550,22 @@ fun RoutinesSection(
                 ) {
                     Text(
                         text = "Voir tout",
-                        color = MaterialTheme.colorScheme.primary
+                        color = PrimaryColor
                     )
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowRight,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = PrimaryColor
                     )
                 }
-                
-                FloatingActionButton(
-                    onClick = onAddRoutine,
-                    modifier = Modifier.size(42.dp),
-                    shape = CircleShape,
-                    elevation = FloatingActionButtonDefaults.elevation(4.dp),
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ) {
+
+
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Ajouter une routine",
                         modifier = Modifier.size(18.dp)
                     )
-                }
+
             }
         }
         
@@ -1583,7 +1581,7 @@ fun RoutinesSection(
                         .padding(vertical = 16.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        containerColor = Color(0xFF1D1D1D)
                     )
                 ) {
                     Column(
@@ -1595,7 +1593,7 @@ fun RoutinesSection(
                         Icon(
                             imageVector = Icons.Default.Loop,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = PrimaryColor,
                             modifier = Modifier.size(48.dp)
                         )
                         
@@ -1604,13 +1602,13 @@ fun RoutinesSection(
                         Text(
                             text = "Aucune routine aujourd'hui",
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = TextColor
                         )
                         
                         Text(
                             text = "Créez des routines pour automatiser vos tâches récurrentes",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            color = TextColor,
                             textAlign = TextAlign.Center
                         )
                         
@@ -1618,12 +1616,17 @@ fun RoutinesSection(
                         
                         Button(
                             onClick = onAddRoutine,
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PrimaryColor,
+                                contentColor = TextColor
+                            )
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Add,
                                 contentDescription = null,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(16.dp),
+                                tint = TextColor
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Créer une routine")
@@ -1738,13 +1741,13 @@ fun ImprovedRoutineCard(
                         Icon(
                             imageVector = Icons.Default.Sync,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.tertiary,
+                            tint = PrimaryColor,
                             modifier = Modifier.size(12.dp)
                         )
                         Text(
                             text = "Synchronisé",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.tertiary
+                            color = PrimaryColor
                         )
                     }
                 }
@@ -1859,21 +1862,12 @@ fun UpcomingTasksSection(
                     fontWeight = FontWeight.Bold
                 )
             )
-            
-            FloatingActionButton(
-                onClick = onAddTaskClick,
-                modifier = Modifier.size(42.dp),
-                shape = CircleShape,
-                elevation = FloatingActionButtonDefaults.elevation(4.dp),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Ajouter une tâche",
                     modifier = Modifier.size(18.dp)
                 )
-            }
+
         }
         
         Spacer(modifier = Modifier.height(16.dp))
@@ -1891,7 +1885,7 @@ fun UpcomingTasksSection(
                         .padding(bottom = 16.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        containerColor = Color(0xFF1D1D1D)
                     )
                 ) {
                     Column(
@@ -1903,7 +1897,7 @@ fun UpcomingTasksSection(
                         Icon(
                             imageVector = Icons.Default.TaskAlt,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = PrimaryColor,
                             modifier = Modifier.size(48.dp)
                         )
                         
@@ -1912,13 +1906,13 @@ fun UpcomingTasksSection(
                         Text(
                             text = "Aucune tâche à venir",
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = TextColor
                         )
                         
                         Text(
                             text = "Créez des tâches pour organiser votre travail",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            color = TextColor,
                             textAlign = TextAlign.Center
                         )
                         
@@ -1926,7 +1920,11 @@ fun UpcomingTasksSection(
                         
                         Button(
                             onClick = onAddTaskClick,
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PrimaryColor,
+                                contentColor = TextColor
+                            )
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Add,
@@ -1961,12 +1959,12 @@ fun UpcomingTasksSection(
                         ) {
                             Text(
                                 text = "Voir ${tasks.size - 3} tâches supplémentaires",
-                                color = MaterialTheme.colorScheme.primary
+                                color = PrimaryColor
                             )
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowRight,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = PrimaryColor
                             )
                         }
                     }
@@ -2061,7 +2059,7 @@ fun AnimatedTaskCard(
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = "Completed",
-                        tint = Color.White,
+                        tint = TextColor,
                         modifier = Modifier.size(16.dp)
                     )
                 }

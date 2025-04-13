@@ -4,6 +4,11 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import com.mlk.taskmanager.ui.theme.Background
+import com.mlk.taskmanager.ui.theme.TextColor
+import com.mlk.taskmanager.ui.theme.PrimaryColor
+import com.mlk.taskmanager.ui.theme.SecondaryColor
+import com.mlk.taskmanager.ui.theme.AccentColor
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,24 +43,26 @@ fun RoutinesScreen(
     Scaffold(
         topBar = {
             Column(
-                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                modifier = Modifier.background(Background)
             ) {
                 TopAppBar(
                     title = {
                         Text(
                             text = "My Routines",
                             style = MaterialTheme.typography.headlineMedium.copy(
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                color = TextColor
                             )
                         )
                     },
                     actions = {
                         IconButton(onClick = { /* TODO: Filter routines */ }) {
-                            Icon(Icons.Default.FilterList, contentDescription = "Filter")
+                            Icon(Icons.Default.FilterList, contentDescription = "Filter", tint = TextColor)
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface
+                        containerColor = Background,
+                        titleContentColor = TextColor
                     )
                 )
             }
@@ -63,9 +70,9 @@ fun RoutinesScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate(Screen.AddRoutine.route) },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
+                containerColor = PrimaryColor,
+                contentColor = TextColor
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Routine")
             }
@@ -74,6 +81,7 @@ fun RoutinesScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Background)
                 .padding(padding)
         ) {
             if (uiState.isLoading) {
@@ -92,13 +100,13 @@ fun RoutinesScreen(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = null,
                         modifier = Modifier.size(72.dp),
-                        tint = Color.LightGray
+                        tint = SecondaryColor.copy(alpha = 0.5f)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "No routines yet",
                         style = MaterialTheme.typography.headlineSmall,
-                        color = Color.Gray
+                        color = TextColor
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -110,7 +118,8 @@ fun RoutinesScreen(
                     Button(
                         onClick = { navController.navigate(Screen.AddRoutine.route) },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
+                            containerColor = PrimaryColor,
+                            contentColor = TextColor
                         )
                     ) {
                         Icon(
@@ -160,10 +169,10 @@ fun RoutineCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = backgroundColor
-        ),
+            .padding(vertical = 8.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF121212)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -184,7 +193,7 @@ fun RoutineCard(
                     style = MaterialTheme.typography.headlineSmall.copy(
                         fontWeight = FontWeight.Bold
                     ),
-                    color = if (routine.isEnabled) MaterialTheme.colorScheme.primary else Color.Gray
+                    color = if (routine.isEnabled) PrimaryColor else SecondaryColor
                 )
                 
                 Text(
@@ -199,7 +208,7 @@ fun RoutineCard(
                 modifier = Modifier
                     .height(50.dp)
                     .width(1.dp),
-                color = Color.LightGray
+                color = SecondaryColor.copy(alpha = 0.2f)
             )
             
             // Content column
@@ -213,7 +222,7 @@ fun RoutineCard(
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold
                     ),
-                    color = if (routine.isEnabled) Color.Black else Color.Gray
+                    color = if (routine.isEnabled) TextColor else SecondaryColor
                 )
                 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -222,7 +231,7 @@ fun RoutineCard(
                     Text(
                         text = routine.description,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray,
+                        color = SecondaryColor,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -241,8 +250,8 @@ fun RoutineCard(
                                 .size(24.dp)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(
-                                    if (isSelected && routine.isEnabled) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
-                                    else Color.LightGray.copy(alpha = 0.3f)
+                                    if (isSelected && routine.isEnabled) PrimaryColor.copy(alpha = 0.2f)
+                                    else Color(0xFF222222)
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
@@ -251,7 +260,7 @@ fun RoutineCard(
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                                 ),
-                                color = if (isSelected && routine.isEnabled) MaterialTheme.colorScheme.primary else Color.Gray
+                                color = if (isSelected && routine.isEnabled) PrimaryColor else SecondaryColor
                             )
                         }
                     }
@@ -263,8 +272,10 @@ fun RoutineCard(
                 checked = routine.isEnabled,
                 onCheckedChange = { onToggleEnabled() },
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colorScheme.primary,
-                    checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                    checkedThumbColor = PrimaryColor,
+                    checkedTrackColor = PrimaryColor.copy(alpha = 0.5f),
+                    uncheckedThumbColor = TextColor,
+                    uncheckedTrackColor = TextColor.copy(alpha = 0.2f)
                 )
             )
         }

@@ -4,6 +4,11 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import com.mlk.taskmanager.ui.theme.Background
+import com.mlk.taskmanager.ui.theme.TextColor
+import com.mlk.taskmanager.ui.theme.PrimaryColor
+import com.mlk.taskmanager.ui.theme.SecondaryColor
+import com.mlk.taskmanager.ui.theme.AccentColor
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -16,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -69,21 +75,26 @@ fun StepCounterScreen(
                     Text(
                         "Mode Step",
                         style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = TextColor
                         )
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Retour")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Retour", tint = TextColor)
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Background,
+                    titleContentColor = TextColor
+                )
             )
         }
     ) { paddingValues ->
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = Color(0xFFF8F9FA)
+            color = Background
         ) {
             Column(
                 modifier = Modifier
@@ -97,13 +108,13 @@ fun StepCounterScreen(
                         text = "Activité Quotidienne",
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1E293B)
+                            color = TextColor
                         )
                     )
                     Text(
                         text = "Suivez vos pas et votre activité",
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = Color(0xFF64748B)
+                            color = SecondaryColor
                         )
                     )
                 }
@@ -121,27 +132,34 @@ fun StepCounterScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         // En-tête de la carte
-                        Row(
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                                .padding(vertical = 4.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF121212))
                         ) {
-                            // Icône activité
-                            Box(
+                            Row(
                                 modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
-                                contentAlignment = Alignment.Center
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.DirectionsRun,
-                                    contentDescription = "Marche",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(20.dp)
-                                )
+                                // Icône activité
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(CircleShape)
+                                        .background(PrimaryColor.copy(alpha = 0.1f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.DirectionsRun,
+                                        contentDescription = "Marche",
+                                        tint = PrimaryColor,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
                             }
                         }
                         
@@ -150,7 +168,7 @@ fun StepCounterScreen(
                             text = "${uiState.steps}",
                             style = MaterialTheme.typography.displayLarge.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF1E293B)
+                                color = White
                             ),
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
@@ -171,8 +189,8 @@ fun StepCounterScreen(
                                 .fillMaxWidth()
                                 .height(8.dp)
                                 .clip(RoundedCornerShape(4.dp)),
-                            color = MaterialTheme.colorScheme.primary,
-                            trackColor = MaterialTheme.colorScheme.primary.copy(alpha =.1f)
+                            color = PrimaryColor,
+                            trackColor = PrimaryColor.copy(alpha = 0.1f)
                         )
                         
                         // Pourcentage de progression
@@ -180,7 +198,7 @@ fun StepCounterScreen(
                             text = "${(progressPercentage * 100).toInt()}%",
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.primary
+                                color = PrimaryColor
                             ),
                             modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
                         )
@@ -211,7 +229,7 @@ fun StepCounterScreen(
                                             text = DecimalFormat("#.##").format(uiState.distance / 1000),
                                             style = MaterialTheme.typography.headlineMedium.copy(
                                                 fontWeight = FontWeight.Bold,
-                                                color = Color(0xFF1E293B)
+                                                color = White
                                             )
                                         )
                                         Text(
@@ -248,7 +266,7 @@ fun StepCounterScreen(
                                             text = "$calories",
                                             style = MaterialTheme.typography.headlineMedium.copy(
                                                 fontWeight = FontWeight.Bold,
-                                                color = Color(0xFF1E293B)
+                                                color = White
                                             )
                                         )
                                         Text(
@@ -280,9 +298,9 @@ fun StepCounterScreen(
                     shape = RoundedCornerShape(24.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (uiState.isTracking) 
-                            MaterialTheme.colorScheme.error 
+                            AccentColor 
                         else 
-                            MaterialTheme.colorScheme.primary
+                            PrimaryColor
                     )
                 ) {
                     Row(
@@ -295,13 +313,15 @@ fun StepCounterScreen(
                             else 
                                 Icons.Outlined.PlayArrow,
                             contentDescription = if (uiState.isTracking) "Arrêter" else "Démarrer",
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp),
+                            tint = White
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = if (uiState.isTracking) "Arrêter" else "Démarrer",
                             style = MaterialTheme.typography.bodyLarge.copy(
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Medium,
+                                color = White
                             )
                         )
                     }
@@ -321,7 +341,8 @@ fun StepCounterScreen(
                     Text(
                         "Réinitialiser",
                         style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            color = White
                         )
                     )
                 }
@@ -331,7 +352,7 @@ fun StepCounterScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = uiState.error!!,
-                        color = MaterialTheme.colorScheme.error,
+                        color = Color(0xFFDC2626),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -340,9 +361,7 @@ fun StepCounterScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFF8F7FC)
-                    )
+                    colors = CardDefaults.elevatedCardColors(containerColor = Color(0xFF121212))
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -355,9 +374,9 @@ fun StepCounterScreen(
                                 "Détection des pas inactive",
                             style = MaterialTheme.typography.bodyMedium,
                             color = if (uiState.isTracking) 
-                                MaterialTheme.colorScheme.primary 
+                                PrimaryColor 
                             else 
-                                Color(0xFF64748B)
+                                SecondaryColor
                         )
                         Text(
                             text = if (uiState.isTracking) 
@@ -365,7 +384,7 @@ fun StepCounterScreen(
                             else 
                                 "Appuyez sur Démarrer pour activer la détection",
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFF64748B),
+                            color = SecondaryColor.copy(alpha = 0.7f),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(top = 4.dp)
                         )

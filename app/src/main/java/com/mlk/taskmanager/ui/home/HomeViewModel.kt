@@ -233,7 +233,7 @@ class HomeViewModel @Inject constructor(
                     name = name,
                     description = description,
                     icon = icon,
-                    color = 0xFF613BE7L,
+                    color = 0xFFFF8400L, // PrimaryColor
                     taskCount = 0
                 )
                 val projectId = projectRepository.insertProject(newProject)

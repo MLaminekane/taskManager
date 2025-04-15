@@ -45,7 +45,10 @@ class TasksViewModelTest {
         viewModel = TasksViewModel(
             taskRepository = taskRepository,
             locationReminderService = locationReminderService,
-            notificationManager = notificationManager
+            notificationManager = notificationManager,
+            projectRepository = TODO(),
+            calendarSyncService = TODO(),
+            settingsRepository = TODO()
         )
     }
     
@@ -54,6 +57,15 @@ class TasksViewModelTest {
         Dispatchers.resetMain()
     }
     
+    /**
+     * Vérifie que l'état initial du ViewModel contient:
+     * - Une liste de tâches vide
+     * - Une liste de tâches filtrées vide
+     * - L'indicateur de chargement à true
+     * 
+     * Ce test est important pour s'assurer que le ViewModel démarre 
+     * dans un état cohérent et prévisible.
+     */
     @Test
     fun `initial state should have empty tasks and isLoading true`() = runTest {
         // When initialized in setup()
@@ -65,6 +77,15 @@ class TasksViewModelTest {
         assertThat(initialState.isLoading).isTrue()
     }
     
+    /**
+     * Vérifie que l'état UI du ViewModel est correctement mis à jour
+     * lorsque des tâches sont chargées depuis le repository.
+     * 
+     * Le test confirme que:
+     * - Les tâches sont correctement stockées dans l'état
+     * - Les tâches filtrées sont identiques aux tâches non filtrées initialement
+     * - L'indicateur de chargement passe à false une fois les données chargées
+     */
     @Test
     fun `uiState should reflect loaded tasks`() = runTest {
         // Given
@@ -95,6 +116,15 @@ class TasksViewModelTest {
         assertThat(state.isLoading).isFalse()
     }
     
+    /**
+     * Vérifie que la méthode addTask:
+     * - Crée une tâche avec les paramètres fournis
+     * - Appelle le repository pour insérer la tâche
+     * - Programme des notifications pour la nouvelle tâche
+     * 
+     * Le test utilise des capteurs d'arguments pour vérifier les propriétés
+     * exactes des objets transmis aux collaborateurs.
+     */
     @Test
     fun `addTask should call repository and notificationManager`() = runTest {
         // Given
@@ -136,6 +166,14 @@ class TasksViewModelTest {
         assertThat(taskWithIdCaptor.firstValue.id).isEqualTo(taskId)
     }
     
+    /**
+     * Vérifie que la méthode toggleTaskCompletion:
+     * - Bascule correctement l'état d'achèvement d'une tâche (de false à true)
+     * - Appelle le repository pour mettre à jour la tâche avec le nouvel état
+     * 
+     * Ce test est important pour confirmer la fonctionnalité de marquage
+     * des tâches comme complétées.
+     */
     @Test
     fun `toggleTaskCompletion should update task completion status`() = runTest {
         // Given
@@ -160,6 +198,13 @@ class TasksViewModelTest {
         assertThat(updatedTask.isCompleted).isTrue()
     }
     
+    /**
+     * Vérifie que la méthode deleteTask:
+     * - Appelle correctement le repository pour supprimer la tâche spécifiée
+     * 
+     * Ce test simple confirme que la délégation au repository fonctionne
+     * correctement lors de la suppression d'une tâche.
+     */
     @Test
     fun `deleteTask should call repository`() = runTest {
         // Given
@@ -178,6 +223,14 @@ class TasksViewModelTest {
         verify(taskRepository).deleteTask(task)
     }
     
+    /**
+     * Vérifie que la méthode setSearchQuery:
+     * - Met à jour la requête de recherche dans l'état UI
+     * - Filtre correctement les tâches en fonction du texte recherché
+     * - Trouve les correspondances à la fois dans le titre et la description
+     * 
+     * Ce test confirme que la fonctionnalité de recherche fonctionne comme prévu.
+     */
     @Test
     fun `setSearchQuery should filter tasks`() = runTest {
         // Given
@@ -221,6 +274,14 @@ class TasksViewModelTest {
         }
     }
     
+    /**
+     * Vérifie que la méthode togglePriorityFilter:
+     * - Ajoute ou supprime des priorités de la liste des filtres sélectionnés
+     * - Met à jour correctement la liste des tâches filtrées en conséquence
+     * 
+     * Ce test montre que le filtrage par priorité fonctionne correctement quand
+     * on bascule l'état d'un filtre.
+     */
     @Test
     fun `togglePriorityFilter should update filtered tasks`() = runTest {
         // Given
@@ -264,6 +325,15 @@ class TasksViewModelTest {
         }
     }
     
+    /**
+     * Vérifie que la méthode setSortOption:
+     * - Change l'option de tri dans l'état UI
+     * - Réorganise correctement les tâches selon le critère de tri sélectionné
+     * 
+     * Ce test confirme que:
+     * - Le tri par date (défaut) fonctionne correctement
+     * - Le changement vers un tri par titre fonctionne également
+     */
     @Test
     fun `setSortOption should sort filtered tasks`() = runTest {
         // Given - tasks avec dates différentes
@@ -309,6 +379,15 @@ class TasksViewModelTest {
             .containsExactly("C Task", "B Task", "A Task").inOrder()
     }
     
+    /**
+     * Vérifie que la méthode toggleShowCompletedTasks:
+     * - Bascule l'état de visibilité des tâches complétées
+     * - Filtre correctement la liste des tâches pour inclure ou exclure
+     *   les tâches complétées selon l'état du filtre
+     * 
+     * Ce test est crucial pour valider le bon fonctionnement du filtre
+     * d'affichage ou de masquage des tâches terminées.
+     */
     @Test
     fun `toggleShowCompletedTasks should update filtered tasks`() = runTest {
         // Given

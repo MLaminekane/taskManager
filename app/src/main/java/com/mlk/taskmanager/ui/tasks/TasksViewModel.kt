@@ -12,10 +12,8 @@ import com.mlk.taskmanager.service.CalendarSyncService
 import com.mlk.taskmanager.service.LocationReminderService
 import com.mlk.taskmanager.service.NotificationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import okhttp3.internal.notify
 import java.time.LocalDateTime
 import javax.inject.Inject
 

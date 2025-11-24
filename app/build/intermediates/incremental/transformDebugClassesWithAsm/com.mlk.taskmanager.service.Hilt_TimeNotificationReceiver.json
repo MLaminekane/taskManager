@@ -1,1 +1,0 @@
-{"className":"com.mlk.taskmanager.service.Hilt_TimeNotificationReceiver","classAnnotations":["dagger.hilt.android.internal.OnReceiveBytecodeInjectionMarker"],"interfaces":[],"superClasses":["android.content.BroadcastReceiver","java.lang.Object"]}

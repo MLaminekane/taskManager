@@ -4,7 +4,10 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.mlk.taskmanager.data.model.Priority
 import com.mlk.taskmanager.data.model.Task
+import com.mlk.taskmanager.data.repository.ProjectRepository
+import com.mlk.taskmanager.data.repository.SettingsRepository
 import com.mlk.taskmanager.data.repository.TaskRepository
+import com.mlk.taskmanager.service.CalendarSyncService
 import com.mlk.taskmanager.service.LocationReminderService
 import com.mlk.taskmanager.service.NotificationManager
 import kotlinx.coroutines.Dispatchers
@@ -25,8 +28,11 @@ import java.time.LocalDateTime
 class TasksViewModelTest {
     
     private lateinit var taskRepository: TaskRepository
+    private lateinit var projectRepository: ProjectRepository
     private lateinit var locationReminderService: LocationReminderService
     private lateinit var notificationManager: NotificationManager
+    private lateinit var calendarSyncService: CalendarSyncService
+    private lateinit var settingsRepository: SettingsRepository
     private lateinit var viewModel: TasksViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
     
@@ -39,16 +45,19 @@ class TasksViewModelTest {
         taskRepository = mock {
             on { getAllTasks() } doReturn tasksFlow
         }
+        projectRepository = mock()
         locationReminderService = mock()
         notificationManager = mock()
+        calendarSyncService = mock()
+        settingsRepository = mock()
         
         viewModel = TasksViewModel(
             taskRepository = taskRepository,
+            projectRepository = projectRepository,
             locationReminderService = locationReminderService,
             notificationManager = notificationManager,
-            projectRepository = TODO(),
-            calendarSyncService = TODO(),
-            settingsRepository = TODO()
+            calendarSyncService = calendarSyncService,
+            settingsRepository = settingsRepository
         )
     }
     

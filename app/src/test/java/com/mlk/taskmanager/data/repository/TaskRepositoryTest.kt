@@ -97,7 +97,7 @@ class TaskRepositoryTest {
         taskRepository.insertTask(task)
         
         // Then
-        verify(projectRepository).incrementTaskCount(projectId.toInt())
+        verify(projectRepository).incrementTaskCount(projectId)
     }
     
     @Test
@@ -158,8 +158,8 @@ class TaskRepositoryTest {
         taskRepository.updateTask(updatedTask)
         
         // Then
-        verify(projectRepository).decrementTaskCount(oldProjectId.toInt())
-        verify(projectRepository).incrementTaskCount(newProjectId.toInt())
+        verify(projectRepository).decrementTaskCount(oldProjectId)
+        verify(projectRepository).incrementTaskCount(newProjectId)
     }
     
     @Test
@@ -197,7 +197,7 @@ class TaskRepositoryTest {
         taskRepository.deleteTask(task)
         
         // Then
-        verify(projectRepository).decrementTaskCount(projectId.toInt())
+        verify(projectRepository).decrementTaskCount(projectId)
     }
     
     @Test

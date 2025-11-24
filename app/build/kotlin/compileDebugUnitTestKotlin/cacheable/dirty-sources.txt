@@ -1,5 +1,0 @@
-/Users/lamine/Projects/taskManager/app/src/test/java/com/mlk/taskmanager/service/NotificationManagerTest.kt
-/Users/lamine/Projects/taskManager/app/src/test/java/com/mlk/taskmanager/data/dao/TaskDaoTest.kt
-/Users/lamine/Projects/taskManager/app/src/test/java/com/mlk/taskmanager/data/repository/TaskRepositoryTest.kt
-/Users/lamine/Projects/taskManager/app/src/test/java/com/mlk/taskmanager/ExampleUnitTest.kt
-/Users/lamine/Projects/taskManager/app/src/test/java/com/mlk/taskmanager/ui/tasks/TasksViewModelTest.kt
